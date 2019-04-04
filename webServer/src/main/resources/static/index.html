@@ -2,9 +2,28 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>connection db</title>
+<script src="http://code.jquery.com/jquery-1.8.0.min.js"></script>
 </head>
 <body>
+
+<div>
+	<button onClick="doConnect()">新建连接</button>
+</div>
+	
+<script>
+	//连接
+	function doConnect(){
+		console.log('try connect.');
+		$.ajax({
+			url: '/newcon/create',
+			type: 'post',
+			success: function(data){
+				console.log(data);
+			}
+		});
+	}
+</script>	
 
 </body>
 </html>
