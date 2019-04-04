@@ -7,7 +7,7 @@ package com.github.jayuc.dbclient.entity;
  *
  */
 public enum DbType {
-	Orale("oracle"),
+	Oracle("oracle"),
 	Mysql("mysql"),
 	Redis("redis");
 	

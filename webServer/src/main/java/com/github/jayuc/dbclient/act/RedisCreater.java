@@ -2,6 +2,7 @@ package com.github.jayuc.dbclient.act;
 
 import org.springframework.stereotype.Component;
 
+import com.github.jayuc.dbclient.entity.DbPool;
 import com.github.jayuc.dbclient.iter.IDbConfig;
 import com.github.jayuc.dbclient.iter.IDbCreate;
 import com.github.jayuc.dbclient.iter.IDbPool;
@@ -16,7 +17,7 @@ public class RedisCreater implements IDbCreate {
 
 	@Override
 	public IDbPool create(IDbConfig config) {
-		return null;
+		return new DbPool();
 	}
 
 }
