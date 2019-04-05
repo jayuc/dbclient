@@ -1,6 +1,6 @@
 package com.github.jayuc.dbclient.err;
 
-public class PoolException extends RuntimeException {
+public class PoolException extends Exception {
 
 	/**
 	 * 
