@@ -7,6 +7,7 @@ import com.github.jayuc.dbclient.err.PoolException;
 import com.github.jayuc.dbclient.iter.IDBPoolsManager;
 import com.github.jayuc.dbclient.iter.IDbConfig;
 import com.github.jayuc.dbclient.iter.IDbPool;
+import com.github.jayuc.dbclient.utils.IdUtils;
 
 /**
  * 抽象数据库连接池管理类
@@ -24,7 +25,14 @@ public abstract class AbstractDBPoolsManager implements IDBPoolsManager {
 
 	@Override
 	public boolean setDbPool(IDbConfig config) throws PoolException {
-		return false;
+		String id = IdUtils.generateId();
+		IDbPool pool = createPool(config);
+		if(null == pool) {
+			throw new PoolException("pool为空");
+		}else {
+			reposity.put(id, pool);
+			return true;
+		}
 	}
 
 	@Override

@@ -20,4 +20,5 @@ public enum DbType {
 	public String getName() {
 		return name;
 	}
+	
 }

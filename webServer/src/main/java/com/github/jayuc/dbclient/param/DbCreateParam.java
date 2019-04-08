@@ -10,7 +10,7 @@ public class DbCreateParam implements IDbConfig {
 	
 	private DbType type;
 	
-	private String url;
+	private String host;
 	
 	private String port;
 	

@@ -36,7 +36,6 @@ public class NewConnectionController {
 			e.printStackTrace();
 		}
 		
-		
 		return map;
 	}
 	
