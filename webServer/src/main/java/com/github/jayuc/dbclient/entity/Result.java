@@ -10,12 +10,14 @@ import java.util.Map;
  * {
  * 		status: 'success',   //此次请求的状态 可选值 success,error
  * 		errorInfo: '',       //请求出错说明
+ * 		attributes: { 		 //附加属性(扩展属性)
+ * 			...
+ * 		},
  * 		result: {            //请求结果对象
  * 			rows: [],		 //请求结果
  * 			total: 1  		 //结果数量
  * 			...				 //可包括其他扩展属性
  * 		}  
- * 		...					 //可包括其他扩展属性
  * }
  * @author yujie
  *
@@ -36,7 +38,7 @@ public final class Result {
 			map.put("result", result);
 		}
 		map.put("status", ResultStatus.success);
-		map.put("attribute", properties);
+		map.put("attributes", properties);
 		map.put("errorInfo", "");
 	}
 	

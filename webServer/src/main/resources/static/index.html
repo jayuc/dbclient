@@ -29,9 +29,9 @@
 			data: param,
 			type: 'post',
 			success: function(data){
-				console.log(data.attribute.token);
-				if(data.attribute.token){
-					cache.token = data.attribute.token;
+				console.log(data.attributes.token);
+				if(data.attributes.token){
+					cache.token = data.attributes.token;
 				}
 				console.log(data);
 			}

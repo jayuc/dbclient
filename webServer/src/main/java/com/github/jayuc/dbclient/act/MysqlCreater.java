@@ -1,6 +1,5 @@
 package com.github.jayuc.dbclient.act;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 
 import org.slf4j.Logger;
@@ -8,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import com.github.jayuc.dbclient.config.DruidDataSourceConfig;
 import com.github.jayuc.dbclient.entity.DbPool;
 import com.github.jayuc.dbclient.err.PoolException;
 import com.github.jayuc.dbclient.iter.IDbConfig;
@@ -34,8 +34,8 @@ public class MysqlCreater implements IDbCreate {
 		DbPool pool = new DbPool();
 		pool.setType(config.getType());
 		DruidDataSource ds = new DruidDataSource();
-		ds.setMaxWait(6000);
-		ds.setTestOnReturn(false);
+		ds.setMaxWait(DruidDataSourceConfig.MAX_WAIT_TIME);
+		ds.setRemoveAbandonedTimeoutMillis(DruidDataSourceConfig.REMOVE_ABANDONED_TIMEOUT_MILLIS);
 		ds.setDriverClassName(driver);
 		ds.setUrl(getUrl(config));
 		ds.setUsername(config.getUserName());
@@ -43,7 +43,8 @@ public class MysqlCreater implements IDbCreate {
 		try {
 			trySql(ds);
 		} catch (SQLException e) {
-			throw new PoolException("数据路连接失败了");
+			ds.close();
+			throw new PoolException("数据库连接失败了");
 		}
 		pool.setPool(ds);
 		log.debug("mysql create end");
