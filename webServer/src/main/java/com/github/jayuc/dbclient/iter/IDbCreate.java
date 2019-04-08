@@ -1,5 +1,7 @@
 package com.github.jayuc.dbclient.iter;
 
+import com.github.jayuc.dbclient.err.PoolException;
+
 public interface IDbCreate {
 	
 	/**
@@ -7,6 +9,6 @@ public interface IDbCreate {
 	 * @param config 配置参数
 	 * @return
 	 */
-	IDbPool create(IDbConfig config);
+	IDbPool create(IDbConfig config) throws PoolException;
 
 }

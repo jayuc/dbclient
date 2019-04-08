@@ -7,5 +7,7 @@ public interface IDbPool {
 	DbType getType();
 	
 	Object getPool();
+	
+	String getToken();
 
 }

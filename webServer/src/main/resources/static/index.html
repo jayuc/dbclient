@@ -14,14 +14,25 @@
 <script>
 	//根路径
 	const restRoot = ''; //必须要设计成一个变量
+	//缓存
+	var cache = {
+			
+	};
+	var param = {type: 'Mysql', host: '192.168.10.8', port: '33061', name: 'mysql', 
+			userName: 'root', password: '123456'};
 	//连接
 	function doConnect(){
 		console.log('try connect.');
+		$.extend(param, cache);
 		$.ajax({
 			url: restRoot + '/newcon/create',
-			data: {type: 'Mysql'},
+			data: param,
 			type: 'post',
 			success: function(data){
+				console.log(data.attribute.token);
+				if(data.attribute.token){
+					cache.token = data.attribute.token;
+				}
 				console.log(data);
 			}
 		});

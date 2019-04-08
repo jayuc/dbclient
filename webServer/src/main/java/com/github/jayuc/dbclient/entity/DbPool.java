@@ -10,5 +10,7 @@ public class DbPool implements IDbPool {
 	private DbType type;
 	
 	private Object pool;
+	
+	private String token;
 
 }

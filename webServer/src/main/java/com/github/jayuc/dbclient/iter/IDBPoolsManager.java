@@ -11,7 +11,8 @@ public interface IDBPoolsManager {
 
 	IDbPool getDbPool(String token) throws PoolException;
 	
-	boolean setDbPool(IDbConfig config) throws PoolException;
+	//返回token
+	String setDbPool(IDbConfig config) throws PoolException;
 	
 	boolean removeDbPool(String token) throws PoolException;
 	

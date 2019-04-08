@@ -4,8 +4,10 @@ import com.github.jayuc.dbclient.entity.DbType;
 import com.github.jayuc.dbclient.iter.IDbConfig;
 
 import lombok.Data;
+import lombok.ToString;
 
 @Data
+@ToString
 public class DbCreateParam implements IDbConfig {
 	
 	private DbType type;
@@ -18,6 +20,8 @@ public class DbCreateParam implements IDbConfig {
 	
 	private String userName;
 	
-	private String passWord;
+	private String password;
+	
+	private String token;
 
 }

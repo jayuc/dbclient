@@ -29,6 +29,17 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 		
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-logging</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>mysql</groupId>
+	    	<artifactId>mysql-connector-java</artifactId>
+	    	<version>5.1.47</version>
+		</dependency>
+		
 		<!-- 热部署插件 -->
 		<dependency>
 	        <groupId>org.springframework.boot</groupId>

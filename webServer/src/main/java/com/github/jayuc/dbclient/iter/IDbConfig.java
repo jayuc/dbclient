@@ -14,6 +14,8 @@ public interface IDbConfig {
 	
 	String getUserName();
 	
-	String getPassWord();
+	String getPassword();
+	
+	String getToken();
 
 }
