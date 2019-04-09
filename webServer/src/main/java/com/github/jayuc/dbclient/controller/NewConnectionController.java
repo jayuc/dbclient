@@ -40,7 +40,11 @@ public class NewConnectionController {
 		
 		try {
 			String token = dbPoolManager.setDbPool(param);
-			map.setProperty("token", token);
+			if("token已经存在".equals(token)) {
+				map.setProperty("tip", token);
+			}else {
+				map.setProperty("token", token);
+			}
 		} catch (PoolException e) {
 			map.setError(e.getMessage());
 			log.error(e.getMessage() + param);

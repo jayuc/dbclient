@@ -14,16 +14,15 @@
 <script>
 	//根路径
 	const restRoot = ''; //必须要设计成一个变量
-	//缓存
-	var cache = {
-			
-	};
-	var param = {type: 'Mysql', host: '192.168.10.8', port: '33061', name: 'mysql', 
+	//cookie名
+	const cookieName = '_tokensu';
+	var param = {type: 'Mysql', host: '192.168.10.8', port: '3306', name: 'mysql', 
 			userName: 'root', password: '123456'};
 	//连接
 	function doConnect(){
 		console.log('try connect.');
-		$.extend(param, cache);
+		param.token = getCookie(cookieName);
+		console.log(param);
 		$.ajax({
 			url: restRoot + '/newcon/create',
 			data: param,
@@ -31,12 +30,34 @@
 			success: function(data){
 				console.log(data.attributes.token);
 				if(data.attributes.token){
-					cache.token = data.attributes.token;
+					setCookie(cookieName, data.attributes.token, 1000);
 				}
 				console.log(data);
 			}
 		});
 	}
+	//设置cookie
+	function setCookie(cname, cvalue, exdays) {
+        var d = new Date();
+        d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+        var expires = "expires=" + d.toUTCString();
+     	document.cookie = cname + "=" + cvalue + "; " + expires+"; path=/";  //这个很重要代表在那个层级下可以访问cookie
+    }
+    //获取cookie
+    function getCookie(cname) {
+        var name = cname + "=";
+        var ca = document.cookie.split(';');
+        for(var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while(c.charAt(0) == ' ') c = c.substring(1);
+            if(c.indexOf(name) != -1) return c.substring(name.length, c.length);
+        }
+        return null;
+    }
+    //删除 cookie
+    function clearCookie(name) {
+        setCookie(name, "", -1);
+    }
 </script>	
 
 </body>

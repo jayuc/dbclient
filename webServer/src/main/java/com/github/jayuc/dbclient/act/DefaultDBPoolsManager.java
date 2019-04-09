@@ -51,12 +51,6 @@ public class DefaultDBPoolsManager extends AbstractDBPoolsManager {
 		return pool;
 	}
 	
-	private String getUrlId(IDbConfig config) {
-		String host = config.getHost().replace(".", "_");
-		return config.getType().getName() + "_" + host + "_" + config.getPort() + "_" +
-				config.getName() + "_" + config.getUserName();
-	}
-	
 	//检查参数
 	private void checkParam(IDbConfig config) throws PoolException {
 		log.debug("开始检查参数");
