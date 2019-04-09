@@ -39,6 +39,12 @@
 	    	<artifactId>mysql-connector-java</artifactId>
 		</dependency>
 		
+		<dependency>
+			<groupId>com.alibaba</groupId>
+	    	<artifactId>fastjson</artifactId>
+	    	<version>1.2.7</version>
+		</dependency>
+		
 		<!-- 热部署插件 -->
 		<dependency>
 	        <groupId>org.springframework.boot</groupId>

@@ -33,7 +33,7 @@ public final class Result {
 	public Result(boolean normal) {
 		if(normal) {
 			result = new HashMap<String, Object>();
-			result.put("total", 1);
+			result.put("total", 0);
 			result.put("rows", new ArrayList<Object>());
 			map.put("result", result);
 		}

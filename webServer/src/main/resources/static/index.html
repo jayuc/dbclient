@@ -10,18 +10,26 @@
 <div>
 	<button onClick="doConnect()">新建连接</button>
 </div>
+<div style="height: 30px;"></div>
+<div>
+	<button onClick="doQuery()">查询数据</button>
+</div>
 	
 <script>
 	//根路径
 	const restRoot = ''; //必须要设计成一个变量
 	//cookie名
 	const cookieName = '_tokensu';
+	//缓存
+	const cache = {
+		token: getCookie(cookieName)
+	};
 	var param = {type: 'Mysql', host: '192.168.10.8', port: '3306', name: 'mysql', 
 			userName: 'root', password: '123456'};
 	//连接
 	function doConnect(){
 		console.log('try connect.');
-		param.token = getCookie(cookieName);
+		$.extend(param, cache);
 		console.log(param);
 		$.ajax({
 			url: restRoot + '/newcon/create',
@@ -29,9 +37,30 @@
 			type: 'post',
 			success: function(data){
 				console.log(data.attributes.token);
-				if(data.attributes.token){
+				if(data.attributes.token && !cache.token){
+					console.log('设置cookie');
 					setCookie(cookieName, data.attributes.token, 1000);
 				}
+				var dbId = data.attributes.dbId;
+				if(dbId && !cache.dbId){
+					console.log('设置dbId');
+					cache.dbId = dbId;
+				}
+				console.log(data);
+			}
+		});
+	}
+	//查询
+	function doQuery(){
+		var param = {
+			sql: 'select * from bill'	
+		};
+		$.extend(param, cache);
+		console.log(param);
+		$.ajax({
+			url: restRoot + '/data/query',
+			data: param,
+			success: function(data){
 				console.log(data);
 			}
 		});

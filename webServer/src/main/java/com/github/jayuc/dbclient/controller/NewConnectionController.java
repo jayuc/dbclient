@@ -39,12 +39,10 @@ public class NewConnectionController {
 		Result map = ResultUtils.simpleResult();
 		
 		try {
-			String token = dbPoolManager.setDbPool(param);
-			if("token已经存在".equals(token)) {
-				map.setProperty("tip", token);
-			}else {
-				map.setProperty("token", token);
-			}
+			Map<String, Object> returnMap = dbPoolManager.setDbPool(param);
+			trySetProperty(returnMap, map, "tip");
+			trySetProperty(returnMap, map, "token");
+			trySetProperty(returnMap, map, "dbId");
 		} catch (PoolException e) {
 			map.setError(e.getMessage());
 			log.error(e.getMessage() + param);
@@ -54,6 +52,19 @@ public class NewConnectionController {
 		log.debug("请求结束并返回结果");
 		
 		return map.getResult();
+	}
+	
+	/**
+	 * 设置返回结果，
+	 * 如果returnMap包含名为name的属性，则把名为name的值插入map
+	 * @param returnMap
+	 * @param map
+	 * @param name
+	 */
+	private void trySetProperty(Map<String, Object> returnMap, Result map, String name) {
+		if(returnMap.containsKey(name)) {
+			map.setProperty(name, returnMap.get(name));
+		}
 	}
 	
 }

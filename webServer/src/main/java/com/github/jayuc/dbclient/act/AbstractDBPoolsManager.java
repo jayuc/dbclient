@@ -1,5 +1,6 @@
 package com.github.jayuc.dbclient.act;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -11,6 +12,7 @@ import com.github.jayuc.dbclient.iter.IDBPoolsManager;
 import com.github.jayuc.dbclient.iter.IDbConfig;
 import com.github.jayuc.dbclient.iter.IDbPool;
 import com.github.jayuc.dbclient.utils.IdUtils;
+import com.github.jayuc.dbclient.utils.StringUtil;
 
 /**
  * 抽象数据库连接池管理类
@@ -26,18 +28,26 @@ public abstract class AbstractDBPoolsManager implements IDBPoolsManager {
 	@Override
 	public IDbPool getDbPool(String token) throws PoolException {
 		log.debug("获取pool,id为: " + token);
+		if(StringUtil.isBlank(token)) {
+			throw new PoolException("token或dbId为空");
+		}
 		return reposity.get(token);
 	}
 
 	@Override
-	public String setDbPool(IDbConfig config) throws PoolException {
+	public Map<String, Object> setDbPool(IDbConfig config) throws PoolException {
 		String token = config.getToken();
 		String urlId = getUrlId(config);
-		if(null != token && reposity.containsKey(token + urlId)) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		String id = token;
+		if(null == token) {
+			id = IdUtils.generateId();
+			map.put("token", id);
+		}else if(reposity.containsKey(token + urlId)) {
 			log.debug("token已经存在: " + token);
-			return "token已经存在";
+			map.put("tip", "token已存在");
+			return map;
 		}
-		String id = (null == token) ? IdUtils.generateId() : token;
 		IDbPool pool = createPool(config);
 		log.debug(id + " ----- " + pool);
 		if(null == pool) {
@@ -48,7 +58,8 @@ public abstract class AbstractDBPoolsManager implements IDBPoolsManager {
 				log.debug("向reposity中添加id为 " + key);
 				reposity.put(key, pool);
 			}
-			return id;
+			map.put("dbId", urlId);
+			return map;
 		}
 	}
 
