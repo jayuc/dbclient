@@ -62,6 +62,12 @@ public final class Result {
 			result.put("rows", rows);
 		}
 	}
+	
+	public void setResultProperty(String key, Object value) {
+		if(null != result) {
+			result.put(key, value);
+		}
+	}
 
 	public void setStatus(ResultStatus status) {
 		map.put("status", status);

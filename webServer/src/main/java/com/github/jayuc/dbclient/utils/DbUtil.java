@@ -7,7 +7,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,69 +30,42 @@ public class DbUtil {
 	/**
 	 * 执行无查询结果的查询,
 	 * 比如：update,delete,简单insert都可以用此方法
+	 * @throws SQLException 
 	 */
-	public static void executeSql(Connection conn, String sql){
+	public static void executeSql(Connection conn, String sql) throws SQLException{
 		if(null == conn) {
-			return;
+			throw new SQLException("connection连接为空");
 		}
  	    Statement  stmt = null;   
- 		try {
- 			stmt = conn.createStatement();
- 			stmt.execute(sql);
- 			stmt.close();
- 			conn.close();
- 		} catch (SQLException e) {
- 			e.printStackTrace();
- 		}finally{
- 			try {
- 				if(stmt!=null){
- 					stmt.close();//出现异常关闭链接
- 				}
- 				if(conn!=null){
- 					conn.close();
- 				}
- 			} catch (SQLException e) {
- 				e.printStackTrace();
- 			}
- 		}
+ 	    stmt = conn.createStatement();
+		stmt.execute(sql);
+		stmt.close();
+		conn.close();
 	}
 	
-    /** 
+    /**
+     * @throws SQLException  
      * @Title: insertDataHasRet 
      * @Description: 插入数据
      * @param @param sql    设定文件 
      * @return void    返回类型 
      * @throws 
      */
-     public static int insertDataHasRet(Connection conn, String sql){
+     public static int insertDataHasRet(Connection conn, String sql) throws SQLException{
     	if(null == conn) {
- 			return 0;
+    		throw new SQLException("connection连接为空");
  		}
      	PreparedStatement  preparedStatement = null;   
  	    int retVal=0;
- 		try {
- 			preparedStatement = conn.prepareStatement(sql);
- 			retVal=	preparedStatement.executeUpdate();
- 			preparedStatement.close();
- 			conn.close();
- 		} catch (SQLException e) {
- 			e.printStackTrace();
- 		}finally{
- 			try {
- 				if(preparedStatement!=null){
- 					preparedStatement.close();//出现异常关闭链接
- 				}
- 				if(conn!=null){
- 					conn.close();
- 				}
- 			} catch (SQLException e) {
- 				e.printStackTrace();
- 			}
- 		}
+ 	    preparedStatement = conn.prepareStatement(sql);
+		retVal=	preparedStatement.executeUpdate();
+		preparedStatement.close();
+		conn.close();
 		return retVal;
      }
      
-   /** 
+   /**
+ * @throws SQLException  
     * @Title: executeBatchArryData 
     * @Description: 根据出入的数组信息批量插入数据
     * @param @param sql
@@ -98,79 +73,49 @@ public class DbUtil {
     * @return void    返回类型 
     * @throws 
     */
-    public static void executeBatchArryData(Connection conn, String sql,Object[]...params){
+    public static void executeBatchArryData(Connection conn, String sql,Object[]...params) throws SQLException{
 		if(null == conn) {
-			return;
+			throw new SQLException("connection连接为空");
 		}
     	int  size  = params[0].length;
      	PreparedStatement  stmt = null;   
- 		try {
- 			stmt = conn.prepareStatement(sql);
- 			//提交数据条数
- 			for(int s =0;s<size;s++){
- 		        //需要传参数??
- 				for(int i=0;i<params.length;i++){
- 					Object[]   temp = (Object[]) params[i][s];
- 					stmt.setObject(i+1, temp[0],(int)temp[1]);
- 				}
- 				stmt.addBatch();
- 			}
- 			stmt.executeBatch();
- 			stmt.close();
- 			conn.close();
- 		} catch (SQLException e) {
- 			e.printStackTrace();
- 		}finally{
- 			try {
- 				if(stmt!=null){
- 					stmt.close();//出现异常关闭链接
- 				}
- 				if(conn!=null){
- 					conn.close();
- 				}
- 			} catch (SQLException e) {
- 				e.printStackTrace();
- 			}
- 		}
+     	stmt = conn.prepareStatement(sql);
+		//提交数据条数
+		for(int s =0;s<size;s++){
+	        //需要传参数??
+			for(int i=0;i<params.length;i++){
+				Object[]   temp = (Object[]) params[i][s];
+				stmt.setObject(i+1, temp[0],(int)temp[1]);
+			}
+			stmt.addBatch();
+		}
+		stmt.executeBatch();
+		stmt.close();
+		conn.close();
      }
     
-    /** 
+    /**
+     * @throws SQLException  
      * @Title: insertData 
      * @Description: 插入数据
      * @param @param sql    设定文件 
      * @return void    返回类型 
      * @throws 
      */
-     public static void executeBatchData(Connection conn, List<String> sqls){
+     public static void executeBatchData(Connection conn, List<String> sqls) throws SQLException{
  		if(null == conn) {
-			return;
+ 			throw new SQLException("connection连接为空");
 		}
  	    Statement  stmt = null;   
- 		try {
- 			conn.setAutoCommit(false);
- 			stmt = conn.createStatement();
- 			for(String  sql:sqls){
- 				stmt.addBatch(sql);
- 			}
- 			stmt.executeBatch();
- 			conn.commit();
- 			stmt.close();
- 			conn.close();
- 		} catch (SQLException e) {
- 			e.printStackTrace();
- 		}finally{
- 			try {
- 				if(stmt!=null){
- 					stmt.close();//出现异常关闭链接
- 				}
- 				if(conn!=null){
- 					conn.close();
- 				}
- 			} catch (SQLException e) {
- 				log.error(Thread.currentThread().getName() + "->" + e.getCause().getMessage());
- 				e.printStackTrace();
- 			}
- 		}
+		conn.setAutoCommit(false);
+		stmt = conn.createStatement();
+		for(String  sql:sqls){
+			stmt.addBatch(sql);
+		}
+		stmt.executeBatch();
+		conn.commit();
+		stmt.close();
+		conn.close();
      }
      
    /**
@@ -207,6 +152,37 @@ public class DbUtil {
 		return list;
     } 
     
+    /**
+     * 获取的结果是map
+     * 结构是{
+     * rows: 结果,
+     * headers: 头部结果
+     * }
+     */
+    public static Map<String, Object> queryJSONMap(Connection conn, String sql) throws SQLException{
+		if(null == conn) {
+			throw new SQLException("connection连接为空");
+		}
+    	JSONArray  list =null;
+	    Statement  stmt = null;   
+	    ResultSet  rs = null; //表示接收数据库的查询结果
+	    stmt = conn.createStatement();
+		rs = stmt.executeQuery(sql);
+		Map<String, Object> map = createJSONArrayMap(rs);
+		rs.close();
+		stmt.close();
+		conn.close();
+		if(rs!=null){
+			rs.close(); //出现异常关闭链接
+		}
+		if(stmt!=null){
+			stmt.close();//出现异常关闭链接
+		}
+		if(conn!=null){
+			conn.close();
+		}
+		return map;
+    }
 
     /**
      * @throws SQLException  
@@ -235,8 +211,37 @@ public class DbUtil {
 		}
 		return list;
 	}
+    
+    private static Map<String, Object> createJSONArrayMap(ResultSet rs) throws SQLException {
+    	JSONArray list  = new JSONArray();
+    	Map<String, Object> map = new HashMap<String, Object>();
+    	List<String> headers = new ArrayList<String>();
+    	int c = 1;
+		while(rs.next()){
+			JSONObject jsonObject  = new JSONObject();
+	        try{
+	            int  length = rs.getMetaData().getColumnCount();
+	            for(int i=0;i<length;i++){
+	            	String  key  = rs.getMetaData().getColumnName(i+1);
+	            	String  classType = rs.getMetaData().getColumnClassName(i+1);
+	            	jsonObject.put(key,Class.forName(classType).cast(rs.getObject(i+1)));
+	            	if(c == 1) {
+	            		headers.add(key);
+	            	}
+	            }
+	        }catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	        list.add(jsonObject);
+	        c++;
+		}
+		map.put("rows", list);
+		map.put("headers", headers);
+		return map;
+	}
 
-	/** 
+	/**
+	 * @throws SQLException  
 	* @Title: queryData 
 	* @Description: 根据传入的接口获取Object对象
 	* @param @param sql
@@ -245,39 +250,19 @@ public class DbUtil {
 	* @return List    返回类型 
 	* @throws 
 	*/
-	public static List queryData(Connection conn, String sql,Class className) {
+	public static List queryData(Connection conn, String sql,Class className) throws SQLException {
 		if(null == conn) {
-			return null;
+			throw new SQLException("connection连接为空");
 		}
 		List  list =null;
 	    Statement  stmt = null;   
 	    ResultSet  rs = null; //表示接收数据库的查询结果
-		try {
-			stmt = conn.createStatement();
-			rs = stmt.executeQuery(sql);
-			list = createList(rs,className);
-			rs.close();
-			stmt.close();
-			conn.close();
-		} catch (SQLException e) {
-			log.info("执行SQL出现异常，SQL:"+sql);
-			e.printStackTrace();
-		}finally{
-			try {
-				if(rs!=null){
-					rs.close(); //出现异常关闭链接
-				}
-				if(stmt!=null){
-					stmt.close();//出现异常关闭链接
-				}
-				if(conn!=null){
-					conn.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-			
-		}
+	    stmt = conn.createStatement();
+		rs = stmt.executeQuery(sql);
+		list = createList(rs,className);
+		rs.close();
+		stmt.close();
+		conn.close();
 		return list;
 	}
 	/**

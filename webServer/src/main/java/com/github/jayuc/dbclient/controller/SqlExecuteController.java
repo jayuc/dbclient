@@ -60,15 +60,24 @@ public class SqlExecuteController {
 				ISqlHandler handler = ac.getBean(pool.getType().getHandlerName(), ISqlHandler.class);
 				if(null != handler) {
 					try {
-						Map<String, Object> map = handler.query(pool.getPool(), param.getSql());
-						int total = 0;
-						if(null != map.get("total")) {
-							total = (int)map.get("total");
+						String upperSql = param.getSql().toUpperCase();
+						/**
+						 * sql语句分为有查询结果的和无查询结果的两种sql
+						 */
+						if(upperSql.startsWith("SELECT")) {  //sql语句分为有查询结果的比如：select语句；无查询结果的比如：delete,insert,update
+							Map<String, Object> map = handler.query(pool.getPool(), param.getSql(), param.getToken());
+							int total = 0;
+							if(null != map.get("total")) {
+								total = (int)map.get("total");
+							}
+							result.setResult(total, map.get("rows"));
+							result.setResultProperty("headers", map.get("headers"));
+						}else {  //当sql语句为 delete,insert,update
+							
 						}
-						result.setResult(total, map.get("rows"));
 					} catch (SqlHandlerException e) {
-						result.setError("执行数据库查询语句时失败了");
-						LOG.error("执行数据库查询语句失败了: " + param.getSql());
+						result.setError(e.getMessage());
+						LOG.error(e.getMessage() + ",sql: " + param.getSql());
 						e.printStackTrace();
 					}
 				}else {
