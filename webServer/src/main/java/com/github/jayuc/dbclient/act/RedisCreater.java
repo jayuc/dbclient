@@ -13,7 +13,7 @@ import com.github.jayuc.dbclient.iter.IDbPool;
  * @author jayu
  *
  */
-@Component("redis")
+@Component("redisCreater")
 public class RedisCreater implements IDbCreate {
 
 	@Override

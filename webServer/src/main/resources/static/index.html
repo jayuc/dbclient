@@ -53,12 +53,13 @@
 	//查询
 	function doQuery(){
 		var param = {
-			sql: 'select * from bill'	
+			//sql: 'select * from bill'
+			sql: 'select * from pass limit 10'
 		};
 		$.extend(param, cache);
 		console.log(param);
 		$.ajax({
-			url: restRoot + '/data/query',
+			url: restRoot + '/sql/execute',
 			data: param,
 			success: function(data){
 				console.log(data);

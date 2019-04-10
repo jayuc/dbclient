@@ -40,6 +40,7 @@ public abstract class AbstractDBPoolsManager implements IDBPoolsManager {
 		String urlId = getUrlId(config);
 		Map<String, Object> map = new HashMap<String, Object>();
 		String id = token;
+		map.put("dbId", urlId);
 		if(null == token) {
 			id = IdUtils.generateId();
 			map.put("token", id);
@@ -58,7 +59,6 @@ public abstract class AbstractDBPoolsManager implements IDBPoolsManager {
 				log.debug("向reposity中添加id为 " + key);
 				reposity.put(key, pool);
 			}
-			map.put("dbId", urlId);
 			return map;
 		}
 	}

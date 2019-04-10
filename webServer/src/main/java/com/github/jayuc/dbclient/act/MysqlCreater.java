@@ -16,7 +16,7 @@ import com.github.jayuc.dbclient.iter.IMyDataSources;
  * @author jayu
  *
  */
-@Component("mysql")
+@Component("mysqlCreater")
 public class MysqlCreater implements IDbCreate {
 	
 	private static final Logger log = LoggerFactory.getLogger(MysqlCreater.class);

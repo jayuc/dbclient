@@ -2,7 +2,6 @@ package com.github.jayuc.dbclient.entity;
 
 /**
  * 数据库类型 
- * 注意：name 和 IDbCreate 的实现bean 的名字对应
  * @author yujie
  *
  */
@@ -19,6 +18,16 @@ public enum DbType {
 	
 	public String getName() {
 		return name;
+	}
+	
+	// 和ISqlHandler对应的实现类相对应
+	public String getHandlerName() {
+		return name + "Handler";
+	}
+	
+	// 和IDbCreater对应的实现类相对应
+	public String getCreaterName() {
+		return name + "Creater";
 	}
 	
 }

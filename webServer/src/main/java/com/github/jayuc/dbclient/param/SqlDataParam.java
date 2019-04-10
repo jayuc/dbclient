@@ -10,7 +10,7 @@ import lombok.ToString;
  */
 @Data
 @ToString
-public class QueryDataParam {
+public class SqlDataParam {
 
 	//查询sql语句
 	private String sql;

@@ -173,7 +173,8 @@ public class DbUtil {
  		}
      }
      
-   /** 
+   /**
+ * @throws SQLException  
     * @Title: queryData 
     * @Description:根据传入的SQL获取JSON数据 
     * @param @param sql
@@ -181,37 +182,27 @@ public class DbUtil {
     * @return JSONArray    返回类型 
     * @throws 
     */
-    public static JSONArray queryJSONData(Connection conn, String sql){
+    public static JSONArray queryJSONData(Connection conn, String sql) throws SQLException{
 		if(null == conn) {
-			return null;
+			throw new SQLException("connection连接为空");
 		}
     	JSONArray  list =null;
 	    Statement  stmt = null;   
 	    ResultSet  rs = null; //表示接收数据库的查询结果
-		try {
-			stmt = conn.createStatement();
-			rs = stmt.executeQuery(sql);
-			list = createJSONArray(rs);
-			rs.close();
-			stmt.close();
+	    stmt = conn.createStatement();
+		rs = stmt.executeQuery(sql);
+		list = createJSONArray(rs);
+		rs.close();
+		stmt.close();
+		conn.close();
+		if(rs!=null){
+			rs.close(); //出现异常关闭链接
+		}
+		if(stmt!=null){
+			stmt.close();//出现异常关闭链接
+		}
+		if(conn!=null){
 			conn.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}finally{
-			try {
-				if(rs!=null){
-					rs.close(); //出现异常关闭链接
-				}
-				if(stmt!=null){
-					stmt.close();//出现异常关闭链接
-				}
-				if(conn!=null){
-					conn.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-			
 		}
 		return list;
     } 

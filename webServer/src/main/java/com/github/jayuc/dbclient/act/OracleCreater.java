@@ -13,7 +13,7 @@ import com.github.jayuc.dbclient.iter.IDbPool;
  * @author jayu
  *
  */
-@Component("oracle")
+@Component("oracleCreater")
 public class OracleCreater implements IDbCreate {
 
 	@Override
