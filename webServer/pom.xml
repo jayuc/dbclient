@@ -40,6 +40,12 @@
 		</dependency>
 		
 		<dependency>
+			<groupId>com.oracle</groupId>
+			<artifactId>ojdbc</artifactId>
+			<version>11.02</version>
+		</dependency>
+		
+		<dependency>
 			<groupId>com.alibaba</groupId>
 	    	<artifactId>fastjson</artifactId>
 	    	<version>1.2.7</version>

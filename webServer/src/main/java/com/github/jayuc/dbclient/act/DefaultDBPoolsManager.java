@@ -40,6 +40,7 @@ public class DefaultDBPoolsManager extends AbstractDBPoolsManager {
 		if(null == ac) {
 			throw new PoolException("applicationContext为空");
 		}
+		log.debug("type: " + config.getType().getCreaterName());
 		IDbCreate creater = ac.getBean(config.getType().getCreaterName(), IDbCreate.class);
 		if(null == creater) {
 			throw new PoolException("没有找到对应的数据库连接池创建者");

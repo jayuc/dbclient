@@ -28,8 +28,10 @@
 	const cache = {
 		token: getCookie(cookieName)
 	};
-	var param = {type: 'Mysql', host: '192.168.10.8', port: '3306', name: 'mysql', 
+	var param1 = {type: 'Mysql', host: '192.168.10.8', port: '3306', name: 'mysql', 
 			userName: 'root', password: '123456'};
+	var param = {type: 'Oracle', host: '192.168.10.228', port: '1522', name: 'orclc', 
+			userName: 'itms3', password: 'itms3'};
 	//连接
 	function doConnect(){
 		console.log('try connect.');
@@ -57,7 +59,8 @@
 	//查询
 	function doQuery(){
 		var param = {
-			sql: 'select * from bill',
+			//sql: 'select * from bill',
+			//sql: "select * from t_sys_user",
 			//sql: '    select * from pass   ',
 			//sql: 'update table pass',
 			//sql: "insert into bill (id,name,count) values('5','曹操',3400)",
@@ -68,7 +71,13 @@
 			//sql: "show tables",
 			//sql: "show databases",
 			//sql: "select database()",
-			//sql: "use mysql",
+			//sql: "use sys",
+			sql: "select * from cba",
+			//sql: "drop table cba",
+			//sql: "insert into cba(id,name,age) values('2','曹操',32)",
+			//sql: "delete from cba",
+			//sql: "update cba set age = 89 where id = '1'",
+			//sql: "create table cba(id varchar(32),name varchar(32),age int)"
 		};
 		$.extend(param, cache);
 		console.log(param);

@@ -2,6 +2,8 @@ package com.github.jayuc.dbclient.act;
 
 import org.springframework.stereotype.Component;
 
+import com.github.jayuc.dbclient.config.SqlConfig;
+
 /**
  * mysql 处理器
  * @author yujie
@@ -16,7 +18,7 @@ public class MysqlSqlHandler extends AbstractSqlHandler {
 		if(upperSql.contains("LIMIT")) {
 			return sql;
 		}
-		return "select * from (" + sql + ") AA_AA limit " + getLimit(token);
+		return "select * from (" + sql + ") " + SqlConfig.COUNT_SQL_ALIAS + " limit " + getLimit(token);
 	}
 
 }

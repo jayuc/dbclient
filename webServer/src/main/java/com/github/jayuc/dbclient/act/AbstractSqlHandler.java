@@ -160,7 +160,7 @@ public abstract class AbstractSqlHandler implements ISqlHandler {
 					LOG.error("sql: " + sql);
 					throw new SqlHandlerException(e.getMessage());
 				}
-			}else if(upperSql.startsWith("UPDATE") || upperSql.startsWith("DELETE")) {
+			}else if(upperSql.startsWith("UPDATE")) {
 				LOG.debug("----: update");
 				try {
 					int effectInt = DbUtil.update(conn, sql);
@@ -174,7 +174,22 @@ public abstract class AbstractSqlHandler implements ISqlHandler {
 					LOG.error("sql: " + sql);
 					throw new SqlHandlerException(e.getMessage());
 				}
-			}else {
+				/**
+				 * 对于没有返回结果的查询用此查询语句
+				 */
+			}else if(upperSql.startsWith("CREATE") 
+					|| upperSql.startsWith("DROP") 
+					|| upperSql.startsWith("USE") 
+					|| upperSql.startsWith("DELETE")) {
+				LOG.debug("----: create");
+				try {
+					DbUtil.execute(conn, sql);
+					map.put("status", "success");
+				} catch (SQLException e) {
+					LOG.error("sql: " + sql);
+					throw new SqlHandlerException(e.getMessage());
+				}
+			} else {
 				LOG.debug("----: other");
 				try {
 					Map<String, Object> arr = DbUtil.queryJSONMap(conn, sql);
