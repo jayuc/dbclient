@@ -1,5 +1,7 @@
 package com.github.jayuc.dbclient.param;
 
+import com.github.jayuc.dbclient.iter.IDbToken;
+
 import lombok.Data;
 import lombok.ToString;
 
@@ -10,7 +12,7 @@ import lombok.ToString;
  */
 @Data
 @ToString
-public class SqlDataParam {
+public class SqlDataParam implements IDbToken {
 
 	//查询sql语句
 	private String sql;

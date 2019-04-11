@@ -2,7 +2,7 @@ package com.github.jayuc.dbclient.iter;
 
 import com.github.jayuc.dbclient.entity.DbType;
 
-public interface IDbConfig {
+public interface IDbConfig extends IToken {
 	
 	DbType getType();
 	
@@ -15,7 +15,5 @@ public interface IDbConfig {
 	String getUserName();
 	
 	String getPassword();
-	
-	String getToken();
 
 }

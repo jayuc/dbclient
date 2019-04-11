@@ -21,7 +21,7 @@ public interface ISqlHandler {
 	
 	/**
 	 * 执行sql,一般时没有返回结果的，包括,insert,delete,update
-	 * 返回结果中包括，effect影响数量，success成功数量，fail失败数量
+	 * 返回结果中包括，total总，success成功数量，fail失败数量
 	 * 参数说明：token用户key,为了识别用户信息
 	 */
 	Map<String, Object> execute(Object pool, String sql, String token) throws SqlHandlerException;

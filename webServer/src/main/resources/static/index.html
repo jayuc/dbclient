@@ -6,13 +6,17 @@
 <script src="http://code.jquery.com/jquery-1.8.0.min.js"></script>
 </head>
 <body>
-
+<div style="height: 20px;"></div>
 <div>
 	<button onClick="doConnect()">新建连接</button>
 </div>
-<div style="height: 30px;"></div>
+<div style="height: 20px;"></div>
 <div>
 	<button onClick="doQuery()">查询数据</button>
+</div>
+<div style="height: 20px;"></div>
+<div>
+	<button onClick="doSetting()">设置</button>
 </div>
 	
 <script>
@@ -53,15 +57,40 @@
 	//查询
 	function doQuery(){
 		var param = {
-			//sql: 'select * from bill',
-			sql: 'select * from pass',
-			//sql: 'update table pass'
+			sql: 'select * from bill',
+			//sql: '    select * from pass   ',
+			//sql: 'update table pass',
+			//sql: "insert into bill (id,name,count) values('5','曹操',3400)",
+			//sql: "insert into bill (id,name,count) values('25','曹操',25);insert into bill (id,name,count) values('15','曹操',15)",
+			//sql: "update bill set count = 303 where id = '1'",
+			//sql: "delete from bill where id = '3'",
+			//sql: "desc bill",
+			//sql: "show tables",
+			//sql: "show databases",
+			//sql: "select database()",
+			//sql: "use mysql",
 		};
 		$.extend(param, cache);
 		console.log(param);
 		$.ajax({
 			url: restRoot + '/sql/execute',
 			data: param,
+			success: function(data){
+				console.log(data);
+			}
+		});
+	}
+	//设置
+	function doSetting(){
+		var param = {
+			limit: 10	
+		};
+		$.extend(param, cache);
+		console.log(param);
+		$.ajax({
+			url: restRoot + '/user/setting/doset',
+			data: param,
+			type: 'post',
 			success: function(data){
 				console.log(data);
 			}

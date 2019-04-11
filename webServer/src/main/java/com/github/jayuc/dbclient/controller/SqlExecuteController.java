@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alibaba.fastjson.JSONArray;
 import com.github.jayuc.dbclient.entity.Result;
 import com.github.jayuc.dbclient.err.PoolException;
 import com.github.jayuc.dbclient.err.SqlHandlerException;
@@ -55,17 +56,20 @@ public class SqlExecuteController {
 			e.printStackTrace();
 		}
 		if(null != pool && !StringUtil.isBlank(param.getSql())) {
+			//去掉sql空格
+			final String finalSql = param.getSql().trim();
 			ApplicationContext ac = ApplicationContextUtils.getAc();
 			if(null != ac) {
 				ISqlHandler handler = ac.getBean(pool.getType().getHandlerName(), ISqlHandler.class);
 				if(null != handler) {
 					try {
-						String upperSql = param.getSql().toUpperCase();
+						String upperSql = finalSql.toUpperCase();
 						/**
 						 * sql语句分为有查询结果的和无查询结果的两种sql
 						 */
 						if(upperSql.startsWith("SELECT")) {  //sql语句分为有查询结果的比如：select语句；无查询结果的比如：delete,insert,update
-							Map<String, Object> map = handler.query(pool.getPool(), param.getSql(), param.getToken());
+							LOG.debug("sql type: select");
+							Map<String, Object> map = handler.query(pool.getPool(), finalSql, param.getToken());
 							int total = 0;
 							if(null != map.get("total")) {
 								total = (int)map.get("total");
@@ -73,11 +77,36 @@ public class SqlExecuteController {
 							result.setResult(total, map.get("rows"));
 							result.setResultProperty("headers", map.get("headers"));
 						}else {  //当sql语句为 delete,insert,update
-							
+							LOG.debug("sql type: 非select");
+							Map<String, Object> map = handler.execute(pool.getPool(), finalSql, param.getToken());
+							LOG.info("结果: " + map);
+							Object status = map.get("status");
+							Object otype = map.get("sqlType");
+							if(null != status) {
+								LOG.info("tt:single");
+								if("success".equals(status)) {
+									result.setProperty("tip", "success");
+								}else {
+									result.setError("操作失败");
+								}
+							}else if("multi".equals(otype)) {
+								LOG.info("tt:multi");
+								result.setProperty("totalSql", map.get("totalSql"));
+								result.setProperty("effectSql", map.get("effectSql"));
+								result.setProperty("effectRows", map.get("effectRows"));
+							}else {
+								LOG.info("tt:other");
+								Object rows = map.get("rows");
+								if(null != rows) {
+									JSONArray arrs = (JSONArray) rows;
+									result.setResult(arrs.size(), map.get("rows"));
+									result.setResultProperty("headers", map.get("headers"));
+								}
+							}
 						}
 					} catch (SqlHandlerException e) {
-						result.setError(e.getMessage());
-						LOG.error(e.getMessage() + ",sql: " + param.getSql());
+						result.setError(e.getMessage() + finalSql);
+						LOG.error(e.getMessage() + ",sql: " + finalSql);
 						e.printStackTrace();
 					}
 				}else {

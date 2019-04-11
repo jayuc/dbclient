@@ -1,7 +1,10 @@
 package com.github.jayuc.dbclient.act;
 
+import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -31,6 +34,10 @@ public abstract class AbstractSqlHandler implements ISqlHandler {
 	@Override
 	public Map<String, Object> query(Object pool, String sql, String token) 
 			throws SqlHandlerException {
+		//判断是否为多语句
+		if(haveMultiSql(sql)) {
+			throw new SqlHandlerException("select语句不支持多语句同时查询");
+		}
 		IMyDataSources dataSources = (IMyDataSources) pool;
 		Map<String, Object> map = new HashMap<String, Object>();
 		Map<String, Object> list = null;
@@ -56,9 +63,14 @@ public abstract class AbstractSqlHandler implements ISqlHandler {
 					",sql: " + sql);
 			throw new SqlHandlerException(e.getMessage());
 		}
-		map.put("rows", list.get("rows"));
-		map.put("headers", list.get("headers"));
-		map.put("total", total);
+		if(null != list) {
+			map.put("rows", list.get("rows"));
+			map.put("headers", list.get("headers"));
+			map.put("total", total);
+		}else {
+			LOG.error("list: " + list);
+			throw new SqlHandlerException("未查询到结果");
+		}
 		return map;
 	}
 	
@@ -107,7 +119,92 @@ public abstract class AbstractSqlHandler implements ISqlHandler {
 	@Override
 	public Map<String, Object> execute(Object pool, String sql, String token) 
 			throws SqlHandlerException {
-		return null;
+		IMyDataSources dataSources = (IMyDataSources) pool;
+		Connection conn = null;
+		try {
+			conn = dataSources.getConnection();
+		} catch (SQLException e) {
+			LOG.error("conn: " + conn);
+			throw new SqlHandlerException(e.getMessage());
+		}
+		Map<String, Object> map = new HashMap<String, Object>();
+		
+		//判断是不是多条语句
+		if(haveMultiSql(sql)) {
+			LOG.debug("type: 多语句查询");
+			List<String> sqllist = Arrays.asList(sql.split(";"));
+			try {
+				int[] effectRows = DbUtil.executeBatchData(conn, sqllist);
+				map.put("totalSql", sqllist.size());
+				map.put("effectSql", effectRows.length);
+				map.put("effectRows", effectRows);
+				map.put("sqlType", "multi");
+			} catch (SQLException e) {
+				LOG.error("sqllist: " + sqllist);
+				throw new SqlHandlerException(e.getMessage());
+			}
+		}else {
+			LOG.debug("type: 单语句");
+			String upperSql = sql.toUpperCase();
+			if(upperSql.startsWith("INSERT")) {
+				LOG.debug("----: insert");
+				try {
+					int effectInt = DbUtil.insert(conn, sql);
+					LOG.info("effect: " + effectInt);
+					if(1 == effectInt) {
+						map.put("status", "success");
+					}else if(0 == effectInt) {
+						map.put("status", "fail");
+					}
+				} catch (SQLException e) {
+					LOG.error("sql: " + sql);
+					throw new SqlHandlerException(e.getMessage());
+				}
+			}else if(upperSql.startsWith("UPDATE") || upperSql.startsWith("DELETE")) {
+				LOG.debug("----: update");
+				try {
+					int effectInt = DbUtil.update(conn, sql);
+					LOG.info("effect: " + effectInt);
+					if(1 == effectInt) {
+						map.put("status", "success");
+					}else if(0 == effectInt) {
+						map.put("status", "fail");
+					}
+				} catch (SQLException e) {
+					LOG.error("sql: " + sql);
+					throw new SqlHandlerException(e.getMessage());
+				}
+			}else {
+				LOG.debug("----: other");
+				try {
+					Map<String, Object> arr = DbUtil.queryJSONMap(conn, sql);
+					LOG.debug("json result: " + arr);
+					if(null != arr) {
+						map.put("rows", arr.get("rows"));
+						map.put("headers", arr.get("headers"));
+					}else {
+						LOG.error("arr: " + arr);
+						throw new SqlHandlerException("未查询到结果");
+					}
+				} catch (SQLException e) {
+					e.printStackTrace();
+					LOG.error("sql: " + sql);
+					throw new SqlHandlerException(e.getMessage());
+				}
+			}
+		}
+		
+		return map;
+	}
+	
+	//判断是不是多条语句
+	private boolean haveMultiSql(String sql) {
+		boolean b = false;
+		String[] sqls = sql.split(";");
+		if(sqls.length > 1) {
+			b = true;
+		}
+		return b;
 	}
 
 }

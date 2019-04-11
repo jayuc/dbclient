@@ -29,18 +29,34 @@ public class DbUtil {
 
 	/**
 	 * 执行无查询结果的查询,
-	 * 比如：update,delete,简单insert都可以用此方法
+	 * 比如：不常用
 	 * @throws SQLException 
 	 */
-	public static void executeSql(Connection conn, String sql) throws SQLException{
+	public static boolean execute(Connection conn, String sql) throws SQLException{
 		if(null == conn) {
 			throw new SQLException("connection连接为空");
 		}
- 	    Statement  stmt = null;   
+ 	    Statement stmt = null;   
  	    stmt = conn.createStatement();
-		stmt.execute(sql);
+		boolean b = stmt.execute(sql);
 		stmt.close();
 		conn.close();
+		return b;
+	}
+	
+	/**
+	 * 更新数据 删除
+	 */
+	public static int update(Connection conn, String sql) throws SQLException{
+		if(null == conn) {
+			throw new SQLException("connection连接为空");
+		}
+ 	    Statement stmt = null;   
+ 	    stmt = conn.createStatement();
+		int re = stmt.executeUpdate(sql);
+		stmt.close();
+		conn.close();
+		return re;
 	}
 	
     /**
@@ -51,7 +67,7 @@ public class DbUtil {
      * @return void    返回类型 
      * @throws 
      */
-     public static int insertDataHasRet(Connection conn, String sql) throws SQLException{
+     public static int insert(Connection conn, String sql) throws SQLException{
     	if(null == conn) {
     		throw new SQLException("connection连接为空");
  		}
@@ -73,7 +89,7 @@ public class DbUtil {
     * @return void    返回类型 
     * @throws 
     */
-    public static void executeBatchArryData(Connection conn, String sql,Object[]...params) throws SQLException{
+    public static int[] executeBatchArryData(Connection conn, String sql,Object[]...params) throws SQLException{
 		if(null == conn) {
 			throw new SQLException("connection连接为空");
 		}
@@ -89,9 +105,10 @@ public class DbUtil {
 			}
 			stmt.addBatch();
 		}
-		stmt.executeBatch();
+		int[] re = stmt.executeBatch();
 		stmt.close();
 		conn.close();
+		return re;
      }
     
     /**
@@ -102,7 +119,7 @@ public class DbUtil {
      * @return void    返回类型 
      * @throws 
      */
-     public static void executeBatchData(Connection conn, List<String> sqls) throws SQLException{
+     public static int[] executeBatchData(Connection conn, List<String> sqls) throws SQLException{
  		if(null == conn) {
  			throw new SQLException("connection连接为空");
 		}
@@ -112,10 +129,11 @@ public class DbUtil {
 		for(String  sql:sqls){
 			stmt.addBatch(sql);
 		}
-		stmt.executeBatch();
+		int[] re = stmt.executeBatch();
 		conn.commit();
 		stmt.close();
 		conn.close();
+		return re;
      }
      
    /**
@@ -163,7 +181,6 @@ public class DbUtil {
 		if(null == conn) {
 			throw new SQLException("connection连接为空");
 		}
-    	JSONArray  list =null;
 	    Statement  stmt = null;   
 	    ResultSet  rs = null; //表示接收数据库的查询结果
 	    stmt = conn.createStatement();
