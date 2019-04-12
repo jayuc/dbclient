@@ -28,9 +28,9 @@
 	const cache = {
 		token: getCookie(cookieName)
 	};
-	var param1 = {type: 'Mysql', host: '192.168.10.8', port: '3306', name: 'mysql', 
+	var param = {type: 'Mysql', host: '192.168.10.8', port: '3306', name: 'mysql', 
 			userName: 'root', password: '123456'};
-	var param = {type: 'Oracle', host: '192.168.10.228', port: '1522', name: 'orclc', 
+	var param1 = {type: 'Oracle', host: '192.168.10.228', port: '1522', name: 'orclc', 
 			userName: 'itms3', password: 'itms3'};
 	//连接
 	function doConnect(){
@@ -70,14 +70,14 @@
 			//sql: "desc bill",
 			//sql: "show tables",
 			//sql: "show databases",
-			//sql: "select database()",
+			sql: "select database()",
 			//sql: "use sys",
-			sql: "select * from cba",
+			//sql: "select * from cba",
 			//sql: "drop table cba",
-			//sql: "insert into cba(id,name,age) values('2','曹操',32)",
+			//sql: "insert into cba(id,name,age) values('111','曹操',32)",
 			//sql: "delete from cba",
 			//sql: "update cba set age = 89 where id = '1'",
-			//sql: "create table cba(id varchar(32),name varchar(32),age int)"
+			//sql: "create table cba(id varchar(6),name varchar(12),age int)"
 		};
 		$.extend(param, cache);
 		console.log(param);

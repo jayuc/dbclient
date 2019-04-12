@@ -1,6 +1,5 @@
 package com.github.jayuc.dbclient.act;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -120,13 +119,6 @@ public abstract class AbstractSqlHandler implements ISqlHandler {
 	public Map<String, Object> execute(Object pool, String sql, String token) 
 			throws SqlHandlerException {
 		IMyDataSources dataSources = (IMyDataSources) pool;
-		Connection conn = null;
-		try {
-			conn = dataSources.getConnection();
-		} catch (SQLException e) {
-			LOG.error("conn: " + conn);
-			throw new SqlHandlerException(e.getMessage());
-		}
 		Map<String, Object> map = new HashMap<String, Object>();
 		
 		//判断是不是多条语句
@@ -134,7 +126,7 @@ public abstract class AbstractSqlHandler implements ISqlHandler {
 			LOG.debug("type: 多语句查询");
 			List<String> sqllist = Arrays.asList(sql.split(";"));
 			try {
-				int[] effectRows = DbUtil.executeBatchData(conn, sqllist);
+				int[] effectRows = DbUtil.executeBatchData(dataSources.getConnection(), sqllist);
 				map.put("totalSql", sqllist.size());
 				map.put("effectSql", effectRows.length);
 				map.put("effectRows", effectRows);
@@ -145,70 +137,114 @@ public abstract class AbstractSqlHandler implements ISqlHandler {
 			}
 		}else {
 			LOG.debug("type: 单语句");
-			String upperSql = sql.toUpperCase();
-			if(upperSql.startsWith("INSERT")) {
-				LOG.debug("----: insert");
-				try {
-					int effectInt = DbUtil.insert(conn, sql);
-					LOG.info("effect: " + effectInt);
-					if(1 == effectInt) {
-						map.put("status", "success");
-					}else if(0 == effectInt) {
-						map.put("status", "fail");
-					}
-				} catch (SQLException e) {
-					LOG.error("sql: " + sql);
-					throw new SqlHandlerException(e.getMessage());
-				}
-			}else if(upperSql.startsWith("UPDATE")) {
-				LOG.debug("----: update");
-				try {
-					int effectInt = DbUtil.update(conn, sql);
-					LOG.info("effect: " + effectInt);
-					if(1 == effectInt) {
-						map.put("status", "success");
-					}else if(0 == effectInt) {
-						map.put("status", "fail");
-					}
-				} catch (SQLException e) {
-					LOG.error("sql: " + sql);
-					throw new SqlHandlerException(e.getMessage());
-				}
-				/**
-				 * 对于没有返回结果的查询用此查询语句
-				 */
-			}else if(upperSql.startsWith("CREATE") 
-					|| upperSql.startsWith("DROP") 
-					|| upperSql.startsWith("USE") 
-					|| upperSql.startsWith("DELETE")) {
-				LOG.debug("----: create");
-				try {
-					DbUtil.execute(conn, sql);
-					map.put("status", "success");
-				} catch (SQLException e) {
-					LOG.error("sql: " + sql);
-					throw new SqlHandlerException(e.getMessage());
-				}
-			} else {
-				LOG.debug("----: other");
-				try {
-					Map<String, Object> arr = DbUtil.queryJSONMap(conn, sql);
-					LOG.debug("json result: " + arr);
-					if(null != arr) {
-						map.put("rows", arr.get("rows"));
-						map.put("headers", arr.get("headers"));
-					}else {
-						LOG.error("arr: " + arr);
-						throw new SqlHandlerException("未查询到结果");
-					}
-				} catch (SQLException e) {
-					e.printStackTrace();
-					LOG.error("sql: " + sql);
-					throw new SqlHandlerException(e.getMessage());
-				}
+			Map<String, Object> smap = executeSingleSql(dataSources, sql);
+			LOG.debug("single sql execute result: " + smap);
+			Object type = smap.get("type");
+			if("set".equals(type)) {
+				map.put("rows", smap.get("rows"));
+				map.put("headers", smap.get("headers"));
 			}
 		}
 		
+		return map;
+	}
+	
+	/**
+	 * 执行单语句sql
+	 * 返回结果：{
+	 * 	type: 'set', //表示是否有返回值   'set' 有值  , 'noSet' 没有值
+	 * }
+	 */
+	private Map<String, Object> executeSingleSql(IMyDataSources pool, String sql) throws SqlHandlerException{
+		Map<String, Object> map = new HashMap<String, Object>();
+		LOG.info("executeSingleSql: sql: " + sql);
+		try {
+			boolean b = DbUtil.execute(pool.getConnection(), sql);
+			LOG.info("return result: " + b);
+			if(b) {  //有返回结果，则继续查询
+				Map<String, Object> arr = DbUtil.queryJSONMap(pool.getConnection(), sql);
+				map.put("type", "set");
+				LOG.debug("json result: " + arr);
+				if(null != arr) {
+					map.put("rows", arr.get("rows"));
+					map.put("headers", arr.get("headers"));
+				}
+			}else {
+				map.put("type", "noSet");
+			}
+		} catch (SQLException e) {
+			throw new SqlHandlerException(e.getMessage());
+		}
+		return map;
+	}
+	
+	/**
+	 * 执行单sql语句的另一种方法     (过时的一种写法)
+	 */
+	@SuppressWarnings("unused")
+	private Map<String, Object> executeSingeSqlOtherMethod(IMyDataSources pool, String sql) 
+			throws SqlHandlerException{
+		Map<String, Object> map = new HashMap<String, Object>();
+		String upperSql = sql.toUpperCase();
+		map.put("type", "noSet");
+		if(upperSql.startsWith("INSERT")) {
+			LOG.debug("----: insert");
+			try {
+				int effectInt = DbUtil.insert(pool.getConnection(), sql);
+				LOG.info("effect: " + effectInt);
+				if(1 == effectInt) {
+					map.put("status", "success");
+				}else if(0 == effectInt) {
+					map.put("status", "fail");
+				}
+			} catch (SQLException e) {
+				LOG.error("sql: " + sql);
+				throw new SqlHandlerException(e.getMessage());
+			}
+		}else if(upperSql.startsWith("UPDATE")) {
+			LOG.debug("----: update");
+			try {
+				int effectInt = DbUtil.update(pool.getConnection(), sql);
+				LOG.info("effect: " + effectInt);
+				if(1 == effectInt) {
+					map.put("status", "success");
+				}else if(0 == effectInt) {
+					map.put("status", "fail");
+				}
+			} catch (SQLException e) {
+				LOG.error("sql: " + sql);
+				throw new SqlHandlerException(e.getMessage());
+			}
+			/**
+			 * 对于没有返回结果的查询用此查询语句
+			 */
+		}else if(upperSql.startsWith("CREATE") 
+				|| upperSql.startsWith("DROP") 
+				|| upperSql.startsWith("USE") 
+				|| upperSql.startsWith("DELETE")) {
+			LOG.debug("----: create");
+			try {
+				DbUtil.execute(pool.getConnection(), sql);
+				map.put("status", "success");
+			} catch (SQLException e) {
+				LOG.error("sql: " + sql);
+				throw new SqlHandlerException(e.getMessage());
+			}
+		} else {
+			LOG.debug("----: other");
+			map.put("type", "set");
+			try {
+				Map<String, Object> arr = DbUtil.queryJSONMap(pool.getConnection(), sql);
+				LOG.debug("json result: " + arr);
+				if(null != arr) {
+					map.put("rows", arr.get("rows"));
+					map.put("headers", arr.get("headers"));
+				}
+			} catch (SQLException e) {
+				LOG.error("sql: " + sql);
+				throw new SqlHandlerException(e.getMessage());
+			}
+		}
 		return map;
 	}
 	

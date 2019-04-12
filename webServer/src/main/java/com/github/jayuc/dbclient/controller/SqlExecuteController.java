@@ -45,6 +45,8 @@ public class SqlExecuteController {
 	@GetMapping("/execute")
 	public Map<String, Object> execute(@ModelAttribute("param") SqlDataParam param){
 		LOG.debug("开始执行,sql: " + param.getSql());
+		//开始时间
+		long executeStartTime = System.currentTimeMillis();
 		Result result = ResultUtils.normalResult();
 		String tike = getTikeByParam(param);
 		IDbPool pool = null;
@@ -80,22 +82,14 @@ public class SqlExecuteController {
 							LOG.debug("sql type: 非select");
 							Map<String, Object> map = handler.execute(pool.getPool(), finalSql, param.getToken());
 							LOG.info("结果: " + map);
-							Object status = map.get("status");
 							Object otype = map.get("sqlType");
-							if(null != status) {
-								LOG.info("tt:single");
-								if("success".equals(status)) {
-									result.setProperty("tip", "success");
-								}else {
-									result.setError("操作失败");
-								}
-							}else if("multi".equals(otype)) {
+							if("multi".equals(otype)) {
 								LOG.info("tt:multi");
 								result.setProperty("totalSql", map.get("totalSql"));
 								result.setProperty("effectSql", map.get("effectSql"));
 								result.setProperty("effectRows", map.get("effectRows"));
 							}else {
-								LOG.info("tt:other");
+								LOG.info("tt:singel");
 								Object rows = map.get("rows");
 								if(null != rows) {
 									JSONArray arrs = (JSONArray) rows;
@@ -118,6 +112,9 @@ public class SqlExecuteController {
 		}else {
 			LOG.error("pool或者sql为空,pool: " + pool + " ，sql: " + param.getSql());
 		}
+		//结束时间
+		long executeEndTime = System.currentTimeMillis();
+		result.setProperty("took", (executeEndTime - executeStartTime));
 		LOG.debug("执行结束");
 		return result.getResult();
 	}
