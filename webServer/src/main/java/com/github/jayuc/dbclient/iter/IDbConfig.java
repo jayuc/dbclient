@@ -8,7 +8,7 @@ public interface IDbConfig extends IToken {
 	
 	String getHost();
 	
-	String getPort();
+	int getPort();
 	
 	String getName();
 	

@@ -14,7 +14,7 @@ public class DbCreateParam implements IDbConfig {
 	
 	private String host;
 	
-	private String port;
+	private int port;
 	
 	private String name;
 	

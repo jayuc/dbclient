@@ -65,37 +65,25 @@ public class SqlExecuteController {
 				ISqlHandler handler = ac.getBean(pool.getType().getHandlerName(), ISqlHandler.class);
 				if(null != handler) {
 					try {
-						String upperSql = finalSql.toUpperCase();
-						/**
-						 * sql语句分为有查询结果的和无查询结果的两种sql
-						 */
-						if(upperSql.startsWith("SELECT")) {  //sql语句分为有查询结果的比如：select语句；无查询结果的比如：delete,insert,update
-							LOG.debug("sql type: select");
-							Map<String, Object> map = handler.query(pool.getPool(), finalSql, param.getToken());
-							int total = 0;
-							if(null != map.get("total")) {
-								total = (int)map.get("total");
-							}
-							result.setResult(total, map.get("rows"));
-							result.setResultProperty("headers", map.get("headers"));
-						}else {  //当sql语句为 delete,insert,update
-							LOG.debug("sql type: 非select");
-							Map<String, Object> map = handler.execute(pool.getPool(), finalSql, param.getToken());
-							LOG.info("结果: " + map);
-							Object otype = map.get("sqlType");
-							if("multi".equals(otype)) {
-								LOG.info("tt:multi");
-								result.setProperty("totalSql", map.get("totalSql"));
-								result.setProperty("effectSql", map.get("effectSql"));
-								result.setProperty("effectRows", map.get("effectRows"));
-							}else {
-								LOG.info("tt:singel");
-								Object rows = map.get("rows");
-								if(null != rows) {
-									JSONArray arrs = (JSONArray) rows;
-									result.setResult(arrs.size(), map.get("rows"));
-									result.setResultProperty("headers", map.get("headers"));
+						Map<String, Object> map = handler.execute(pool.getPool(), finalSql, param.getToken());
+						LOG.info("结果： " + map);
+						Object otype = map.get("sqlType");
+						if("multi".equals(otype)) {
+							LOG.info("tt:multi");
+							result.setProperty("totalSql", map.get("totalSql"));
+							result.setProperty("effectSql", map.get("effectSql"));
+							result.setProperty("effectRows", map.get("effectRows"));
+						}else {
+							LOG.info("tt:singel");
+							if(null != map.get("rows")) {
+								int total = 0;
+								if(null != map.get("total")) {
+									total = (int)map.get("total");
+								}else {
+									total = ((JSONArray) map.get("rows")).size();
 								}
+								result.setResult(total, map.get("rows"));
+								result.setResultProperty("headers", map.get("headers"));
 							}
 						}
 					} catch (SqlHandlerException e) {

@@ -29,9 +29,25 @@ import com.github.jayuc.dbclient.utils.DbUtil;
 public abstract class AbstractSqlHandler implements ISqlHandler {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractSqlHandler.class);
-
+	
 	@Override
-	public Map<String, Object> query(Object pool, String sql, String token) 
+	public Map<String, Object> execute(Object pool, String sql, String token) 
+			throws SqlHandlerException{
+		String upperSql = sql.toUpperCase();
+		/**
+		 * sql语句分为有查询结果的和无查询结果的两种sql
+		 */
+		if(upperSql.startsWith("SELECT")) {
+			LOG.debug("sql type: select");
+			return query(pool, sql, token);
+		}else {
+			LOG.debug("sql type: 非select");
+			return executesql(pool, sql, token);
+		}
+	}
+
+	//sql单语句查询
+	private Map<String, Object> query(Object pool, String sql, String token) 
 			throws SqlHandlerException {
 		//判断是否为多语句
 		if(haveMultiSql(sql)) {
@@ -115,8 +131,8 @@ public abstract class AbstractSqlHandler implements ISqlHandler {
 						: SqlConfig.LIMIT;
 	}
 
-	@Override
-	public Map<String, Object> execute(Object pool, String sql, String token) 
+	//一般表示非select查询
+	private Map<String, Object> executesql(Object pool, String sql, String token) 
 			throws SqlHandlerException {
 		IMyDataSources dataSources = (IMyDataSources) pool;
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -138,7 +154,7 @@ public abstract class AbstractSqlHandler implements ISqlHandler {
 		}else {
 			LOG.debug("type: 单语句");
 			Map<String, Object> smap = executeSingleSql(dataSources, sql);
-			LOG.debug("single sql execute result: " + smap);
+			LOG.debug("single sql execute result: ");
 			Object type = smap.get("type");
 			if("set".equals(type)) {
 				map.put("rows", smap.get("rows"));

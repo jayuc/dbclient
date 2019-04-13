@@ -64,13 +64,13 @@ public class DefaultDBPoolsManager extends AbstractDBPoolsManager {
 		if(null == config.getHost()) {
 			sb.append("数据库地址不能为空，");
 		}
-		if(null == config.getPort()) {
+		if(0 == config.getPort()) {
 			sb.append("端口port不能为空，");
 		}
-		if(null == config.getName()) {
+		if(!"redis".equals(config.getType().getName()) && null == config.getName()) {
 			sb.append("数据库名name不能为空，");
 		}
-		if(null == config.getUserName()) {
+		if(!"redis".equals(config.getType().getName()) && null == config.getUserName()) {
 			sb.append("用户名不能为空，");
 		}
 		if(null == config.getPassword()) {
