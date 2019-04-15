@@ -28,11 +28,11 @@
 	const cache = {
 		token: getCookie(cookieName)
 	};
-	var param = {type: 'Mysql', host: '192.168.10.8', port: 3306, name: 'mysql', 
+	var param2 = {type: 'Mysql', host: '192.168.10.8', port: 3306, name: 'mysql', 
 			userName: 'root', password: '123456'};
 	var param1 = {type: 'Oracle', host: '192.168.10.228', port: 1522, name: 'orclc', 
 			userName: 'itms3', password: 'itms3'};
-	var param2 = {type: 'Redis', host: '192.168.10.8', port: 6379, password: '123456'};
+	var param = {type: 'Redis', host: '192.168.10.201', port: 6379, password: 'myRedis'};
 	//连接
 	function doConnect(){
 		console.log('try connect.');
@@ -69,7 +69,7 @@
 			//sql: "update bill set count = 303 where id = '1'",
 			//sql: "delete from bill where id = '3'",
 			//sql: "desc bill",
-			sql: "show tables",
+			//sql: "show tables",
 			//sql: "show databases",
 			//sql: "select database()",
 			//sql: "use sys",
@@ -78,7 +78,13 @@
 			//sql: "insert into cba(id,name,age) values('111','曹操',32)",
 			//sql: "delete from cba",
 			//sql: "update cba set age = 89 where id = '1'",
-			//sql: "create table cba(id varchar(6),name varchar(12),age int)"
+			//sql: "create table cba(id varchar(6),name varchar(12),age int)",
+			//sql: "get keyList",
+			//sql: "hgetallcc policeLocation",
+			sql: "keys *",
+			//sql: "keys policeLocation",
+			//sql: "select 4",
+			//sql: "exists policeLocation",
 		};
 		$.extend(param, cache);
 		console.log(param);
@@ -93,7 +99,8 @@
 	//设置
 	function doSetting(){
 		var param = {
-			limit: 10	
+			limit: 10,
+			//redisIndex: 2
 		};
 		$.extend(param, cache);
 		console.log(param);

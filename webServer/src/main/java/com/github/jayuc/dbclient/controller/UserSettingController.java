@@ -38,13 +38,16 @@ public class UserSettingController {
 		if(haveUserDataChange(param)) {
 			String token = param.getToken();
 			int limit = param.getLimit();
+			int redisIndex = param.getRedisIndex();
 			UserData data = userData.getUserData(token);
 			LOG.debug("user data: " + data);
 			if(null != data) {
 				data.setLimit(limit);
+				data.setRedisIndex(redisIndex);
 			}else {
 				UserData ud = new UserData();
 				ud.setLimit(limit);
+				ud.setRedisIndex(redisIndex);
 				userData.setUserData(token, ud);
 			}
 		}else {

@@ -17,5 +17,7 @@ public class UserSettingParam implements IToken {
 	private String token;
 	
 	private int limit;
+	
+	private int redisIndex;
 
 }

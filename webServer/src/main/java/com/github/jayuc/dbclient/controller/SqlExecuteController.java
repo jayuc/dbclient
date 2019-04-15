@@ -58,6 +58,8 @@ public class SqlExecuteController {
 			e.printStackTrace();
 		}
 		if(null != pool && !StringUtil.isBlank(param.getSql())) {
+			//标记数据库类型
+			result.setProperty("dbType", pool.getType().getName());
 			//去掉sql空格
 			final String finalSql = param.getSql().trim();
 			ApplicationContext ac = ApplicationContextUtils.getAc();
@@ -66,29 +68,39 @@ public class SqlExecuteController {
 				if(null != handler) {
 					try {
 						Map<String, Object> map = handler.execute(pool.getPool(), finalSql, param.getToken());
+						/**
+						 * 返回结果说明
+						 * total: 结果总数
+						 * rows: 结果数组
+						 * totalSql： 总的执行sql语句数（每个sql之间用;隔开）
+						 * effectSql： 影响的sql语句总数
+						 * effectRows：影响的sql
+						 */
 						LOG.info("结果： " + map);
-						Object otype = map.get("sqlType");
-						if("multi".equals(otype)) {
-							LOG.info("tt:multi");
-							result.setProperty("totalSql", map.get("totalSql"));
-							result.setProperty("effectSql", map.get("effectSql"));
-							result.setProperty("effectRows", map.get("effectRows"));
-						}else {
-							LOG.info("tt:singel");
-							if(null != map.get("rows")) {
-								int total = 0;
-								if(null != map.get("total")) {
-									total = (int)map.get("total");
-								}else {
-									total = ((JSONArray) map.get("rows")).size();
+						if(null != map) {
+							Object otype = map.get("sqlType");
+							if("multi".equals(otype)) {
+								LOG.info("tt:multi");
+								result.setProperty("totalSql", map.get("totalSql"));
+								result.setProperty("effectSql", map.get("effectSql"));
+								result.setProperty("effectRows", map.get("effectRows"));
+							}else {
+								LOG.info("tt:singel");
+								if(null != map.get("rows")) {
+									int total = 0;
+									if(null != map.get("total")) {
+										total = (int)map.get("total");
+									}else {
+										total = ((JSONArray) map.get("rows")).size();
+									}
+									result.setResult(total, map.get("rows"));
+									result.setResultProperty("headers", map.get("headers"));
 								}
-								result.setResult(total, map.get("rows"));
-								result.setResultProperty("headers", map.get("headers"));
 							}
 						}
 					} catch (SqlHandlerException e) {
-						result.setError(e.getMessage() + finalSql);
-						LOG.error(e.getMessage() + ",sql: " + finalSql);
+						result.setError(e.getMessage());
+						LOG.error(e.getMessage() + " ,sql: " + finalSql);
 						e.printStackTrace();
 					}
 				}else {
