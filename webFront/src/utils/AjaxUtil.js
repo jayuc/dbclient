@@ -23,8 +23,6 @@ function ajax(_options) {
   $.extend(options, _options);
   options.data.dbId = User.get("dbId");
   options.data.token = CookieUtil.get(InnerConfig.cookieName);
-  console.log('param: ');
-  console.log(options.data);
   $.ajax({
     url: restRoot + options.url,
     type: options.type,
