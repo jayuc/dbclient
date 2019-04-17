@@ -21,7 +21,11 @@ import com.github.jayuc.dbclient.utils.StringUtil;
  */
 public abstract class AbstractDBPoolsManager implements IDBPoolsManager {
 	
+	//数据库连接池仓库
 	private Map<String, IDbPool> reposity = new ConcurrentHashMap<String, IDbPool>();
+	
+	//密码仓库
+	private Map<String, String> passwrodReposity = new ConcurrentHashMap<String, String>();
 	
 	private static final Logger log = LoggerFactory.getLogger(AbstractDBPoolsManager.class);
 
@@ -38,26 +42,33 @@ public abstract class AbstractDBPoolsManager implements IDBPoolsManager {
 	public Map<String, Object> setDbPool(IDbConfig config) throws PoolException {
 		String token = config.getToken();
 		String urlId = getUrlId(config);
+		String key = token + urlId;
 		Map<String, Object> map = new HashMap<String, Object>();
-		String id = token;
 		map.put("dbId", urlId);
-		if(null == token) {
-			id = IdUtils.generateId();
-			map.put("token", id);
-		}else if(reposity.containsKey(token + urlId)) {
+		if(StringUtil.isBlank(token)) {
+			log.debug("token为空，需要生成新的token");
+			token = IdUtils.generateId();
+			map.put("token", token);
+		}else if(reposity.containsKey(key)) {
+			//验证密码是否正确
+			checkPassword(config, urlId);
 			log.debug("token已经存在: " + token);
 			map.put("tip", "token已存在");
 			return map;
 		}
 		IDbPool pool = createPool(config);
-		log.debug(id + " ----- " + pool);
+		log.debug(token + " ----- " + pool);
 		if(null == pool) {
 			throw new PoolException("pool为空");
 		}else {
-			String key = id + urlId;
-			if(!reposity.containsKey(key)) {
-				log.debug("向reposity中添加id为 " + key);
-				reposity.put(key, pool);
+			//此时的keys 保证token有值
+			String keys = token + urlId;
+			log.info("reposity 是否包含 key(" + keys + "): " + reposity.containsKey(keys));
+			if(!reposity.containsKey(keys)) {
+				log.debug("向reposity中添加id为 " + keys);
+				reposity.put(keys, pool);
+				log.debug("向password reposity仓库中添加，key: " + urlId);
+				passwrodReposity.put(urlId, config.getPassword());
 			}
 			return map;
 		}
@@ -68,6 +79,20 @@ public abstract class AbstractDBPoolsManager implements IDBPoolsManager {
 		log.debug("删除pool,id为: " + token);
 		reposity.remove(token);
 		return true;
+	}
+	
+	/**
+	 * 判断密码是否正确，不正确则抛出异常
+	 * @param config
+	 * @param urlId
+	 * @throws PoolException
+	 */
+	protected void checkPassword(IDbConfig config, String urlId) throws PoolException {
+		log.debug("reposity password: " + passwrodReposity.get(urlId));
+		log.debug("config password: " + config.getPassword());
+		if(!passwrodReposity.get(urlId).equals(config.getPassword())) {
+			throw new PoolException("密码不正确");
+		}
 	}
 
 	/**

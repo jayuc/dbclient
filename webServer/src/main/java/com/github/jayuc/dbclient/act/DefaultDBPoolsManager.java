@@ -33,6 +33,8 @@ public class DefaultDBPoolsManager extends AbstractDBPoolsManager {
 		checkParam(config);
 		String urlId = getUrlId(config);
 		if(urlReposity.containsKey(urlId)) {
+			//验证密码
+			checkPassword(config, urlId);
 			log.debug("仓库中已经包括数据库连接池: id: " + urlId);
 			return urlReposity.get(urlId);
 		}

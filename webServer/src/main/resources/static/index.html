@@ -18,6 +18,10 @@
 <div>
 	<button onClick="doSetting()">设置</button>
 </div>
+<div style="height: 20px;"></div>
+<div>
+	<button onClick="clearCookie('_tokensu')">删除token</button>
+</div>
 	
 <script>
 	//根路径
@@ -43,7 +47,7 @@
 			data: param,
 			type: 'post',
 			success: function(data){
-				console.log(data.attributes.token);
+				console.log("结果中的tooken: " + data.attributes.token);
 				if(data.attributes.token && !cache.token){
 					console.log('设置cookie');
 					setCookie(cookieName, data.attributes.token, 1000);
@@ -133,6 +137,7 @@
     }
     //删除 cookie
     function clearCookie(name) {
+    	console.log('clear cookie name: ' + name)
         setCookie(name, "", -1);
     }
 </script>	

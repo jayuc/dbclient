@@ -35,6 +35,7 @@ public class NewConnectionController {
 	public Map<String, Object> create(@ModelAttribute("param") DbCreateParam param){
 		
 		log.debug("接到创建数据库连接池请求");
+		log.debug("参数： " + param);
 		
 		Result map = ResultUtils.simpleResult();
 		
