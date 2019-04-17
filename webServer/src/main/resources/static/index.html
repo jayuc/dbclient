@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <title>connection db</title>
 <script src="http://code.jquery.com/jquery-1.8.0.min.js"></script>
+<script type="text/javascript" src="./jquery.cookie.js"></script>
 </head>
 <body>
 <div style="height: 20px;"></div>
@@ -51,6 +52,8 @@
 				if(data.attributes.token && !cache.token){
 					console.log('设置cookie');
 					setCookie(cookieName, data.attributes.token, 1000);
+					
+					cache.token = data.attributes.token;
 				}
 				var dbId = data.attributes.dbId;
 				if(dbId && !cache.dbId){
@@ -119,13 +122,17 @@
 	}
 	//设置cookie
 	function setCookie(cname, cvalue, exdays) {
+		$.cookie(cname, cvalue, { expires: exdays });
+		/*
         var d = new Date();
         d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
         var expires = "expires=" + d.toUTCString();
      	document.cookie = cname + "=" + cvalue + "; " + expires+"; path=/";  //这个很重要代表在那个层级下可以访问cookie
+     	*/
     }
     //获取cookie
     function getCookie(cname) {
+    	/*
         var name = cname + "=";
         var ca = document.cookie.split(';');
         for(var i = 0; i < ca.length; i++) {
@@ -133,12 +140,17 @@
             while(c.charAt(0) == ' ') c = c.substring(1);
             if(c.indexOf(name) != -1) return c.substring(name.length, c.length);
         }
-        return null;
+        */
+        var value = $.cookie(cname);
+        if( value == 'null' || (value && value.length == 0)){
+        	return null;
+        }
+        return value;
     }
     //删除 cookie
     function clearCookie(name) {
     	console.log('clear cookie name: ' + name)
-        setCookie(name, "", -1);
+    	$.cookie(name, '');
     }
 </script>	
 

@@ -4,7 +4,7 @@
  * @param value cookie值
  * @param days  cookie存活时间
  */
-function setCookie(name, value, days) {
+function set(name, value, days) {
   let d = new Date();
   d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
   let expires = "expires=" + d.toUTCString();
@@ -16,7 +16,7 @@ function setCookie(name, value, days) {
  * @param name cookie名
  * @returns {string|null}
  */
-function getCookie(name) {
+function get(name) {
   let cname = name + "=";
   let ca = document.cookie.split(';');
   for(let i = 0; i < ca.length; i++) {
@@ -31,12 +31,12 @@ function getCookie(name) {
  * 清除cookie
  * @param name
  */
-function clearCookie(name) {
+function clear(name) {
   setCookie(name, "", -1);
 }
 
 export default {
-    setCookie,
-    getCookie,
-    clearCookie
+    set,
+    get,
+    clear
 }
