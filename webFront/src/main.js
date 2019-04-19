@@ -5,6 +5,7 @@ import App from './App'
 import router from './router'
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
+import './main.css';
 
 //使用 饿了么 ui
 Vue.use(ElementUI);

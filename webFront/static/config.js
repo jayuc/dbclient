@@ -5,7 +5,7 @@
 var $rootScope = {
 
   // rest 根路径
-  restRoot: '',
+  restRoot: 'http://127.0.0.1:8004/',
 
   //用户信息
   userInfo: {}

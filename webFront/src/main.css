@@ -1,0 +1,29 @@
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.h10{
+  height: 10px;
+}
+
+.h20{
+  height: 20px;
+}
+
+.h30{
+  height: 30px;
+}
+
+.h40{
+  height: 40px;
+}
+
+.h50{
+  height: 50px;
+}
+
+.h100{
+  height: 100px;
+}
