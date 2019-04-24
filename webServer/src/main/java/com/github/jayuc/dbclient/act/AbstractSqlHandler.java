@@ -47,12 +47,14 @@ public abstract class AbstractSqlHandler implements ISqlHandler {
 	}
 
 	//sql单语句查询
-	private Map<String, Object> query(Object pool, String sql, String token) 
+	private Map<String, Object> query(Object pool, String rawSql, String token) 
 			throws SqlHandlerException {
 		//判断是否为多语句
-		if(haveMultiSql(sql)) {
+		if(haveMultiSql(rawSql)) {
 			throw new SqlHandlerException("select语句不支持多语句同时查询");
 		}
+		//进一步清洗sql语句
+		String sql = rawSql.replaceAll(";", "");
 		IMyDataSources dataSources = (IMyDataSources) pool;
 		Map<String, Object> map = new HashMap<String, Object>();
 		Map<String, Object> list = null;

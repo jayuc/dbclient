@@ -1,6 +1,5 @@
 <template>
   <span>
-    <div class="header"></div>
     <div class="h30"></div>
     <div class="row_">
       <div class="col_">
@@ -74,13 +73,6 @@
 </script>
 
 <style scoped>
- .header{
-   height: 20px;
-   background: black;
- }
-  .el-col{
-    text-align: center;
-  }
   .row_{
     overflow: hidden;
   }

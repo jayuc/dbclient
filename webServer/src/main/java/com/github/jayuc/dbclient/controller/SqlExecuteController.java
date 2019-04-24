@@ -105,12 +105,15 @@ public class SqlExecuteController {
 					}
 				}else {
 					LOG.error("未找到对应的handler,type: " + pool.getType().getHandlerName());
+					result.setError("未找到合适的sql处理器");
 				}
 			}else {
 				LOG.error("ac为空");
+				result.setError("ac为空");
 			}
 		}else {
 			LOG.error("pool或者sql为空,pool: " + pool + " ，sql: " + param.getSql());
+			result.setError("你尚未创建连接或者sql为空");
 		}
 		//结束时间
 		long executeEndTime = System.currentTimeMillis();

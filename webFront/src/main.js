@@ -6,6 +6,7 @@ import router from './router'
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import './main.css';
+import User from '@/user';
 
 //使用 饿了么 ui
 Vue.use(ElementUI);
@@ -17,5 +18,12 @@ new Vue({
   el: '#app',
   router,
   components: { App },
-  template: '<App/>'
+  template: '<App/>',
+  created() {
+    let connected = User.get('connected');
+    // 如果未创建连接，则跳转到连接页面，刷新时也跳转到连接页面
+    if(connected !== 'yes'){
+      this.$router.push("/");
+    }
+  }
 });

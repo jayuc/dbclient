@@ -2,6 +2,7 @@
   <el-dialog :title="$attrs.dbData.type + ' 连接：'"
              :visible.sync="visible"
              width="450px"
+             class="login_dialog_"
   >
     <el-form :model="formData"
              label-width="115px"
@@ -81,36 +82,50 @@
                 spinner: 'el-icon-loading',
                 background: 'rgba(0, 0, 0, 0.5)'
               });
-              let param = this.formData;
+              let param = this.filterFormData();
               param.type = type;
               AjaxUtil.post('newcon/create', param).then((data) => {
                 loading.close();  //关闭正在加载
                 console.log(data);
-                if(data.status == 'success'){  //请求成功
-                  that.$message.success('请求成功');
+                if(data.status === 'success'){  //请求成功
+                  that.$message.success('连接成功');
                   // 数据库编号
                   let dbId = data.attributes.dbId;
                   if(dbId){
                     User.set('dbId', dbId);
+                    // 标识用户已经创建连接
+                    User.set('connected', 'yes');
                   }
                   // 用户标识
                   let token = data.attributes.token;
                   if(token){
-                    CookieUtil.set(InnerConfig.cookieName, token);
+                    CookieUtil.set(InnerConfig.cookieName, token, 1000);
                   }
                   that.close();
-                }else if(data.status == 'error'){ // 请求失败
-                  that.$message.error('请求出错，错误原因：' + data.errorInfo);
+                  //跳转到主页面
+                  that.$router.push("/main");
+                }else if(data.status === 'error'){ // 请求失败
+                  that.$message.error('连接出错，错误原因：' + data.errorInfo);
                 }else{
-                  that.$message.error('请求出错');
+                  that.$message.error('连接出错');
                 }
               }, (err) => {
                 loading.close();  //关闭正在加载
                 console.log(err);
-                that.$message.error('请求出错，错误原因：' + err.message);
+                that.$message.error('连接出错，错误原因：' + err.message);
               });
             }
           });
+        },
+        //过滤表单
+        filterFormData(){
+          let data = {};
+          data.port = this.formData.port;
+          data.password = this.formData.password;
+          data.host = this.formData.host.trim();
+          data.name = this.formData.name.trim();
+          data.userName = this.formData.userName.trim();
+          return data;
         },
         close(){
           this.resetFrom();
@@ -127,6 +142,8 @@
     }
 </script>
 
-<style scoped>
-
+<style>
+  .login_dialog_ .el-dialog__footer{
+    padding-top: 0px;
+  }
 </style>

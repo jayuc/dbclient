@@ -1,6 +1,11 @@
 <template>
   <div id="app">
-    <router-view/>
+    <span>
+      <div class="header"></div>
+    </span>
+    <span>
+      <router-view/>
+    </span>
   </div>
 </template>
 
@@ -11,4 +16,8 @@ export default {
 </script>
 
 <style>
+  .header{
+    height: 20px;
+    background: black;
+  }
 </style>
