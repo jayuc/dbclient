@@ -17,7 +17,7 @@ export default {
 
 <style>
   .header{
-    height: 20px;
+    height: 10px;
     background: black;
   }
 </style>

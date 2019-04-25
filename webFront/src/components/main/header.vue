@@ -11,8 +11,8 @@
               v-model="sql"
     />
     <div class="main_header_sql_btn_">
-      <el-button @click="clearSql">清空</el-button>
-      <el-button type="primary" @click="execute">执行</el-button>
+      <el-button @click="clearSql" size="mini">清空</el-button>
+      <el-button type="primary" @click="execute" size="mini">执行</el-button>
     </div>
   </span>
 </template>
@@ -71,6 +71,7 @@
   .main_header_sql_tip_{
     color: blue;
     margin-bottom: 7px;
+    font-size: 14px;
     font-family: '微软雅黑';
   }
   .main_header_sql_btn_{
@@ -82,8 +83,8 @@
     margin: 5px 2px 0px 0px;
   }
   .main_header_ .el-textarea__inner{
-    height: 240px;
-    font-size: 22px;
+    height: 180px;
+    font-size: 14px;
     font-family: Arial;
   }
 </style>

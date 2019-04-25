@@ -41,6 +41,7 @@
     color: blue;
     margin-bottom: 7px;
     font-family: '微软雅黑';
+    font-size: 14px;
   }
   .main_body_table_ .el-table--border{
     border-top: none;

@@ -2,7 +2,7 @@
   <span>
     <div class="h10"></div>
     <el-container>
-      <el-aside width="300px">
+      <el-aside width="260px">
         <Sider />
       </el-aside>
       <el-container>
@@ -30,8 +30,8 @@
         name: "Main",
         data(){
           return {
-            headerHeight: 320,
-            extractHeight: 100,
+            headerHeight: 240,
+            extractHeight: 200,
             bodyHeight: 300
           }
         },
