@@ -31,7 +31,7 @@
         data(){
           return {
             headerHeight: 240,
-            extractHeight: 200,
+            extractHeight: 160,
             bodyHeight: 300
           }
         },

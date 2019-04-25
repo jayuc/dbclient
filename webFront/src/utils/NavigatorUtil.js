@@ -3,7 +3,7 @@
  */
 
 const width = () => {
-  return window.screen.height;
+  return window.screen.availHeight;
 };
 
 export default {
