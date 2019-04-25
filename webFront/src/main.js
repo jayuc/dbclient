@@ -7,6 +7,7 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import './main.css';
 import User from '@/user';
+import Initial from './init';
 
 //使用 饿了么 ui
 Vue.use(ElementUI);
@@ -27,3 +28,6 @@ new Vue({
     }
   }
 });
+
+// 初始化
+Initial.init();

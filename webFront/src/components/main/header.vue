@@ -11,7 +11,7 @@
               v-model="sql"
     />
     <div class="main_header_sql_btn_">
-      <el-button>清空</el-button>
+      <el-button @click="clearSql">清空</el-button>
       <el-button type="primary" @click="execute">执行</el-button>
     </div>
   </span>
@@ -31,6 +31,9 @@
         };
       },
       methods: {
+        clearSql(){
+          this.sql = '';
+        },
         execute(){
           // 用户是否已经连接
           let connected = User.get('connected');

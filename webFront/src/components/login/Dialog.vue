@@ -86,7 +86,7 @@
               param.type = type;
               AjaxUtil.post('newcon/create', param).then((data) => {
                 loading.close();  //关闭正在加载
-                console.log(data);
+                //console.log(data);
                 if(data.status === 'success'){  //请求成功
                   that.$message.success('连接成功');
                   // 数据库编号
