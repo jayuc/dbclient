@@ -41,7 +41,7 @@
           }
           let that = this;
           AjaxUtil.get('sql/execute', this.getParam()).then((data) => {
-            console.log(data);
+            //console.log(data);
             if(data.status === 'success'){
               that.$emit('get-data', data.result);
             }else if(data.status === 'error'){

@@ -6,12 +6,12 @@
         <Sider />
       </el-aside>
       <el-container>
-        <el-header>
+        <el-header height="320px">
           <Header v-on:get-data="handlerData"
           />
         </el-header>
         <el-main>
-          <Body />
+          <Body ref="the_body" />
         </el-main>
       </el-container>
     </el-container>
@@ -32,7 +32,24 @@
         },
         methods: {
           handlerData(data){
-            console.log(data);
+            //console.log(data);
+            let columns = this.convertHeader(data.headers);
+            //console.log(columns);
+            this.$refs.the_body.assignColumns(columns);
+            this.$refs.the_body.assignTableData(data.rows);
+          },
+          convertHeader(arr){
+            let result = [];
+            for (let i=0; i<arr.length; i++){
+              let item = arr[i];
+              let temp = {};
+              temp.prop = item;
+              temp.label = item.toUpperCase();
+              temp.width = 180;
+              temp.key = i;
+              result.push(temp);
+            }
+            return result;
           }
         }
     }
