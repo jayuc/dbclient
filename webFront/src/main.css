@@ -5,6 +5,18 @@ body {
   font-size: 12px;
 }
 
+.hide{
+  display: none;
+}
+
+.inline_show{
+  display: inline;
+}
+
+.block_show{
+  display: block;
+}
+
 .h10{
   height: 10px;
 }

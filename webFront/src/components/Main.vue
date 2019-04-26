@@ -8,6 +8,7 @@
       <el-container>
         <el-header :height="headerHeight + 'px'">
           <Header v-on:get-data="handlerData"
+                  v-on:start-get-data="startGetData"
           />
         </el-header>
         <el-main>
@@ -31,7 +32,7 @@
         data(){
           return {
             headerHeight: 240,
-            extractHeight: 160,
+            extractHeight: 155,
             bodyHeight: 300
           }
         },
@@ -44,16 +45,23 @@
           initHeight(){
             this.bodyHeight = Config.get('navigatorHeight') - this.headerHeight - this.extractHeight;
           },
+          startGetData(status){
+            this.$refs.the_body.setLoading(status);
+          },
           handlerData(data){
             this.initHeight();
             //console.log(data);
-            let columns = this.convertHeader(data.headers);
+            let columns = this.convertHeader(data.result.headers);
             //console.log(columns);
             this.$refs.the_body.assignColumns(columns);
-            this.$refs.the_body.assignTableData(data.rows);
+            this.$refs.the_body.assignTableData(data.result.rows);
+            this.$refs.the_body.assignTookTotal(this.handleTook(data.attributes.took), data.result.total);
           },
           convertHeader(arr){
             let result = [];
+            if(!(arr instanceof Array)){
+              return result;
+            }
             let arrLen = arr.length - 1;
             for (let i=0; i<arrLen; i++){
               let item = arr[i];
@@ -71,6 +79,9 @@
             lastTemp.key = arrLen;
             result.push(lastTemp);
             return result;
+          },
+          handleTook(took){
+            return took/1000;
           }
         }
     }

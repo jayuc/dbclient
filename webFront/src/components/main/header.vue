@@ -35,6 +35,10 @@
           this.sql = '';
         },
         execute(){
+          if(this.sql.length === 0){
+            this.$message.error('sql不能为空');
+            return ;
+          }
           // 用户是否已经连接
           let connected = User.get('connected');
           if(connected !== 'yes'){
@@ -42,17 +46,21 @@
             this.$router.push("/");
             return;
           }
+          this.$emit('start-get-data', true);
           let that = this;
           AjaxUtil.get('sql/execute', this.getParam()).then((data) => {
-            //console.log(data);
+            console.log(data);
+            this.$emit('start-get-data', false);
+            that.$emit('get-data', data);
             if(data.status === 'success'){
-              that.$emit('get-data', data.result);
+              that.$message.success('sql语句已经成功执行');
             }else if(data.status === 'error'){
               that.$message.error('请求出错，错误原因：' + data.errorInfo);
             }else{
               that.$message.error('请求出错');
             }
           }, (err) => {
+            this.$emit('start-get-data', false);
             that.$message.error('请求出错，错误原因：' + err.message);
           });
         },
