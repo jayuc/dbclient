@@ -19,8 +19,6 @@
 
 <script>
     import User from '@/user';
-    import CookieUtil from '@/utils/CookieUtil';
-    import InnerConfig from '@/config/innerConfig';
     import AjaxUtil from '@/utils/AjaxUtil';
 
     export default {
@@ -67,8 +65,6 @@
         getParam(){
           let data = {};
           data.sql = this.sql;
-          data.dbId = User.get('dbId');
-          data.token = CookieUtil.get(InnerConfig.cookieName);
           return data;
         }
       }

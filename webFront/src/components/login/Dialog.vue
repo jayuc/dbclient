@@ -37,6 +37,13 @@
     import User from '@/user';
     import CookieUtil from '@/utils/CookieUtil';
     import InnerConfig from '@/config/innerConfig';
+    import Config from '@/config';
+    import handlers from './handler';
+
+    // 连接
+    const connectObj = {};
+    // 连接在数组中的位置
+    const connectPos = {};
 
     export default {
       name: "Dialog",
@@ -95,6 +102,8 @@
                     User.set('dbId', dbId);
                     // 标识用户已经创建连接
                     User.set('connected', 'yes');
+                    // 生产连接
+                    that.produceConnects(dbId, type);
                   }
                   // 用户标识
                   let token = data.attributes.token;
@@ -122,9 +131,9 @@
           let data = {};
           data.port = this.formData.port;
           data.password = this.formData.password;
-          data.host = this.formData.host.trim();
-          data.name = this.formData.name.trim();
-          data.userName = this.formData.userName.trim();
+          data.host = this.formData.host ? this.formData.host.trim() : this.formData.host;
+          data.name = this.formData.name ? this.formData.name.trim() : this.formData.name;
+          data.userName = this.formData.userName ? this.formData.userName.trim() : this.formData.userName;
           return data;
         },
         close(){
@@ -137,6 +146,31 @@
         },
         resetFrom(){  //重置表单
           this.$refs.myForm.resetFields();
+        },
+        // 处理连接
+        produceConnects(dbId, type){
+          let connectArr = Config.get('connects');
+          if(!(connectArr instanceof Array)){
+            connectArr = [];
+            Config.set('connects', connectArr);
+          }
+          if(!connectObj[dbId]){
+            let con = {
+              id: dbId,
+              label: this.handleDbId(dbId, type)
+            };
+            connectPos[dbId] = connectArr.length;
+            connectArr.push(con);
+            connectObj[dbId] = dbId;
+          }
+          // 设置当前连接
+          User.set('connectIndex', connectPos[dbId]);
+        },
+        // 处理dbId
+        handleDbId(dbId, type){
+          if (typeof handlers.dbIdHandlers[type] === 'function'){
+            return handlers.dbIdHandlers[type](dbId);
+          }
         }
       }
     }

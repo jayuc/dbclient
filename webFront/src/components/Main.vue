@@ -1,9 +1,11 @@
 <template>
-  <span>
+  <span class="my_main_">
     <div class="h10"></div>
     <el-container>
-      <el-aside width="260px">
-        <Sider />
+      <el-aside width="280px">
+        <Sider v-on:get-data="handlerData"
+               v-on:start-get-data="startGetData"
+        />
       </el-aside>
       <el-container>
         <el-header :height="headerHeight + 'px'">
@@ -32,7 +34,7 @@
         data(){
           return {
             headerHeight: 240,
-            extractHeight: 155,
+            extractHeight: 135,
             bodyHeight: 300
           }
         },
@@ -62,22 +64,24 @@
             if(!(arr instanceof Array)){
               return result;
             }
-            let arrLen = arr.length - 1;
-            for (let i=0; i<arrLen; i++){
-              let item = arr[i];
-              let temp = {};
-              temp.prop = item;
-              temp.label = item.toUpperCase();
-              temp.width = 180;
-              temp.key = i;
-              result.push(temp);
+            if(arr.length > 0){
+              let arrLen = arr.length - 1;
+              for (let i=0; i<arrLen; i++){
+                let item = arr[i];
+                let temp = {};
+                temp.prop = item;
+                temp.label = item.toUpperCase();
+                temp.width = 180;
+                temp.key = i;
+                result.push(temp);
+              }
+              let lastTemp = {};
+              let lastData = arr[arrLen];
+              lastTemp.prop = lastData;
+              lastTemp.label = lastData.toUpperCase();
+              lastTemp.key = arrLen;
+              result.push(lastTemp);
             }
-            let lastTemp = {};
-            let lastData = arr[arrLen];
-            lastTemp.prop = lastData;
-            lastTemp.label = lastData.toUpperCase();
-            lastTemp.key = arrLen;
-            result.push(lastTemp);
             return result;
           },
           handleTook(took){
@@ -87,6 +91,11 @@
     }
 </script>
 
-<style scoped>
-
+<style>
+  .my_main_ .el-header{
+    padding: 0 10px;
+  }
+  .my_main_ .el-main{
+    padding: 10px;
+  }
 </style>
