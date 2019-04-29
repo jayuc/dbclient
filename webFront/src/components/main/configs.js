@@ -28,8 +28,24 @@ const tableNa = {
   'redis': 'redis中所有key'
 };
 
+const produceChildNode = (i, tableName) => {
+  let arr = [];
+  arr.push({id: 'q__' + i, label: '查询', type: 'query', tableName: tableName});
+  arr.push({id: 'c__' + i, label: '表结构',type: 'tableStructure', tableName: tableName});
+  return arr;
+};
+const produceChildNodeByRedis = (i, tableName) => {
+  return null;
+};
+const tableChildrenNode = {
+  'mysql': produceChildNode,
+  'oracle': produceChildNode,
+  'redis': produceChildNodeByRedis,
+};
+
 export default {
   tableSql,
   tableQuery,
   tableNa,
+  tableChildrenNode
 }

@@ -3,17 +3,20 @@
  */
 
 import Config from '@/config';
+import entity from './configs';
 
 // 计算所有表
-const produceTables = (result) => {
+const produceTables = (result, dbType) => {
   let field = result.result.headers[0];
   let rows = result.result.rows;
   let arr  = [];
-  rows.forEach((item) => {
-    let temp = {};
-    temp.name = item[field];
-    arr.push(temp);
-  });
+  for(let i=0; i<rows.length; i++){
+    arr.push({
+      id: 'f__' + i,
+      label: rows[i][field],
+      children: entity.tableChildrenNode[dbType](i, rows[i][field])
+    });
+  }
   return arr;
 };
 

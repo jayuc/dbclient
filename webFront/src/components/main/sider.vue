@@ -13,6 +13,7 @@
                node-key="id"
                :default-expanded-keys="tableTerrDefaultExpanded"
                :v-loading="tableLoading"
+               @node-click="tableNodeClick"
       />
     </div>
   </span>
@@ -43,17 +44,21 @@
         let tables = entity.tableNa[currentDb];
         let tableTreeArr = [];
 
+        let that = this;
         AjaxUtil.get('sql/execute', {sql: tableSql[currentDb]}).then((data) => {
-          let arr = handler.produceTables(data);
+          let arr = handler.produceTables(data, currentDb);
           for(let i=0; i<arr.length; i++){
-            tableTreeArr.push({id: i + 'c', label: arr[i].name});
+            tableTreeArr.push(arr[i]);
           }
 
           // 修改table树高度
           setTimeout(() => {
             $('.main_asider_item_tree_').find('.el-tree-node__children').css(handler.computeTableStyle());
-            this.tableLoading = false;
+            that.tableLoading = false;
           }, 500);
+        }, () => {
+          that.tableLoading = false;
+          that.$message.warning('查询所有表失败');
         });
         return {
           connectTree: [{
@@ -69,12 +74,6 @@
           }],
           tableTerrDefaultExpanded: [1],
           tableLoading: true,
-          tableProps: {
-            label: 'name',
-            children: 'zones',
-            isLeaf: 'leaf'
-          },
-          tables: tables,
           currentDb: currentDb,
         }
       },
@@ -91,18 +90,32 @@
                 .addClass('el-tree-node__background_5c')
                 .append($('<div class="my_selected"><i class="el-icon-check"></i></div>'));
             }
+
             // 设置 db id
             let dbId = data.id;
-            user.set('dbId', dbId);
             this.currentDb = dbId.substring(0, dbId.indexOf('_'));
-            // 设置 table
-            /*
-            this.tableTree = [{
-              id: 1,
-              label: 'tables',
-              children: [{id: 12, label: '33'}]
-            }];
-            */
+            let preDbId = user.get('dbId');
+            if(preDbId !== dbId){
+              user.set('dbId', dbId);
+
+              // 设置 table
+              let that = this;
+              that.tableLoading = true;
+              AjaxUtil.get('sql/execute', {sql: tableSql[this.currentDb]}).then((data) => {
+                //console.log(data);
+                that.tableLoading = false;
+                let arr = handler.produceTables(data, that.currentDb);
+                that.tableTree = [{
+                  id: 1,
+                  label: entity.tableNa[that.currentDb],
+                  children: arr
+                }];
+              }, () => {
+                that.tableLoading = false;
+                that.$message.warning('查询所有表失败');
+              });
+            }
+
           }
         },
         // 加载数据库中包含的所有表
@@ -128,27 +141,29 @@
             resolve(option);
           }
         },
-        tableNodeClick(data){
-          //console.log(data);
-          let query = entity.tableQuery[this.currentDb] ? entity.tableQuery[this.currentDb][data.type] : null;
-          let that = this;
-          if(typeof query === 'function'){
-            this.$emit('start-get-data', true);
-            AjaxUtil.get('sql/execute', {sql: query(data.tableName)}).then((data) => {
-              console.log(data);
-              this.$emit('start-get-data', false);
-              that.$emit('get-data', data);
-              if(data.status === 'success'){
-                that.$message.success('sql语句已经成功执行');
-              }else if(data.status === 'error'){
-                that.$message.error('请求出错，错误原因：' + data.errorInfo);
-              }else{
-                that.$message.error('请求出错');
-              }
-            }, (err) => {
-              this.$emit('start-get-data', false);
-              that.$message.error('请求出错，错误原因：' + err.message);
-            });
+        tableNodeClick(data, node){
+          //console.log(node);
+          if(node.level === 3){
+            let query = entity.tableQuery[this.currentDb] ? entity.tableQuery[this.currentDb][data.type] : null;
+            let that = this;
+            if(typeof query === 'function'){
+              this.$emit('start-get-data', true);
+              AjaxUtil.get('sql/execute', {sql: query(data.tableName)}).then((data) => {
+                //console.log(data);
+                this.$emit('start-get-data', false);
+                that.$emit('get-data', data);
+                if(data.status === 'success'){
+                  that.$message.success('sql语句已经成功执行');
+                }else if(data.status === 'error'){
+                  that.$message.error('请求出错，错误原因：' + data.errorInfo);
+                }else{
+                  that.$message.error('请求出错');
+                }
+              }, (err) => {
+                this.$emit('start-get-data', false);
+                that.$message.error('请求出错，错误原因：' + err.message);
+              });
+            }
           }
         }
       },
