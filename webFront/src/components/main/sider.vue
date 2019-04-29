@@ -8,13 +8,11 @@
                ref="connectTree"
       />
     </div>
-    <div class="main_asider_item_tree_"
-         >
-      <el-tree :props="tableProps"
-               lazy
-               :load="loadTables"
-               ref="tableTree"
-               @node-click="tableNodeClick"
+    <div class="main_asider_item_tree_">
+      <el-tree :data="tableTree"
+               node-key="id"
+               :default-expanded-keys="tableTerrDefaultExpanded"
+               :v-loading="tableLoading"
       />
     </div>
   </span>
@@ -43,6 +41,20 @@
         let dbId = user.get('dbId');
         let currentDb = dbId.substring(0, dbId.indexOf('_'));
         let tables = entity.tableNa[currentDb];
+        let tableTreeArr = [];
+
+        AjaxUtil.get('sql/execute', {sql: tableSql[currentDb]}).then((data) => {
+          let arr = handler.produceTables(data);
+          for(let i=0; i<arr.length; i++){
+            tableTreeArr.push({id: i + 'c', label: arr[i].name});
+          }
+
+          // 修改table树高度
+          setTimeout(() => {
+            $('.main_asider_item_tree_').find('.el-tree-node__children').css(handler.computeTableStyle());
+            this.tableLoading = false;
+          }, 500);
+        });
         return {
           connectTree: [{
             id: 1,
@@ -50,6 +62,13 @@
             children: connects
           }],
           connectTerrDefaultExpanded: [1],
+          tableTree: [{
+            id: 1,
+            label: tables,
+            children: tableTreeArr
+          }],
+          tableTerrDefaultExpanded: [1],
+          tableLoading: true,
           tableProps: {
             label: 'name',
             children: 'zones',
@@ -72,9 +91,18 @@
                 .addClass('el-tree-node__background_5c')
                 .append($('<div class="my_selected"><i class="el-icon-check"></i></div>'));
             }
+            // 设置 db id
             let dbId = data.id;
             user.set('dbId', dbId);
             this.currentDb = dbId.substring(0, dbId.indexOf('_'));
+            // 设置 table
+            /*
+            this.tableTree = [{
+              id: 1,
+              label: 'tables',
+              children: [{id: 12, label: '33'}]
+            }];
+            */
           }
         },
         // 加载数据库中包含的所有表
