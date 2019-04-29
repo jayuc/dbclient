@@ -22,7 +22,9 @@
         <el-input v-model="formData.userName"></el-input>
       </el-form-item>
       <el-form-item label="用户密码：" prop="password">
-        <el-input v-model="formData.password" :show-password="true"></el-input>
+        <el-input v-model="formData.password"
+                  :show-password="true"
+        />
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">

@@ -158,44 +158,54 @@ public class RedisSqlHandler implements ISqlHandler {
 	private Map<String, Object> parseResult(Class<?> clazz, Object obj, Object[] params) 
 			throws SqlHandlerException {
 		Map<String, Object> map = new HashMap<String, Object>();
+		final String field = "field";
+		final String value = "value";
 		if(null != obj) {
 			List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+			List<String> headerList = new ArrayList<String>();
+			int total = 0;
 			if(String.class == clazz || Boolean.class == clazz) {  //
 				if(!"OK".equals(obj)) {
 					Map<String, Object> row = new HashMap<String, Object>();
-					if(params.length > 1) {
-						row.put(params[1].toString(), obj);
-					}else {
-						if(params.length > 0) {
-							row.put(params[0].toString(), obj);
-						}
-					}
+					row.put(value, obj);
 					list.add(row);
-					map.put("rows", list);
-					map.put("total", 1);
+					headerList.add(value);
+					total = 1;
 				}
 			}else if(Map.class == clazz) {  //map类型
 				Map<String, Object> row = (Map<String, Object>) obj;
 				Set<String> keys = row.keySet();
 				for(String key:keys) {
 					Map<String, Object> r = new HashMap<String, Object>();
-					r.put(key, row.get(key));
+					r.put(field, key);
+					r.put(value, row.get(key));
 					list.add(r);
 				}
-				map.put("rows", list);
-				map.put("total", keys.size());
+				headerList.add(field);
+				headerList.add(value);
+				total = keys.size();
 			}else if(Set.class == clazz) {
 				Set<String> row = (Set<String>) obj;
-				map.put("rows", row);
-				map.put("total", row.size());
+				row.forEach((item) -> {
+					Map<String, Object> temp = new HashMap<String, Object>();
+					temp.put(value, item);
+					list.add(temp);
+				});
+				headerList.add(value);
+				total = row.size();
 			}else if(List.class == clazz) {
 				List<String> row = (List<String>) obj;
-				map.put("rows", row);
-				map.put("total", row.size());
+				row.forEach((item) -> {
+					Map<String, Object> temp = new HashMap<String, Object>();
+					temp.put(value, item);
+					list.add(temp);
+				});
+				headerList.add(value);
+				total = row.size();
 			}
-			if(params.length > 0) {
-				map.put("headers", params[0]);
-			}
+			map.put("headers", headerList);
+			map.put("rows", list);
+			map.put("total", total);
 		}
 		return map;
 	}

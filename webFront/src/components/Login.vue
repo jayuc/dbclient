@@ -3,19 +3,26 @@
     <div class="h30"></div>
     <div class="row_">
       <div class="col_">
-        <el-button type="primary" v-on:click="openDialog('Mysql')">连接mysql</el-button>
+        <el-button type="primary" v-on:click="openDialog('Mysql')">连接 Mysql</el-button>
       </div>
       <div class="col_">
-        <el-button type="success" v-on:click="openDialog('Oracle')">连接oracle</el-button>
+        <el-button type="success" v-on:click="openDialog('Oracle')">连接 Oracle</el-button>
       </div>
       <div class="col_">
-        <el-button type="info" v-on:click="openDialog('Redis')">连接redis</el-button>
+        <el-button type="info" v-on:click="openDialog('Redis')">连接 Redis</el-button>
       </div>
       <div class="col_" style="margin-left: 18px">
-        <el-button type="warning" v-on:click="">连接postgresql</el-button>
+        <el-button type="warning" v-on:click="">连接 Postgresql</el-button>
       </div>
       <div class="col_" style="margin-left: 36px">
-        <el-button type="danger" v-on:click="">连接mongodb</el-button>
+        <el-button type="danger" v-on:click="">连接 Mongodb</el-button>
+      </div>
+      <div class="col_">
+        <el-button type="primary"
+                   icon="el-icon-d-arrow-right"
+                   circle
+                   @click="gotoMain"
+        />
       </div>
     </div>
     <Dialog ref="dialog"
@@ -26,6 +33,7 @@
 
 <script>
     import Dialog from './login/Dialog';
+    import user from '@/user';
 
     // 数据库默认值
     const dbValues = {
@@ -64,6 +72,15 @@
           this.dbData.showName = data.showName;
           this.dbData.showUserName = data.showUserName;
           this.$refs.dialog.open(data);
+        },
+        gotoMain(){
+          let connected = user.get('connected');
+          if(connected === 'yes'){
+            //跳转到主页面
+            this.$router.push("/main");
+          }else{
+            this.$message.warning('还未连接，请先连接');
+          }
         }
       },
       components: {

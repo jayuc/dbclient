@@ -96,7 +96,7 @@
         },
         tableNodeClick(data){
           //console.log(data);
-          let query = entity.tableQuery[this.currentDb][data.type];
+          let query = entity.tableQuery[this.currentDb] ? entity.tableQuery[this.currentDb][data.type] : null;
           let that = this;
           if(typeof query === 'function'){
             this.$emit('start-get-data', true);

@@ -40,7 +40,7 @@
           total: 0,
           tookClass: 'hide',
           totalClass: 'hide',
-          loading: false
+          loading: false,
         }
       },
       methods: {
@@ -58,6 +58,9 @@
         },
         setLoading(status){
           this.loading = status;
+        },
+        computeTableHeaderStyle(a){
+          console.log(a);
         }
       }
     }
@@ -83,6 +86,7 @@
   }
   .main_body_table_ .el-table__header th{
     border-top: 1px solid #ebeef5;
+    background-color: #F2F6FC;
   }
   .main_body_table_ .el-table__header th:first-child,.main_body_table_ .el-table__row td:first-child{
     border-left: 1px solid #ebeef5;
