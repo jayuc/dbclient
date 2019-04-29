@@ -39,6 +39,10 @@
         if(!(connects instanceof Array)){
           connects = [];
         }
+        // db id
+        let dbId = user.get('dbId');
+        let currentDb = dbId.substring(0, dbId.indexOf('_'));
+        let tables = entity.tableNa[currentDb];
         return {
           connectTree: [{
             id: 1,
@@ -51,25 +55,27 @@
             children: 'zones',
             isLeaf: 'leaf'
           },
-          tables: '数据库所有表',
-          currentDb: '',
+          tables: tables,
+          currentDb: currentDb,
         }
       },
       methods: {
         nodeClick(data, node, node_div){
-          let nodeDiv = node_div.$refs.node;
-          $(nodeDiv).siblings().find('.my_selected').remove();
-          $(nodeDiv).siblings().find('.el-tree-node__content')
-            .removeClass('el-tree-node__background_5c');
-          let my_selected = $(nodeDiv).find('.my_selected');
-          if(my_selected.length === 0){
-            $(nodeDiv).children('.el-tree-node__content')
-              .addClass('el-tree-node__background_5c')
-              .append($('<div class="my_selected"><i class="el-icon-check"></i></div>'));
+          if(node.level === 2){
+            let nodeDiv = node_div.$refs.node;
+            $(nodeDiv).siblings().find('.my_selected').remove();
+            $(nodeDiv).siblings().find('.el-tree-node__content')
+              .removeClass('el-tree-node__background_5c');
+            let my_selected = $(nodeDiv).find('.my_selected');
+            if(my_selected.length === 0){
+              $(nodeDiv).children('.el-tree-node__content')
+                .addClass('el-tree-node__background_5c')
+                .append($('<div class="my_selected"><i class="el-icon-check"></i></div>'));
+            }
+            let dbId = data.id;
+            user.set('dbId', dbId);
+            this.currentDb = dbId.substring(0, dbId.indexOf('_'));
           }
-          let dbId = data.id;
-          user.set('dbId', dbId);
-          this.currentDb = dbId.substring(0, dbId.indexOf('_'));
         },
         // 加载数据库中包含的所有表
         loadTables(node, resolve){

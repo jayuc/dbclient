@@ -21,7 +21,15 @@ const tableQuery = {
   }
 };
 
+const tableDesc = '数据库所有表';
+const tableNa = {
+  'mysql': tableDesc,
+  'oracle': tableDesc,
+  'redis': 'redis中所有key'
+};
+
 export default {
   tableSql,
   tableQuery,
+  tableNa,
 }
