@@ -112,8 +112,14 @@ public class SqlExecuteController {
 				result.setError("ac为空");
 			}
 		}else {
-			LOG.error("pool或者sql为空,pool: " + pool + " ，sql: " + param.getSql());
-			result.setError("你尚未创建连接或者sql为空");
+			if(null == pool) {
+				LOG.error("pool为空");
+				result.setError("尚未创建连接");
+				result.setProperty("go_home_page", "yes");
+			}else {
+				LOG.error("sql为空");
+				result.setError("sql为空");
+			}
 		}
 		//结束时间
 		long executeEndTime = System.currentTimeMillis();

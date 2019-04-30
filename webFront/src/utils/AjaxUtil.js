@@ -69,8 +69,9 @@ function doAjaxByPromise(_url, _data, _options) {
       success: function (data) {
         resolve(data);
       },
-      error: function (errmsg) {
+      error: function (errmsg, status) {
         reject(errmsg);
+        forceRefresh(status);
       }
     });
   });
@@ -100,7 +101,10 @@ function doAjax(_options) {
     data: options.data,
     timeout: 1000000,
     success: options.success,
-    error: options.error
+    error: (err, status) => {
+      options.error(err);
+      forceRefresh(status);
+    }
   });
 }
 
@@ -114,6 +118,13 @@ function handleOptions(options, _options){
 //处理url
 function handleUrl(options) {
   return restRoot + options.url;
+}
+
+// 在服务挂机时，强制刷新页面
+function forceRefresh(status) {
+  if(status === 'error'){
+    window.location.reload();
+  }
 }
 
 export default {

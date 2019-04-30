@@ -20,6 +20,7 @@
 <script>
     import User from '@/user';
     import AjaxUtil from '@/utils/AjaxUtil';
+    import ResultUtil from '@/utils/ResultUtil';
 
     export default {
       name: "main-header",
@@ -48,17 +49,11 @@
           let that = this;
           AjaxUtil.get('sql/execute', this.getParam()).then((data) => {
             console.log(data);
-            this.$emit('start-get-data', false);
+            that.$emit('start-get-data', false);
             that.$emit('get-data', data);
-            if(data.status === 'success'){
-              that.$message.success('sql语句已经成功执行');
-            }else if(data.status === 'error'){
-              that.$message.error('请求出错，错误原因：' + data.errorInfo);
-            }else{
-              that.$message.error('请求出错');
-            }
+            ResultUtil.handle(data, null, that);
           }, (err) => {
-            this.$emit('start-get-data', false);
+            that.$emit('start-get-data', false);
             that.$message.error('请求出错，错误原因：' + err.message);
           });
         },

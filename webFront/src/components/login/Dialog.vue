@@ -41,11 +41,7 @@
     import InnerConfig from '@/config/innerConfig';
     import Config from '@/config';
     import handlers from './handler';
-
-    // 连接
-    const connectObj = {};
-    // 连接在数组中的位置
-    const connectPos = {};
+    import ResultUtil from '@/utils/ResultUtil';
 
     export default {
       name: "Dialog",
@@ -96,7 +92,7 @@
               AjaxUtil.post('newcon/create', param).then((data) => {
                 loading.close();  //关闭正在加载
                 //console.log(data);
-                if(data.status === 'success'){  //请求成功
+                ResultUtil.handle(data, () => {
                   that.$message.success('连接成功');
                   // 数据库编号
                   let dbId = data.attributes.dbId;
@@ -115,11 +111,7 @@
                   that.close();
                   //跳转到主页面
                   that.$router.push("/main");
-                }else if(data.status === 'error'){ // 请求失败
-                  that.$message.error('连接出错，错误原因：' + data.errorInfo);
-                }else{
-                  that.$message.error('连接出错');
-                }
+                }, that);
               }, (err) => {
                 loading.close();  //关闭正在加载
                 console.log(err);
@@ -152,9 +144,15 @@
         // 处理连接
         produceConnects(dbId, type){
           let connectArr = Config.get('connects');
+          let connectObj = Config.get('connectObj');
+          let connectPos = Config.get('connectPos');
           if(!(connectArr instanceof Array)){
             connectArr = [];
+            connectObj = {};
+            connectPos = {};
             Config.set('connects', connectArr);
+            Config.set('connectObj', connectObj);
+            Config.set('connectPos', connectPos);
           }
           if(!connectObj[dbId]){
             let con = {

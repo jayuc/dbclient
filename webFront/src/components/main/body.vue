@@ -59,9 +59,6 @@
         setLoading(status){
           this.loading = status;
         },
-        computeTableHeaderStyle(a){
-          console.log(a);
-        }
       }
     }
 </script>

@@ -12,7 +12,7 @@
       <el-tree :data="tableTree"
                node-key="id"
                :default-expanded-keys="tableTerrDefaultExpanded"
-               :v-loading="tableLoading"
+               v-loading="tableLoading"
                @node-click="tableNodeClick"
       />
     </div>
@@ -26,6 +26,7 @@
     import AjaxUtil from '@/utils/AjaxUtil';
     import entity from './configs';
     import handler from './handler';
+    import ResultUtil from '@/utils/ResultUtil';
 
     // table 查询sql
     const tableSql = entity.tableSql;
@@ -46,16 +47,18 @@
 
         let that = this;
         AjaxUtil.get('sql/execute', {sql: tableSql[currentDb]}).then((data) => {
-          let arr = handler.produceTables(data, currentDb);
-          for(let i=0; i<arr.length; i++){
-            tableTreeArr.push(arr[i]);
-          }
+          ResultUtil.handle(data, () => {
+            let arr = handler.produceTables(data, currentDb);
+            for(let i=0; i<arr.length; i++){
+              tableTreeArr.push(arr[i]);
+            }
 
-          // 修改table树高度
-          setTimeout(() => {
-            $('.main_asider_item_tree_').find('.el-tree-node__children').css(handler.computeTableStyle());
-            that.tableLoading = false;
-          }, 500);
+            // 修改table树高度
+            setTimeout(() => {
+              $('.main_asider_item_tree_').find('.el-tree-node__children').css(handler.computeTableStyle());
+              that.tableLoading = false;
+            }, 500);
+          }, that);
         }, () => {
           that.tableLoading = false;
           that.$message.warning('查询所有表失败');
@@ -102,14 +105,16 @@
               let that = this;
               that.tableLoading = true;
               AjaxUtil.get('sql/execute', {sql: tableSql[this.currentDb]}).then((data) => {
-                //console.log(data);
+                console.log(data);
                 that.tableLoading = false;
-                let arr = handler.produceTables(data, that.currentDb);
-                that.tableTree = [{
-                  id: 1,
-                  label: entity.tableNa[that.currentDb],
-                  children: arr
-                }];
+                ResultUtil.handle(data, () => {
+                  let arr = handler.produceTables(data, that.currentDb);
+                  that.tableTree = [{
+                    id: 1,
+                    label: entity.tableNa[that.currentDb],
+                    children: arr
+                  }];
+                }, that);
               }, () => {
                 that.tableLoading = false;
                 that.$message.warning('查询所有表失败');
