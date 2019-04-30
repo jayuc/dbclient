@@ -131,4 +131,5 @@ export default {
   ajax,
   post,
   get,
+  forceRefresh,
 }

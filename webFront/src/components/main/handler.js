@@ -7,15 +7,19 @@ import entity from './configs';
 
 // 计算所有表
 const produceTables = (result, dbType) => {
-  let field = result.result.headers[0];
-  let rows = result.result.rows;
   let arr  = [];
-  for(let i=0; i<rows.length; i++){
-    arr.push({
-      id: 'f__' + i,
-      label: rows[i][field],
-      children: entity.tableChildrenNode[dbType](i, rows[i][field])
-    });
+  if(result.result.headers instanceof Array){
+    let field = result.result.headers[0];
+    let rows = result.result.rows;
+    for(let i=0; i<rows.length; i++){
+      arr.push({
+        id: 'f__' + i,
+        label: entity.tableName[dbType](rows[i], field),
+        type: entity.tableType[dbType](rows[i]),
+        tableName: entity.tableChildName[dbType](rows[i], field),
+        children: entity.tableChildrenNode[dbType](i, rows[i][field])
+      });
+    }
   }
   return arr;
 };

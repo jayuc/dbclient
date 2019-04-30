@@ -46,7 +46,7 @@
         let tableTreeArr = [];
 
         let that = this;
-        AjaxUtil.get('sql/execute', {sql: tableSql[currentDb]}).then((data) => {
+        AjaxUtil.get(entity.tableUrl[currentDb], {sql: tableSql[currentDb]}).then((data) => {
           ResultUtil.handle(data, () => {
             let arr = handler.produceTables(data, currentDb);
             for(let i=0; i<arr.length; i++){
@@ -104,8 +104,8 @@
               // 设置 table
               let that = this;
               that.tableLoading = true;
-              AjaxUtil.get('sql/execute', {sql: tableSql[this.currentDb]}).then((data) => {
-                console.log(data);
+              AjaxUtil.get(entity.tableUrl[this.currentDb], {sql: tableSql[this.currentDb]}).then((data) => {
+                //console.log(data);
                 that.tableLoading = false;
                 ResultUtil.handle(data, () => {
                   let arr = handler.produceTables(data, that.currentDb);
@@ -132,12 +132,14 @@
             let that = this;
             AjaxUtil.get('sql/execute', {sql: tableSql[this.currentDb]}).then((data) => {
               //console.log(data);
-              let d = handler.produceTables(data);
-              resolve(d);
-              // 修改table树高度
-              setTimeout(() => {
-                $(that.$refs.tableTree.$el).find('.el-tree-node__children').css(handler.computeTableStyle());
-              }, 500);
+              ResultUtil.handle(data, () => {
+                let d = handler.produceTables(data);
+                resolve(d);
+                // 修改table树高度
+                setTimeout(() => {
+                  $(that.$refs.tableTree.$el).find('.el-tree-node__children').css(handler.computeTableStyle());
+                }, 500);
+              }, that);
             });
           }
           if(node.level === 2){
@@ -147,28 +149,20 @@
           }
         },
         tableNodeClick(data, node){
-          //console.log(node);
-          if(node.level === 3){
-            let query = entity.tableQuery[this.currentDb] ? entity.tableQuery[this.currentDb][data.type] : null;
-            let that = this;
-            if(typeof query === 'function'){
-              this.$emit('start-get-data', true);
-              AjaxUtil.get('sql/execute', {sql: query(data.tableName)}).then((data) => {
-                //console.log(data);
-                this.$emit('start-get-data', false);
-                that.$emit('get-data', data);
-                if(data.status === 'success'){
-                  that.$message.success('sql语句已经成功执行');
-                }else if(data.status === 'error'){
-                  that.$message.error('请求出错，错误原因：' + data.errorInfo);
-                }else{
-                  that.$message.error('请求出错');
-                }
-              }, (err) => {
-                this.$emit('start-get-data', false);
-                that.$message.error('请求出错，错误原因：' + err.message);
-              });
-            }
+          //console.log(data);
+          let query = entity.tableQuery[this.currentDb] ? entity.tableQuery[this.currentDb][data.type] : null;
+          let that = this;
+          if(typeof query === 'function'){
+            this.$emit('start-get-data', true);
+            AjaxUtil.get('sql/execute', {sql: query(data.tableName)}).then((data) => {
+              //console.log(data);
+              that.$emit('start-get-data', false);
+              that.$emit('get-data', data);
+              ResultUtil.handle(data, null, that);
+            }, (err) => {
+              this.$emit('start-get-data', false);
+              that.$message.error('请求出错，错误原因：' + err.message);
+            });
           }
         }
       },

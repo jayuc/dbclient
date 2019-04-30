@@ -2,7 +2,7 @@
   <span class="my_main_">
     <div class="h10"></div>
     <el-container>
-      <el-aside width="280px">
+      <el-aside :width="asideWidth + 'px'">
         <Sider v-on:get-data="handlerData"
                v-on:start-get-data="startGetData"
         />
@@ -11,6 +11,9 @@
         <el-header :height="headerHeight + 'px'">
           <Header v-on:get-data="handlerData"
                   v-on:start-get-data="startGetData"
+                  v-on:to-up="toUp"
+                  v-on:to-down="toDown"
+                  v-on:to-init-height="toInitHeight"
           />
         </el-header>
         <el-main>
@@ -35,7 +38,8 @@
           return {
             headerHeight: 240,
             extractHeight: 138,
-            bodyHeight: 300
+            bodyHeight: 300,
+            asideWidth: 300
           }
         },
         components: {
@@ -86,6 +90,18 @@
           },
           handleTook(took){
             return took/1000;
+          },
+          toUp(){
+            this.headerHeight = 94;
+            this.initHeight();
+          },
+          toDown(){
+            this.headerHeight = 500;
+            this.initHeight();
+          },
+          toInitHeight(){
+            this.headerHeight = 240;
+            this.initHeight();
           }
         }
     }

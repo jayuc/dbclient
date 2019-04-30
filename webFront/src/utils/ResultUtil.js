@@ -3,6 +3,8 @@
  * Created by yujie on 2019/4/30 9:08
  */
 
+import AjaxUtil from '@/utils/AjaxUtil';
+
 const handle = (data, successFun, that, failFun) => {
   if(data.status === 'success'){
     that.$message.success('sql语句已经成功执行');
@@ -21,8 +23,8 @@ const handle = (data, successFun, that, failFun) => {
       failFun(data, that);
     }
     if(data.attributes.go_home_page === 'yes'){
-      // 跳转到首页
-      that.$router.push("/");
+      // 强制刷新页面
+      AjaxUtil.forceRefresh('error');
     }
   }else{
     that.$message.error('请求出错');

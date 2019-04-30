@@ -13,6 +13,10 @@ body {
   display: inline;
 }
 
+.inline_block_show{
+  display: inline-block;
+}
+
 .block_show{
   display: block;
 }
