@@ -2,6 +2,8 @@
  * Created by yujie on 2019/4/28 14:09
  */
 
+import Database from '@/model/Database';
+
 const tableSql = {
   'mysql': 'show tables',
   'oracle': 'select table_name from user_tables',
@@ -106,12 +108,13 @@ const allDatabases = {
 };
 
 function getMysqlDbNameFromDbId(dbId) {
-  let url = dbId.substring(0, dbId.lastIndexOf('_'));
-  return getRedisDbNameFromDbId(url);
+  let database = new Database(dbId, true);
+  return database.name;
 }
 
 function getRedisDbNameFromDbId(dbId) {
-  return dbId.substring(dbId.lastIndexOf('_') + 1, dbId.length);
+  let database = new Database(dbId);
+  return database.name;
 }
 
 // 获取数据库类型
@@ -122,24 +125,22 @@ const getDbNames = {
 };
 
 function getRedisDbParamFromDbId(dbId) {
-  let name = getRedisDbNameFromDbId(dbId);
-  let url = dbId.substring(dbId.indexOf('_') + 1, dbId.lastIndexOf('_'));
-  let port = parseInt(getRedisDbNameFromDbId(url));
-  let _host = url.substring(0, url.lastIndexOf('_'));
-  let host = _host.replace(/_/g, '.');
+  let database = new Database(dbId);
   return {
-    host,
-    port,
-    name,
+    host: database.host,
+    port: database.port,
+    type: dbTypes[database.type]
   }
 }
 
 function getMysqlDbParamFromDbId(dbId) {
-  let userName = getRedisDbNameFromDbId(dbId);
-  let url = dbId.substring(0, dbId.lastIndexOf('_'));
-  let temp = getRedisDbParamFromDbId(url);
-  temp.userName = userName;
-  return temp;
+  let database = new Database(dbId, true);
+  return {
+    host: database.host,
+    port: database.port,
+    userName: database.userName,
+    type: dbTypes[database.type]
+  }
 }
 
 // 获取当前连接参数
@@ -156,6 +157,19 @@ const dbTypes = {
   'redis': 'Redis',
 };
 
+function getMysqlDatabase(dbId) {
+  return new Database(dbId, true);
+}
+function getRedisDatabase(dbId) {
+  return new Database(dbId);
+}
+// 获取database
+const getDatabase = {
+  'mysql': getMysqlDatabase,
+  'oracle': getMysqlDatabase,
+  'redis': getRedisDatabase,
+};
+
 export default {
   tableSql,
   tableQuery,
@@ -169,4 +183,5 @@ export default {
   getDbNames,
   getDbParam,
   dbTypes,
+  getDatabase,
 }

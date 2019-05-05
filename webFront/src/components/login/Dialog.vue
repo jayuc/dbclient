@@ -38,6 +38,8 @@
     import User from '@/user';
     import Config from '@/config';
     import handlers from './handler';
+    import CookieUtil from '@/utils/CookieUtil';
+    import InnerConfig from '@/config/innerConfig';
 
     export default {
       name: "Dialog",
@@ -90,7 +92,33 @@
                 return ;
               }
               //console.log('-------执行');
-              handlers.connect(that, type, param);
+              handlers.connect(that, param, (data, dbId) => {
+                // 数据库编号
+                if(dbId){
+                  // 标识用户已经创建连接
+                  User.set('connected', 'yes');
+                  // 生产连接
+                  that.produceConnects(dbId, type);
+                  // password
+                  let password = User.get('password');
+                  let _id = handlers.getDatabase[type](dbId).exclusionDbNameStr();
+                  if(typeof password === 'object'){
+                    password[_id] = param.password;
+                  }else{
+                    password = {};
+                    password[_id] = param.password;
+                    User.set('password', password);
+                  }
+                }
+                // 用户标识
+                let token = data.attributes.token;
+                if(token){
+                  CookieUtil.set(InnerConfig.cookieName, token, 1000);
+                }
+                that.close();
+                //跳转到主页面
+                that.$router.push("/main");
+              });
             }
           });
         },

@@ -18,7 +18,7 @@
       <a class="main_header_sql_btn_a_">切换数据库：</a>
       <el-select v-model="databaseName"
                  size="mini"
-                 style="width: 150px"
+                 style="width: 156px"
                  @change="selectChange"
       >
         <el-option
@@ -65,6 +65,7 @@
     import $ from 'jquery';
     import TextareaUtil from '@/utils/TextareaUtil';
     import handler from './handler';
+    import loginHandler from '../login/handler';
 
     export default {
       name: "main-header",
@@ -173,6 +174,10 @@
           let param = handler.getDbParamFromDbId(dbId);
           param.name = dbName;
           console.log(param);
+          loginHandler.connect(this, param, (data, dbId) => {
+            console.log(data);
+            console.log(dbId);
+          });
         }
       },
       mounted() {

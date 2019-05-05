@@ -4,9 +4,8 @@
 
 import AjaxUtil from '@/utils/AjaxUtil';
 import User from '@/user';
-import CookieUtil from '@/utils/CookieUtil';
-import InnerConfig from '@/config/innerConfig';
 import ResultUtil from '@/utils/ResultUtil';
+import Database from '@/model/Database';
 
 // 处理db id
 const dbIdHandlers = {
@@ -16,7 +15,7 @@ const dbIdHandlers = {
 };
 
 // 创建连接
-const connect = (that, dbType, param) => {
+const connect = (that, param, fun) => {
   // 正在加载
   const loading = that.$loading({
     lock: true,
@@ -33,19 +32,10 @@ const connect = (that, dbType, param) => {
       let dbId = data.attributes.dbId;
       if(dbId){
         User.set('dbId', dbId);
-        // 标识用户已经创建连接
-        User.set('connected', 'yes');
-        // 生产连接
-        that.produceConnects(dbId, dbType);
       }
-      // 用户标识
-      let token = data.attributes.token;
-      if(token){
-        CookieUtil.set(InnerConfig.cookieName, token, 1000);
+      if(typeof fun === 'function'){
+        fun(data, dbId);
       }
-      that.close();
-      //跳转到主页面
-      that.$router.push("/main");
     }, that);
   }, (err) => {
     loading.close();  //关闭正在加载
@@ -68,55 +58,37 @@ function getStrOutNull(str) {
 }
 
 function produceDbId(dbId) {
-  let item = getTypeByDbId(dbId);
-  if(item){
-    let str = item.str;
-    let username = str.substring(str.lastIndexOf('_'), str.length);
-    let url = str.substring(0, str.lastIndexOf('_'));
-    let urlstr = url.substring(0, url.lastIndexOf('_'));
-    let dbname = url.substring(url.lastIndexOf('_'), url.length);
-    let ur = urlstr.substring(1, urlstr.lastIndexOf('_'));
-    let port = urlstr.substring(urlstr.lastIndexOf('_'), urlstr.length);
-    return joinStr(item.type, username, ur, port, dbname);
-  }
-  return null;
+  let item = new Database(dbId, true);
+  return joinStr(item.type, item.userName, item.host, item.port, item.name);
 }
 
 function produceRedisDbId(dbId) {
-  let item = getTypeByDbId(dbId);
-  if(item){
-    let str = item.str;
-    let url = str.substring(1, str.lastIndexOf('_'));
-    let dbname = str.substring(str.lastIndexOf('_'), str.length);
-    let ur = url.substring(0, url.lastIndexOf('_'));
-    let port = url.substring(url.lastIndexOf('_'), url.length);
-    return joinStr(item.type, null, ur, port, dbname);
-  }
-  return null;
-}
-
-function getTypeByDbId(dbId) {
-  if(typeof dbId === 'string'){
-    let startNum = dbId.indexOf('_');
-    let type = dbId.substring(0, startNum);
-    let str = dbId.substring(startNum, dbId.length);
-    return {
-      type,
-      str
-    }
-  }
-  return null;
+  let item = new Database(dbId);
+  return joinStr(item.type, null, item.host, item.port, item.name);
 }
 
 function joinStr(_type, _user, _url, _port, _name) {
   let user = _user ? _user + '@' : '';
   let name = _name ? '/' + _name : '';
-  return '[' + _type + ']' + user.replace(/_/g, '') + _url.replace(/_/g, '.') + ':'
-    + _port.replace(/_/g, '') + name.replace(/_/g, '');
+  return '[' + _type + ']' + user + _url + ':' + _port + name;
 }
+
+function getMysqlDatabase(dbId) {
+  return new Database(dbId, true);
+}
+function getRedisDatabase(dbId) {
+  return new Database(dbId);
+}
+// 获取database
+const getDatabase = {
+  'Mysql': getMysqlDatabase,
+  'Oracle': getMysqlDatabase,
+  'Redis': getRedisDatabase,
+};
 
 export default {
   dbIdHandlers,
   connect,
+  getDatabase,
   getDbId,
 }

@@ -5,6 +5,7 @@
 import Config from '@/config';
 import entity from './configs';
 import AjaxUtil from '@/utils/AjaxUtil';
+import user from '@/user';
 
 // 计算所有表
 const produceTables = (result, dbType) => {
@@ -97,7 +98,10 @@ const getDbNameFromDbId = (dbId) => {
 const getDbParamFromDbId = (dbId) => {
   let dbType = getDbTypeFromDbId(dbId);
   let temp = entity.getDbParam[dbType](dbId);
-  temp.type = entity.dbTypes[dbType];
+  let passwords = user.get('password');
+  if(typeof passwords === 'object'){
+    temp.password = passwords[entity.getDatabase[dbType](dbId).exclusionDbNameStr()];
+  }
   return temp;
 };
 
