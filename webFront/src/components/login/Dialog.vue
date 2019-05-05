@@ -1,11 +1,11 @@
 <template>
   <el-dialog :title="$attrs.dbData.type + ' 连接：'"
              :visible.sync="visible"
-             width="450px"
+             width="400px"
              class="login_dialog_"
   >
     <el-form :model="formData"
-             label-width="115px"
+             label-width="105px"
              :rules="rules"
              ref="myForm"
     >
@@ -35,13 +35,9 @@
 </template>
 
 <script>
-    import AjaxUtil from '@/utils/AjaxUtil';
     import User from '@/user';
-    import CookieUtil from '@/utils/CookieUtil';
-    import InnerConfig from '@/config/innerConfig';
     import Config from '@/config';
     import handlers from './handler';
-    import ResultUtil from '@/utils/ResultUtil';
 
     export default {
       name: "Dialog",
@@ -80,43 +76,21 @@
           let type = this.$attrs.dbData.type;
           this.$refs.myForm.validate((valid) => {
             if(valid){   //验证成功
-              // 正在加载
-              const loading = this.$loading({
-                lock: true,
-                text: 'Loading',
-                spinner: 'el-icon-loading',
-                background: 'rgba(0, 0, 0, 0.5)'
-              });
-              let param = this.filterFormData();
+              let param = that.filterFormData();
               param.type = type;
-              AjaxUtil.post('newcon/create', param).then((data) => {
-                loading.close();  //关闭正在加载
-                //console.log(data);
-                ResultUtil.handle(data, () => {
-                  that.$message.success('连接成功');
-                  // 数据库编号
-                  let dbId = data.attributes.dbId;
-                  if(dbId){
-                    User.set('dbId', dbId);
-                    // 标识用户已经创建连接
-                    User.set('connected', 'yes');
-                    // 生产连接
-                    that.produceConnects(dbId, type);
-                  }
-                  // 用户标识
-                  let token = data.attributes.token;
-                  if(token){
-                    CookieUtil.set(InnerConfig.cookieName, token, 1000);
-                  }
-                  that.close();
-                  //跳转到主页面
-                  that.$router.push("/main");
-                }, that);
-              }, (err) => {
-                loading.close();  //关闭正在加载
-                console.log(err);
-                that.$message.error('连接出错，错误原因：' + err.message);
-              });
+              let preDbId = handlers.getDbId(param);
+              let dbId = preDbId.substring(0, preDbId.length - 1);
+              //console.log(dbId);
+              let connectObj = Config.get('connectObj');
+              let connectPos = Config.get('connectPos');
+              if(typeof connectObj === 'object' && connectObj[dbId]){
+                User.set('connectIndex', connectPos[dbId]);
+                //跳转到主页面
+                that.$router.push("/main");
+                return ;
+              }
+              //console.log('-------执行');
+              handlers.connect(that, type, param);
             }
           });
         },
@@ -137,6 +111,7 @@
         open(data){
           this.visible = true;
           this.formData.port = data.port;
+          this.formData.name = data.name;
         },
         resetFrom(){  //重置表单
           this.$refs.myForm.resetFields();

@@ -5,7 +5,7 @@
 
 import AjaxUtil from '@/utils/AjaxUtil';
 
-const handle = (data, successFun, that, failFun) => {
+const handle = (data, successFun, that, failFun, refresh) => {
   if(data.status === 'success'){
     that.$message.success('sql语句已经成功执行');
     if(typeof successFun === 'function'){
@@ -22,7 +22,11 @@ const handle = (data, successFun, that, failFun) => {
     if(typeof failFun === 'function'){
       failFun(data, that);
     }
-    if(data.attributes.go_home_page === 'yes'){
+    let needForceRefresh = true;
+    if(refresh === false){   // 如果不需要强制刷新
+      needForceRefresh = false;
+    }
+    if(data.attributes.go_home_page === 'yes' && needForceRefresh){
       // 强制刷新页面
       AjaxUtil.forceRefresh('error');
     }

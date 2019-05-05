@@ -102,11 +102,12 @@ public abstract class AbstractDBPoolsManager implements IDBPoolsManager {
 	 */
 	protected String getUrlId(IDbConfig config) {
 		String host = config.getHost().replace(".", "_");
-		String url = config.getType().getName() + "_" + host + "_" + config.getPort();
+		String url = config.getType().getName() + "_" + host + "_" 
+				+ config.getPort() + "_" + config.getName();
 		if("redis".equals(config.getType().getName())) {
 			return url;
 		}
-		return  url + "_" + config.getName() + "_" + config.getUserName();
+		return  url + "_" + config.getUserName();
 	}
 	
 	protected abstract IDbPool createPool(IDbConfig config) throws PoolException;

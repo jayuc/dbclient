@@ -96,7 +96,7 @@
 
             // 设置 db id
             let dbId = data.id;
-            this.currentDb = dbId.substring(0, dbId.indexOf('_'));
+            this.currentDb = handler.getDbTypeFromDbId(dbId);
             let preDbId = user.get('dbId');
             if(preDbId !== dbId){
               user.set('dbId', dbId);
@@ -119,6 +119,9 @@
                 that.tableLoading = false;
                 that.$message.warning('查询所有表失败');
               });
+
+              // 触发选中事件
+              that.$emit('select-node-click');
             }
 
           }
@@ -204,6 +207,6 @@
     padding: 4px 0;
   }
   .main_asider_item_tree_{
-    margin-top: 10px;
+    margin-top: 5px;
   }
 </style>

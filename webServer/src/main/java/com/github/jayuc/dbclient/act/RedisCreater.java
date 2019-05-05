@@ -33,8 +33,16 @@ public class RedisCreater implements IDbCreate {
 		JedisPoolConfig redisConfig = new JedisPoolConfig();
 		 //在borrow一个jedis实例时，是否提前进行validate操作；如果为true，则得到的jedis实例均是可用的；
 		redisConfig.setTestOnBorrow(RedisConfig.QUERY_VALIDATE);
+		// 选择的库
+		int dbNum = 0;
+		try {
+			dbNum = Integer.valueOf(config.getName());
+		} catch (Exception e) {
+			throw new PoolException("redis非法库");
+		}
 		JedisPool redisPool = new JedisPool(redisConfig, config.getHost(), 
-				config.getPort(), RedisConfig.TIME_OUT, config.getPassword());
+				config.getPort(), RedisConfig.TIME_OUT, config.getPassword(), 
+				dbNum);
 		try {
 			redisPool.getResource();
 		} catch (Exception e) {

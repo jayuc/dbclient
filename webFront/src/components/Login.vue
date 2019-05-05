@@ -38,18 +38,21 @@
     // 数据库默认值
     const dbValues = {
       'Oracle': {
-        port: 1522,
+        port: 1522,        // 默认端口
+        name: undefined,   // 默认数据库名
         showName: true,
         showUserName: true
       },
       'Mysql': {
         port: 3306,
+        name: undefined,
         showName: true,
         showUserName: true
       },
       'Redis': {
         port: 6379,
-        showName: false,
+        name: 0,
+        showName: true,
         showUserName: false
       }
     };

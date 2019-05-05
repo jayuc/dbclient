@@ -9,10 +9,25 @@
     <el-input type="textarea"
               class="main_header_"
               v-model="sql"
+              ref="textarea"
+              :draggable="false"
     />
     <div class="main_header_sql_btn_">
       <el-button @click="clearSql" size="mini">清空</el-button>
       <el-button type="primary" @click="execute" size="mini">执行</el-button>
+      <a class="main_header_sql_btn_a_">切换数据库：</a>
+      <el-select v-model="databaseName"
+                 size="mini"
+                 style="width: 150px"
+                 @change="selectChange"
+      >
+        <el-option
+          v-for="item in databaseOptions"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value">
+        </el-option>
+      </el-select>
       <div class="main_header_sql_btn_inner_btn_">
         <el-button icon="el-icon-arrow-down"
                    size="mini"
@@ -48,6 +63,8 @@
     import AjaxUtil from '@/utils/AjaxUtil';
     import ResultUtil from '@/utils/ResultUtil';
     import $ from 'jquery';
+    import TextareaUtil from '@/utils/TextareaUtil';
+    import handler from './handler';
 
     export default {
       name: "main-header",
@@ -56,12 +73,25 @@
           sql: '',
           initClass: 'hide',
           upClass: 'inline_block_show',
-          downClass: 'inline_block_show'
+          downClass: 'inline_block_show',
+          databaseName: '',
+          databaseOptions: []
         }
       },
       methods: {
         clearSql(){
           this.sql = '';
+          let data = {
+            result: {
+              headers: [],
+              rows: [],
+              total: 0
+            },
+            attributes: {
+              took: 0
+            }
+          };
+          this.$emit('get-data', data);
         },
         execute(){
           if(this.sql.length === 0){
@@ -87,9 +117,17 @@
             that.$message.error('请求出错，错误原因：' + err.message);
           });
         },
+        getSqlSelection(){
+          return TextareaUtil.getSelection(this.$refs.textarea.$el.children[0]);
+        },
         getParam(){
           let data = {};
-          data.sql = this.sql;
+          let sql = this.sql;
+          let selectSql = this.getSqlSelection();
+          if(selectSql.length > 0){   // 当有鼠标选择的内容时，则使用鼠标选中的内容
+            sql = selectSql;
+          }
+          data.sql = sql;
           return data;
         },
         modifyTextareaHeight(_height){
@@ -117,7 +155,28 @@
           this.upClass = 'inline_block_show';
           this.downClass = 'inline_block_show';
           this.initClass = 'hide';
+        },
+        showDataBase(){
+          let dbId = User.get('dbId');
+          let dbType = handler.getDbTypeFromDbId(dbId);
+          handler.showDataBases[dbType](dbType).then((list) => {
+            //console.log(list);
+            this.databaseOptions = list;
+            this.databaseName = handler.getDbNameFromDbId(dbId);
+          }, (err) => {
+            console.error(err);
+          });
+        },
+        selectChange(dbName){
+          //console.log(dbName);
+          let dbId = User.get('dbId');
+          let param = handler.getDbParamFromDbId(dbId);
+          param.name = dbName;
+          console.log(param);
         }
+      },
+      mounted() {
+        this.showDataBase();
       }
     }
 </script>
@@ -147,5 +206,10 @@
     height: 180px;
     font-size: 14px;
     font-family: Arial;
+  }
+  .main_header_sql_btn_a_{
+    margin-left: 10px;
+    color: blue;
+    vertical-align: -2px;
   }
 </style>

@@ -99,6 +99,63 @@ const tableChildName = {
   'redis': _tcn_redis
 };
 
+// 查询所有数据库语句
+const allDatabases = {
+  'mysql': 'show databases',
+  'oracle': 'select name from v$database'
+};
+
+function getMysqlDbNameFromDbId(dbId) {
+  let url = dbId.substring(0, dbId.lastIndexOf('_'));
+  return getRedisDbNameFromDbId(url);
+}
+
+function getRedisDbNameFromDbId(dbId) {
+  return dbId.substring(dbId.lastIndexOf('_') + 1, dbId.length);
+}
+
+// 获取数据库类型
+const getDbNames = {
+  'mysql': getMysqlDbNameFromDbId,
+  'oracle': getMysqlDbNameFromDbId,
+  'redis': getRedisDbNameFromDbId,
+};
+
+function getRedisDbParamFromDbId(dbId) {
+  let name = getRedisDbNameFromDbId(dbId);
+  let url = dbId.substring(dbId.indexOf('_') + 1, dbId.lastIndexOf('_'));
+  let port = parseInt(getRedisDbNameFromDbId(url));
+  let _host = url.substring(0, url.lastIndexOf('_'));
+  let host = _host.replace(/_/g, '.');
+  return {
+    host,
+    port,
+    name,
+  }
+}
+
+function getMysqlDbParamFromDbId(dbId) {
+  let userName = getRedisDbNameFromDbId(dbId);
+  let url = dbId.substring(0, dbId.lastIndexOf('_'));
+  let temp = getRedisDbParamFromDbId(url);
+  temp.userName = userName;
+  return temp;
+}
+
+// 获取当前连接参数
+const getDbParam = {
+  'mysql': getMysqlDbParamFromDbId,
+  'oracle': getMysqlDbParamFromDbId,
+  'redis': getRedisDbParamFromDbId,
+};
+
+//
+const dbTypes = {
+  'mysql': 'Mysql',
+  'oracle': 'Oracle',
+  'redis': 'Redis',
+};
+
 export default {
   tableSql,
   tableQuery,
@@ -108,4 +165,8 @@ export default {
   tableName,
   tableType,
   tableChildName,
+  allDatabases,
+  getDbNames,
+  getDbParam,
+  dbTypes,
 }

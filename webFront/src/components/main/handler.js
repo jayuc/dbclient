@@ -4,6 +4,7 @@
 
 import Config from '@/config';
 import entity from './configs';
+import AjaxUtil from '@/utils/AjaxUtil';
 
 // 计算所有表
 const produceTables = (result, dbType) => {
@@ -28,7 +29,7 @@ const produceTables = (result, dbType) => {
 const computeTableStyle = () => {
   let navigatorHeight = Config.get('navigatorHeight');
   let connects = Config.get('connects');
-  let extra = 150;
+  let extra = 145;
   return {
     overflow: 'auto',
     maxHeight: navigatorHeight - extra - 20*(connects.length)
@@ -49,8 +50,63 @@ const produceTableOption = (node) => {
   return arr;
 };
 
+// 获取mysql oracle 等关系型数据库，可以通过sql查询的
+function _getDataBases(dbType) {
+  return new Promise((resolve, reject) => {
+    AjaxUtil.get('sql/execute', {sql: entity.allDatabases[dbType]}).then((data) => {
+      let field = data.result.headers[0];
+      let arr = [];
+      let rows = data.result.rows;
+      for(let i=0; i<rows.length; i++){
+        arr.push({value: rows[i][field].toLowerCase(), label: rows[i][field].toLowerCase()});
+      }
+      resolve(arr);
+    }, (err) => {
+      reject(err);
+    });
+  });
+}
+function getRedisDataBases() {
+  return new Promise((resolve) => {
+    let arr = [];
+    for (let i=0; i<16; i++){
+      arr.push({value: i, label: i});
+    }
+    resolve(arr);
+  });
+}
+// 查询所有数据库
+const showDataBases = {
+  'mysql': _getDataBases,
+  'oracle': _getDataBases,
+  'redis': getRedisDataBases,
+};
+
+// 获取当前数据库类型
+const getDbTypeFromDbId = (dbId) => {
+  return dbId.substring(0, dbId.indexOf('_'));
+};
+
+// 获取当前数据库名
+const getDbNameFromDbId = (dbId) => {
+  let dbType = getDbTypeFromDbId(dbId);
+  return entity.getDbNames[dbType](dbId);
+};
+
+// 获取当前连接参数
+const getDbParamFromDbId = (dbId) => {
+  let dbType = getDbTypeFromDbId(dbId);
+  let temp = entity.getDbParam[dbType](dbId);
+  temp.type = entity.dbTypes[dbType];
+  return temp;
+};
+
 export default {
   produceTables,
   computeTableStyle,
-  produceTableOption
+  produceTableOption,
+  showDataBases,
+  getDbTypeFromDbId,
+  getDbNameFromDbId,
+  getDbParamFromDbId,
 }

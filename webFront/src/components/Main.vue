@@ -5,6 +5,7 @@
       <el-aside :width="asideWidth + 'px'">
         <Sider v-on:get-data="handlerData"
                v-on:start-get-data="startGetData"
+               v-on:select-node-click="handleSiderSelectNode"
         />
       </el-aside>
       <el-container>
@@ -14,6 +15,7 @@
                   v-on:to-up="toUp"
                   v-on:to-down="toDown"
                   v-on:to-init-height="toInitHeight"
+                  ref="the_header"
           />
         </el-header>
         <el-main>
@@ -102,6 +104,9 @@
           toInitHeight(){
             this.headerHeight = 240;
             this.initHeight();
+          },
+          handleSiderSelectNode(){
+            this.$refs.the_header.showDataBase();
           }
         }
     }

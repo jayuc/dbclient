@@ -69,7 +69,7 @@ public class DefaultDBPoolsManager extends AbstractDBPoolsManager {
 		if(0 == config.getPort()) {
 			sb.append("端口port不能为空，");
 		}
-		if(!"redis".equals(config.getType().getName()) && null == config.getName()) {
+		if(null == config.getName()) {
 			sb.append("数据库名name不能为空，");
 		}
 		if(!"redis".equals(config.getType().getName()) && null == config.getUserName()) {
