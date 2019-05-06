@@ -97,8 +97,6 @@
                 if(dbId){
                   // 标识用户已经创建连接
                   User.set('connected', 'yes');
-                  // 生产连接
-                  that.produceConnects(dbId, type);
                   // password
                   let password = User.get('password');
                   let _id = handlers.getDatabase[type](dbId).exclusionDbNameStr();
@@ -109,6 +107,8 @@
                     password[_id] = param.password;
                     User.set('password', password);
                   }
+                  // 生产连接
+                  that.produceConnects(dbId, type, _id);
                 }
                 // 用户标识
                 let token = data.attributes.token;
@@ -145,7 +145,7 @@
           this.$refs.myForm.resetFields();
         },
         // 处理连接
-        produceConnects(dbId, type){
+        produceConnects(dbId, type, _id){
           let connectArr = Config.get('connects');
           let connectObj = Config.get('connectObj');
           let connectPos = Config.get('connectPos');
@@ -162,12 +162,12 @@
               id: dbId,
               label: this.handleDbId(dbId, type)
             };
-            connectPos[dbId] = connectArr.length;
+            connectPos[_id] = connectArr.length;
             connectArr.push(con);
             connectObj[dbId] = dbId;
           }
           // 设置当前连接
-          User.set('connectIndex', connectPos[dbId]);
+          User.set('connectIndex', connectPos[_id]);
         },
         // 处理dbId
         handleDbId(dbId, type){

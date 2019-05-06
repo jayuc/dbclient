@@ -1,6 +1,6 @@
 <template>
   <span class="main_asider_">
-    <div>
+    <div class="main_connect_item_tree_">
       <el-tree :data="connectTree"
                node-key="id"
                :default-expanded-keys="connectTerrDefaultExpanded"
@@ -27,6 +27,7 @@
     import entity from './configs';
     import handler from './handler';
     import ResultUtil from '@/utils/ResultUtil';
+    import loginHandler from '../login/handler';
 
     // table 查询sql
     const tableSql = entity.tableSql;
@@ -101,30 +102,37 @@
             if(preDbId !== dbId){
               user.set('dbId', dbId);
 
-              // 设置 table
-              let that = this;
-              that.tableLoading = true;
-              AjaxUtil.get(entity.tableUrl[this.currentDb], {sql: tableSql[this.currentDb]}).then((data) => {
-                //console.log(data);
-                that.tableLoading = false;
-                ResultUtil.handle(data, () => {
-                  let arr = handler.produceTables(data, that.currentDb);
-                  that.tableTree = [{
-                    id: 1,
-                    label: entity.tableNa[that.currentDb],
-                    children: arr
-                  }];
-                }, that);
-              }, () => {
-                that.tableLoading = false;
-                that.$message.warning('查询所有表失败');
-              });
+              // 设置当前选中
+              let _id = entity.getDatabase[this.currentDb](dbId).exclusionDbNameStr();
+              user.set('connectIndex', Config.get('connectPos')[_id]);
+
+              this.loadTableTree();
 
               // 触发选中事件
-              that.$emit('select-node-click');
+              this.$emit('select-node-click');
             }
 
           }
+        },
+        loadTableTree(){
+          // 设置 table
+          let that = this;
+          that.tableLoading = true;
+          AjaxUtil.get(entity.tableUrl[this.currentDb], {sql: tableSql[this.currentDb]}).then((data) => {
+            //console.log(data);
+            that.tableLoading = false;
+            ResultUtil.handle(data, () => {
+              let arr = handler.produceTables(data, that.currentDb);
+              that.tableTree = [{
+                id: 1,
+                label: entity.tableNa[that.currentDb],
+                children: arr
+              }];
+            }, that);
+          }, () => {
+            that.tableLoading = false;
+            that.$message.warning('查询所有表失败');
+          });
         },
         // 加载数据库中包含的所有表
         loadTables(node, resolve){
@@ -167,14 +175,51 @@
               that.$message.error('请求出错，错误原因：' + err.message);
             });
           }
+        },
+        selectConnectNode(dbId){
+          //console.log(dbId);
+          let arr = this.connectTree[0].children;
+          let treeData = [{
+            id: 1,
+            label: this.connectTree[0].label,
+            children: arr
+          }];
+          let _id = entity.getDatabase[this.currentDb](dbId).exclusionDbNameStr();
+          let index = Config.get('connectPos')[_id];
+          let temp = {
+            id: dbId,
+            label: loginHandler.dbIdHandlers[entity.dbTypes[this.currentDb]](dbId)
+          };
+          arr.splice(index, 1, temp);
+          //console.log(treeData);
+          this.connectTree = treeData;
+
+          // 选择连接
+          let that = this;
+          setTimeout(function () {
+            that.clickConnectNode();
+          }, 500);
+
+          // 加载table表
+          this.loadTableTree();
+        },
+        clickConnectNode(){
+          // 判断选中哪一个连接
+          let index = user.get('connectIndex');
+          let node = $(this.$refs.connectTree.$el)
+            .find('.el-tree-node__children .el-tree-node__content:eq(' + index + ')');
+          node.click();
+          let list = $(this.$refs.connectTree.$el)
+            .find('.el-tree-node__children .el-tree-node__content .el-tree-node__label');
+          //console.log(list);
+          for(let i=0; i<list.length; i++){
+            let title = $(list[i]).text();
+            $(list[i]).attr('title', title);
+          }
         }
       },
       mounted() {
-        // 判断选中哪一个连接
-        let index = user.get('connectIndex');
-        $(this.$refs.connectTree.$el)
-          .find('.el-tree-node__children .el-tree-node__content:eq(' + index + ')').click();
-
+        this.clickConnectNode();
       }
     }
 </script>
@@ -198,7 +243,11 @@
     font-size: 18px;
     position: absolute;
     top: 0;
-    right: 0;
+    right: -3px;
+  }
+  .main_asider_ .main_connect_item_tree_ .el-tree-node__label{
+    width: 248px;
+    overflow: hidden;
   }
   .main_asider_ .el-tree-node__background_5c{
     background-color: #f5f7fa;

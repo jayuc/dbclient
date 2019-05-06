@@ -6,6 +6,7 @@
         <Sider v-on:get-data="handlerData"
                v-on:start-get-data="startGetData"
                v-on:select-node-click="handleSiderSelectNode"
+               ref="the_sider"
         />
       </el-aside>
       <el-container>
@@ -16,6 +17,7 @@
                   v-on:to-down="toDown"
                   v-on:to-init-height="toInitHeight"
                   ref="the_header"
+                  v-on:select-database="selectDatabase"
           />
         </el-header>
         <el-main>
@@ -107,6 +109,9 @@
           },
           handleSiderSelectNode(){
             this.$refs.the_header.showDataBase();
+          },
+          selectDatabase(dbId){
+            this.$refs.the_sider.selectConnectNode(dbId);
           }
         }
     }

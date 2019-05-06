@@ -172,11 +172,13 @@
           //console.log(dbName);
           let dbId = User.get('dbId');
           let param = handler.getDbParamFromDbId(dbId);
+          let that = this;
           param.name = dbName;
-          console.log(param);
+          //console.log(param);
           loginHandler.connect(this, param, (data, dbId) => {
-            console.log(data);
-            console.log(dbId);
+            //console.log(data);
+            //console.log(dbId);
+            that.$emit('select-database', dbId);
           });
         }
       },
