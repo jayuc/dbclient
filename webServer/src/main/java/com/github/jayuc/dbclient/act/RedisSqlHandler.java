@@ -128,8 +128,7 @@ public class RedisSqlHandler implements ISqlHandler {
 				UserData userData = userCacheData.getUserData(token);
 				LOG.info("user cache data: " + userData);
 				if(null != userData) {
-					LOG.debug("执行第" + userData.getRedisIndex() + "号库");
-					jedis.select(userData.getRedisIndex());
+					
 				}
 				
 				Object methodResult = method.invoke(jedis, params);

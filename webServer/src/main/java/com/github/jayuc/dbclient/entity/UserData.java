@@ -14,7 +14,4 @@ public class UserData {
 
 	private int limit;
 	
-	//redis 的库
-	private int redisIndex;
-	
 }

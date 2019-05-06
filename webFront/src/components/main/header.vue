@@ -5,6 +5,9 @@
       <a href="#/">
         <i class="el-icon-back main_header_sql_back_" title="返回创建连接页面"></i>
       </a>
+      <a @click="doSetting">
+        <i class="el-icon-setting main_header_sql_setting_" title="设置"></i>
+      </a>
     </div>
     <el-input type="textarea"
               class="main_header_"
@@ -180,6 +183,9 @@
             //console.log(dbId);
             that.$emit('select-database', dbId);
           });
+        },
+        doSetting(){
+          this.$emit('setting');
         }
       },
       mounted() {
@@ -208,6 +214,13 @@
     float: right;
     cursor: pointer;
     margin: 5px 2px 0px 0px;
+    color: #409EFF;
+  }
+  .main_header_sql_setting_{
+    float: right;
+    cursor: pointer;
+    margin: 5px 8px 0px 0px;
+    color: #67C23A;
   }
   .main_header_ .el-textarea__inner{
     height: 180px;

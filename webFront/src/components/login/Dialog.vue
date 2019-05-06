@@ -42,7 +42,7 @@
     import InnerConfig from '@/config/innerConfig';
 
     export default {
-      name: "Dialog",
+      name: "login-dialog",
       data(){
         return {
           visible: false,

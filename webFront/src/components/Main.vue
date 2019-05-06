@@ -19,6 +19,7 @@
                   v-on:to-init-height="toInitHeight"
                   ref="the_header"
                   v-on:select-database="selectDatabase"
+                  v-on:setting="doSetting"
           />
         </el-header>
         <el-main>
@@ -28,6 +29,8 @@
         </el-main>
       </el-container>
     </el-container>
+    <Dialog ref="the_dialog"
+    />
   </span>
 </template>
 
@@ -36,6 +39,7 @@
     import Header from './main/header';
     import Body from './main/body';
     import Config from '@/config';
+    import Dialog from './setting/Dialog';
 
     export default {
         name: "Main",
@@ -50,7 +54,8 @@
         components: {
           Sider,
           Header,
-          Body
+          Body,
+          Dialog
         },
         methods: {
           initHeight(){
@@ -116,8 +121,11 @@
           },
           queryTableInfo(info){
             this.$refs.the_body.setTableInfo(info);
+          },
+          doSetting(){
+            this.$refs.the_dialog.open();
           }
-        }
+        },
     }
 </script>
 
