@@ -12,6 +12,10 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         总数：<span style="color: #409EFF">{{total}}</span>
       </span>
+      <span :class="infoClass">
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        表信息：<span style="color: #F56C6C">{{tableInfo}}</span>
+      </span>
     </div>
     <el-table :data="tableData"
               :height="$attrs.bodyHeight + 'px'"
@@ -38,8 +42,10 @@
           tableData: [],
           took: 0,
           total: 0,
+          tableInfo: '',
           tookClass: 'hide',
           totalClass: 'hide',
+          infoClass: 'hide',
           loading: false,
         }
       },
@@ -59,6 +65,10 @@
         setLoading(status){
           this.loading = status;
         },
+        setTableInfo(info){
+          this.tableInfo = info;
+          this.infoClass = 'inline_show';
+        }
       }
     }
 </script>

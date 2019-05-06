@@ -7,6 +7,7 @@
                v-on:start-get-data="startGetData"
                v-on:select-node-click="handleSiderSelectNode"
                ref="the_sider"
+               v-on:query-table-info="queryTableInfo"
         />
       </el-aside>
       <el-container>
@@ -112,6 +113,9 @@
           },
           selectDatabase(dbId){
             this.$refs.the_sider.selectConnectNode(dbId);
+          },
+          queryTableInfo(info){
+            this.$refs.the_body.setTableInfo(info);
           }
         }
     }

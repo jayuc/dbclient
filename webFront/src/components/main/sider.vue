@@ -161,7 +161,12 @@
         },
         tableNodeClick(data, node){
           //console.log(data);
-          let query = entity.tableQuery[this.currentDb] ? entity.tableQuery[this.currentDb][data.type] : null;
+          let query;
+          let tableInfo;
+          if(entity.tableQuery[this.currentDb]){
+            query = entity.tableQuery[this.currentDb][data.type];
+            tableInfo = entity.tableQuery[this.currentDb]['tableInfo'];
+          }
           let that = this;
           if(typeof query === 'function'){
             this.$emit('start-get-data', true);
@@ -173,6 +178,18 @@
             }, (err) => {
               this.$emit('start-get-data', false);
               that.$message.error('请求出错，错误原因：' + err.message);
+            });
+          }
+          // 查询表信息
+          if (data.type === 'tableStructure' && typeof tableInfo === 'function'){
+            AjaxUtil.get('sql/execute', {sql: tableInfo(data.tableName)}).then((data) => {
+              //console.log(data);
+              let result = data.result;
+              if(result.headers instanceof Array
+                  && result.headers.length > 0
+                  && result.rows.length > 0){
+                that.$emit('query-table-info', result.rows[0][result.headers[0]]);
+              }
             });
           }
         },
