@@ -14,8 +14,12 @@ const init = () => {
 
 //缓存浏览器数据
 const initNavigator = () => {
-  let height = NavigatorUtil.width();
+  let height = NavigatorUtil.height();
   Config.set('navigatorHeight', height);
+
+  // 初始化宽度
+  Config.set('bodyWidth', NavigatorUtil.width());
+
 };
 
 export default {

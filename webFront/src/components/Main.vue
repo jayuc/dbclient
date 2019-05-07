@@ -40,6 +40,7 @@
     import Body from './main/body';
     import Config from '@/config';
     import Dialog from './setting/Dialog';
+    import bodyHandler from './main/bodyHandler';
 
     export default {
         name: "Main",
@@ -67,36 +68,12 @@
           handlerData(data){
             this.initHeight();
             //console.log(data);
-            let columns = this.convertHeader(data.result.headers);
+            let columns = bodyHandler.handleHeaders(data.result.headers);
             //console.log(columns);
-            this.$refs.the_body.assignColumns(columns);
-            this.$refs.the_body.assignTableData(data.result.rows);
-            this.$refs.the_body.assignTookTotal(this.handleTook(data.attributes.took), data.result.total);
-          },
-          convertHeader(arr){
-            let result = [];
-            if(!(arr instanceof Array)){
-              return result;
-            }
-            if(arr.length > 0){
-              let arrLen = arr.length - 1;
-              for (let i=0; i<arrLen; i++){
-                let item = arr[i];
-                let temp = {};
-                temp.prop = item;
-                temp.label = item.toUpperCase();
-                temp.width = 180;
-                temp.key = i;
-                result.push(temp);
-              }
-              let lastTemp = {};
-              let lastData = arr[arrLen];
-              lastTemp.prop = lastData;
-              lastTemp.label = lastData.toUpperCase();
-              lastTemp.key = arrLen;
-              result.push(lastTemp);
-            }
-            return result;
+            this.$refs.the_body.assignColumns(columns.result);
+            this.$refs.the_body.assignTableData(bodyHandler.handleRows(data.result.rows));
+            //console.log(columns.headerInfo);
+            this.$refs.the_body.assignTookTotal(this.handleTook(data.attributes.took), data.result.total, columns.headerInfo);
           },
           handleTook(took){
             return took/1000;
@@ -126,6 +103,11 @@
             this.$refs.the_dialog.open();
           }
         },
+        mounted() {
+          let bodyWidth = Config.get('bodyWidth');
+          // 设置table实际所占宽度, 其中 10 是el-main的padding
+          Config.set('tableWidth', bodyWidth - this.asideWidth - 2*10);
+        }
     }
 </script>
 

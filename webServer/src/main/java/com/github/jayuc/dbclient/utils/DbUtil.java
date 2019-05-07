@@ -241,7 +241,17 @@ public class DbUtil {
 	            for(int i=0;i<length;i++){
 	            	String  key  = rs.getMetaData().getColumnName(i+1);
 	            	String  classType = rs.getMetaData().getColumnClassName(i+1);
-	            	jsonObject.put(key,Class.forName(classType).cast(rs.getObject(i+1)));
+	            	//System.out.println("-------" + classType);
+	            	if(null != rs.getObject(i+1)) {
+	            		if("oracle.sql.CLOB".equals(classType)) {
+		            		jsonObject.put(key,rs.getObject(i+1).toString());
+		            	}else if("java.sql.Timestamp".equals(classType)) {
+		            		jsonObject.put(key,rs.getObject(i+1).toString());
+		            	}else {
+		            		jsonObject.put(key,Class.forName(classType).cast(rs.getObject(i+1)));
+		            	}
+	            	}
+	            	
 	            	if(c == 1) {
 	            		headers.add(key);
 	            	}

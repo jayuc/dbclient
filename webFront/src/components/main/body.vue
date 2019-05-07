@@ -22,18 +22,24 @@
               v-loading="loading"
               element-loading-text="拼命加载中"
               element-loading-background="rgba(0, 0, 0, 0.8)"
+              :cell-style="columnFormat"
     >
       <el-table-column v-for="item in columns"
                        :prop="item.prop"
                        :label="item.label"
                        :width="item.width"
                        :key="item.key"
+                       :show-overflow-tooltip="true"
+                       align="center"
       />
     </el-table>
   </div>
 </template>
 
 <script>
+
+    import bodyHandler from "./bodyHandler";
+
     export default {
       name: "main-body",
       data(){
@@ -47,6 +53,7 @@
           totalClass: 'hide',
           infoClass: 'hide',
           loading: false,
+          headerInfo: {},
         }
       },
       methods: {
@@ -56,11 +63,12 @@
         assignTableData(data){
           this.tableData = data;
         },
-        assignTookTotal(took, total){
+        assignTookTotal(took, total, headerInfo){
           this.took = took;
           this.total = total;
           this.tookClass = 'inline_show';
           this.totalClass = 'inline_show';
+          this.headerInfo = headerInfo;
         },
         setLoading(status){
           this.loading = status;
@@ -68,8 +76,20 @@
         setTableInfo(info){
           this.tableInfo = info;
           this.infoClass = 'inline_show';
+        },
+        columnFormat(row){
+          //console.log(row);
+          let columnIndex = row.columnIndex;
+          if(columnIndex > 0){
+            let text = row.row[this.headerInfo[columnIndex]];
+            let px = bodyHandler.computeStrPx(text);
+            let columnWidth = row.column.width;
+            if(columnWidth && columnWidth < px){
+              this.columns[columnIndex].width = px;
+            }
+          }
         }
-      }
+      },
     }
 </script>
 
@@ -104,6 +124,6 @@
   }
   .main_body_table_ .el-table__row td > .cell,.main_body_table_ .el-table__header th > .cell{
     padding: 0 2px;
-    text-align: center;
+    min-width: 4px;
   }
 </style>
