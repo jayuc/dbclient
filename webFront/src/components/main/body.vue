@@ -39,6 +39,7 @@
 <script>
 
     import bodyHandler from "./bodyHandler";
+    import StringUtil from '@/utils/StringUtil';
 
     export default {
       name: "main-body",
@@ -74,8 +75,12 @@
           this.loading = status;
         },
         setTableInfo(info){
-          this.tableInfo = info;
-          this.infoClass = 'inline_show';
+          let className = 'hide';
+          if(!StringUtil.isBlank(info)){
+            className = 'inline_show';
+            this.tableInfo = info;
+          }
+          this.infoClass = className;
         },
         columnFormat(row){
           //console.log(row);

@@ -20,8 +20,17 @@ const containChinese = (str) => {
   return reg.test(str);
 };
 
+// 判断字符串是否为空
+const isBlank = (str) => {
+  if(typeof str === 'string' && str.length > 0){
+    return false;
+  }
+  return true;
+};
+
 export default {
   containCapitalLetter,
   containCapitalLetterNum,
   containChinese,
+  isBlank,
 }

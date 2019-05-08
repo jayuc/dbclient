@@ -17,6 +17,8 @@ import org.slf4j.LoggerFactory;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import oracle.sql.CLOB;
+
 /**
  * 数据库操作工具类
  * @author yujie
@@ -244,7 +246,8 @@ public class DbUtil {
 	            	//System.out.println("-------" + classType);
 	            	if(null != rs.getObject(i+1)) {
 	            		if("oracle.sql.CLOB".equals(classType)) {
-		            		jsonObject.put(key,rs.getObject(i+1).toString());
+	            			CLOB clob = (CLOB)rs.getObject(i+1);
+		            		jsonObject.put(key,clob.getSubString(1, (int)clob.getLength()));
 		            	}else if("java.sql.Timestamp".equals(classType)) {
 		            		jsonObject.put(key,rs.getObject(i+1).toString());
 		            	}else {

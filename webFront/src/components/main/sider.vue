@@ -191,6 +191,8 @@
                 that.$emit('query-table-info', result.rows[0][result.headers[0]]);
               }
             });
+          }else{
+            that.$emit('query-table-info', '');
           }
         },
         selectConnectNode(dbId){
