@@ -69,7 +69,7 @@
             this.initHeight();
             //console.log(data);
             let columns = bodyHandler.handleHeaders(data.result.headers);
-            //console.log(columns);
+            console.log(columns);
             this.$refs.the_body.assignColumns(columns.result);
             this.$refs.the_body.assignTableData(bodyHandler.handleRows(data.result.rows));
             //console.log(columns.headerInfo);

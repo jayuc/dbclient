@@ -12,5 +12,8 @@ public class RedisConfig {
 	
 	//获取连接前是否验证
 	public static boolean QUERY_VALIDATE = true;
+	
+	// 最多查询多少条记录
+	public static int MAX_LINE = 500;
 
 }

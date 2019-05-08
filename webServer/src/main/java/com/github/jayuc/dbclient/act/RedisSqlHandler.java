@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.github.jayuc.dbclient.config.RedisConfig;
 import com.github.jayuc.dbclient.data.UserCacheData;
 import com.github.jayuc.dbclient.entity.UserData;
 import com.github.jayuc.dbclient.err.SqlHandlerException;
@@ -174,31 +175,61 @@ public class RedisSqlHandler implements ISqlHandler {
 			}else if(Map.class == clazz) {  //map类型
 				Map<String, Object> row = (Map<String, Object>) obj;
 				Set<String> keys = row.keySet();
+				int len = keys.size();
+				if(len > RedisConfig.MAX_LINE) {
+					len = RedisConfig.MAX_LINE;
+				}
+				int i = 0;
 				for(String key:keys) {
-					Map<String, Object> r = new HashMap<String, Object>();
-					r.put(field, key);
-					r.put(value, row.get(key));
-					list.add(r);
+					if(i < len) {
+						Map<String, Object> r = new HashMap<String, Object>();
+						r.put(field, key);
+						r.put(value, row.get(key));
+						list.add(r);
+					}else {
+						break;
+					}
+					i ++;
 				}
 				headerList.add(field);
 				headerList.add(value);
 				total = keys.size();
 			}else if(Set.class == clazz) {
 				Set<String> row = (Set<String>) obj;
-				row.forEach((item) -> {
-					Map<String, Object> temp = new HashMap<String, Object>();
-					temp.put(value, item);
-					list.add(temp);
-				});
+				int len = row.size();
+				if(len > RedisConfig.MAX_LINE) {
+					len = RedisConfig.MAX_LINE;
+				}
+				int i = 0;
+				for(String key:row) {
+					if(i < len) {
+						Map<String, Object> r = new HashMap<String, Object>();
+						r.put(value, key);
+						list.add(r);
+					}else {
+						break;
+					}
+					i ++;
+				}
 				headerList.add(value);
 				total = row.size();
 			}else if(List.class == clazz) {
 				List<String> row = (List<String>) obj;
-				row.forEach((item) -> {
-					Map<String, Object> temp = new HashMap<String, Object>();
-					temp.put(value, item);
-					list.add(temp);
-				});
+				int len = row.size();
+				if(len > RedisConfig.MAX_LINE) {
+					len = RedisConfig.MAX_LINE;
+				}
+				int i = 0;
+				for(String key:row) {
+					if(i < len) {
+						Map<String, Object> r = new HashMap<String, Object>();
+						r.put(value, key);
+						list.add(r);
+					}else {
+						break;
+					}
+					i ++;
+				}
 				headerList.add(value);
 				total = row.size();
 			}

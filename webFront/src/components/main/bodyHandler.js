@@ -43,6 +43,7 @@ function hHeaders(arr, result, headerInfo) {
       if(userMaxWidth){
         width = maxCellWidth;
         if(i === arr.length - 1){
+          console.log(item);
           if((tableWidth - total) < maxCellWidth){
             width = undefined;
           }else{
@@ -51,6 +52,7 @@ function hHeaders(arr, result, headerInfo) {
         }
       }else{
         if(i === arr.length - 1){
+          console.log(item);
           if((tableWidth - total) < maxCellWidth){
             width = undefined;
           }else{
@@ -59,6 +61,7 @@ function hHeaders(arr, result, headerInfo) {
         }
         width = item.length*singleLetterWidth + extraWidth;
       }
+      console.log(width);
       result.push({
         prop: item,
         label: item,
@@ -68,6 +71,7 @@ function hHeaders(arr, result, headerInfo) {
       total += width;
       headerInfo[i + 1] = item;
     }
+    headerInfo['size'] = arr.length;
     if(appendRow){
       result.push({
         prop: '____',
@@ -109,20 +113,31 @@ const handleHeaders = (arr) => {
 };
 
 // 计算字符串所占px
-const computeStrPx = (str) => {
+const computeMaxStrPx = (str) => {
   if(typeof str === 'string'){
     let singlePx = bodyLetterWidth;
     if(StringUtil.containChinese(str)){
       singlePx = chineseSingleWidth;
     }
-    let width = str.length*singlePx + extraWidth;
-    return width > maxCellWidth ? maxCellWidth : width;
+    return str.length*singlePx + extraWidth;
   }
   return 0;
+};
+
+// 计算是否最大字符串
+const isMaxStrPx = (str) => {
+  let width = computeMaxStrPx(str);
+  return width > maxCellWidth;
+};
+// 计算字符串所占px
+const computeStrPx = (str) => {
+  let width = computeMaxStrPx(str);
+  return width > maxCellWidth ? maxCellWidth : width;
 };
 
 export default {
   handleRows,
   handleHeaders,
-  computeStrPx
+  computeStrPx,
+  isMaxStrPx,
 }

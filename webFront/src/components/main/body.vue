@@ -85,12 +85,19 @@
         columnFormat(row){
           //console.log(row);
           let columnIndex = row.columnIndex;
-          if(columnIndex > 0){
+          if(columnIndex > 0){  // 去掉第一个，第一个是序号
             let text = row.row[this.headerInfo[columnIndex]];
             let px = bodyHandler.computeStrPx(text);
-            let columnWidth = row.column.width;
+            let columnWidth = this.columns[columnIndex].width;
             if(columnWidth && columnWidth < px){
               this.columns[columnIndex].width = px;
+            }
+            // 判断是不是最后一个并且后面还有一个最小列
+            if(columnIndex === this.headerInfo['size'] && this.columns[columnIndex + 1]){
+              if(bodyHandler.isMaxStrPx(text)){
+                this.columns[columnIndex].width = undefined;
+                this.columns[columnIndex + 1].width = 1;
+              }
             }
           }
         }
