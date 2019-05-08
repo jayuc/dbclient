@@ -43,7 +43,7 @@ function hHeaders(arr, result, headerInfo) {
       if(userMaxWidth){
         width = maxCellWidth;
         if(i === arr.length - 1){
-          console.log(item);
+          //console.log(item);
           if((tableWidth - total) < maxCellWidth){
             width = undefined;
           }else{
@@ -51,17 +51,21 @@ function hHeaders(arr, result, headerInfo) {
           }
         }
       }else{
+        width = item.length*singleLetterWidth + extraWidth;
         if(i === arr.length - 1){
-          console.log(item);
-          if((tableWidth - total) < maxCellWidth){
-            width = undefined;
-          }else{
+          //console.log(item);
+          //console.log(tableWidth - total);
+          if(width < (tableWidth - total)){
             appendRow = true;
           }
+          // if((tableWidth - total) < maxCellWidth){
+          //
+          // }else{
+          //   //appendRow = true;
+          // }
         }
-        width = item.length*singleLetterWidth + extraWidth;
       }
-      console.log(width);
+      //console.log(width);
       result.push({
         prop: item,
         label: item,
@@ -119,7 +123,7 @@ const computeMaxStrPx = (str) => {
     if(StringUtil.containChinese(str)){
       singlePx = chineseSingleWidth;
     }
-    return str.length*singlePx + extraWidth;
+    return (str.replace(/[\r\n] +/g,"")).length*singlePx + extraWidth;
   }
   return 0;
 };
@@ -139,5 +143,6 @@ export default {
   handleRows,
   handleHeaders,
   computeStrPx,
+  computeMaxStrPx,
   isMaxStrPx,
 }

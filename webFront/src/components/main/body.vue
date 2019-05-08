@@ -23,6 +23,7 @@
               element-loading-text="拼命加载中"
               element-loading-background="rgba(0, 0, 0, 0.8)"
               :cell-style="columnFormat"
+              :cell-class-name="convertCellClass"
     >
       <el-table-column v-for="item in columns"
                        :prop="item.prop"
@@ -40,6 +41,7 @@
 
     import bodyHandler from "./bodyHandler";
     import StringUtil from '@/utils/StringUtil';
+    import $ from 'jquery';
 
     export default {
       name: "main-body",
@@ -89,8 +91,10 @@
             let text = row.row[this.headerInfo[columnIndex]];
             let px = bodyHandler.computeStrPx(text);
             let columnWidth = this.columns[columnIndex].width;
-            if(columnWidth && columnWidth < px){
-              this.columns[columnIndex].width = px;
+            if(columnWidth){
+              if(columnWidth < px){
+                this.columns[columnIndex].width = px;
+              }
             }
             // 判断是不是最后一个并且后面还有一个最小列
             if(columnIndex === this.headerInfo['size'] && this.columns[columnIndex + 1]){
@@ -98,10 +102,48 @@
                 this.columns[columnIndex].width = undefined;
                 this.columns[columnIndex + 1].width = 1;
               }
+            }else{
+              if(!columnWidth){
+                if(80 < px){   // 表格的最小宽度是80
+                  this.columns[columnIndex].width = px;
+                }
+              }
+            }
+          }
+        },
+        convertCellClass(cell){
+          //console.log(cell);
+          let columnIndex = cell.columnIndex;
+          let showAfterClass = '_show__after_';
+          if(columnIndex > 0) {  // 去掉第一个，第一个是序号
+            let text = cell.row[this.headerInfo[columnIndex]];
+            let columnWidth = this.columns[columnIndex].width;
+            let maxWidth = bodyHandler.computeMaxStrPx(text);
+            // 测试bug
+            // if (columnIndex === 5 && cell.rowIndex === 5){
+            //   console.log(text);
+            //   console.log(text.length);
+            //   console.log(columnWidth);
+            //   console.log(maxWidth);
+            // }
+            if(columnWidth < maxWidth){
+              return showAfterClass;
+            }
+            // 判断是不是最后一个并且后面还有一个最小列
+            if(columnIndex === this.headerInfo['size'] && this.columns[columnIndex + 1]){
+              if(bodyHandler.isMaxStrPx(text)){
+                return showAfterClass;
+              }
             }
           }
         }
       },
+      mounted() {
+        $('.main_body_table_').on('click', '._show__after_', function () {
+          let text = $(this).children().text();
+          console.log(text);
+        });
+      }
     }
 </script>
 
@@ -137,5 +179,19 @@
   .main_body_table_ .el-table__row td > .cell,.main_body_table_ .el-table__header th > .cell{
     padding: 0 2px;
     min-width: 4px;
+    position: relative;
+  }
+  .main_body_table_ .el-table__row td > .cell::after{
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 16px;
+    height: 24px;
+    cursor: pointer;
+    display: none;
+  }
+  .main_body_table_ .el-table__row td._show__after_ > .cell::after{
+    display: block;
   }
 </style>
