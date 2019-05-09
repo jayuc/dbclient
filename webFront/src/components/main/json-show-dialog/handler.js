@@ -2,6 +2,7 @@
  * Created by yujie on 2019/5/9 13:45
  */
 import $ from 'jquery';
+import el from "element-ui/src/locale/lang/el";
 
 // 每个节点前长度
 const pre = 20;
@@ -39,12 +40,21 @@ function appendItemToElement(element, obj, isInit) {
     firstElement = '[';
     lastElement = ']';
   }
-  $(element).append(getFirstDiv(firstElement, prePx, isInit));
+  let span = $('<span class="json-tree-item-wrapper"></span>');
+  if($(element).hasClass('json-tree-item-value')){
+    $(element).children('.json-tree-value-wrapper').hide();
+    let sp = $('<span class="json-tree-value-span">' + firstElement + '</span>');
+    $(element).append(sp);
+    sp.addClass('brown');
+  }else{
+    span.append(getFirstDiv(firstElement, prePx, isInit));
+  }
   for (let index in obj){
     let item = obj[index];
-    $(element).append(getDiv(index, item, prePx + pre, isInit));
+    span.append(getDiv(index, item, prePx + pre, isInit));
   }
-  $(element).append(getFirstDiv(lastElement, prePx, isInit));
+  span.append(getFirstDiv(lastElement, prePx, isInit));
+  $(element).append(span);
 }
 
 // 判断是否未对象或数组
@@ -61,7 +71,7 @@ function getTypeByValue(value) {
     return item('null', 'red6c');
   }
   if(value instanceof Array){
-    return item('[]', 'brown');
+    return item('[...]', 'brown');
   }
   switch (type) {
     case "string":
@@ -71,7 +81,7 @@ function getTypeByValue(value) {
     case "undefined":
       return item('undefined', 'red6c');
     case "object":
-      return item('{}', 'brown');
+      return item('{...}', 'brown');
   }
   function item(value, className) {
     return {
@@ -86,11 +96,11 @@ function getFirstDiv(value, prePx, isInit) {
   let preSpan = $('<span></span>');
   let span = $('<span></span>');
   div.append(preSpan);
-  let widthPiex = isInit ? prePx : prePx + pre;
   preSpan.css({
     display: 'inline-block',
-    width: widthPiex
+    width: prePx
   });
+  div.addClass('brown');
   span.text(value);
   div.append(span);
   return div;
@@ -104,18 +114,17 @@ function getDiv(key, value, prePx, isInit) {
   }
   let div = $('<div class="' + className + '"></div>');
   let keySpan = $('<span></span>');
-  let valueSpan = $('<span></span>');
+  let valueSpan = $('<span class="json-tree-value-wrapper"></span>');
   let preSpan = $('<span></span>');
   let arrow = $('<i class="el-icon-caret-right"></i>');
   let da = getTypeByValue(value);
-  let widthPiex = isInit ? prePx : prePx + pre;
   keySpan.append('"' + key + '" : ');
   valueSpan.append(da.value);
   valueSpan.addClass(da.className);
   div.append(preSpan);
   preSpan.css({
     display: 'inline-block',
-    width: widthPiex
+    width: prePx
   });
   if (isObject(value)){
     div.append(arrow);
@@ -124,7 +133,7 @@ function getDiv(key, value, prePx, isInit) {
       cursor: 'pointer'
     });
     div.data('__data', value);
-    div.attr('pre', widthPiex);
+    div.attr('pre', prePx);
   }
   div.append(keySpan);
   div.append(valueSpan);
@@ -145,8 +154,20 @@ const changeArrowDir = (str) => {
   return false;
 };
 
+const isItemClose = (str) => {
+  let a = 'el-icon-caret-right';
+  let b = 'el-icon-caret-bottom';
+  if(str === a){
+    return true;
+  }else if(str === b){
+    return false;
+  }
+  return null;
+};
+
 export default {
   createItem,
   canJson,
   changeArrowDir,
+  isItemClose,
 }
