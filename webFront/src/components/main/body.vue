@@ -139,9 +139,10 @@
         }
       },
       mounted() {
+        let that = this;
         $('.main_body_table_').on('click', '._show__after_', function () {
           let text = $(this).children().text();
-          console.log(text);
+          that.$emit('get-json-str', text);
         });
       }
     }

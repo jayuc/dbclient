@@ -25,11 +25,14 @@
         <el-main>
           <Body ref="the_body"
                 :bodyHeight = "bodyHeight"
+                v-on:get-json-str="showJsonDialog"
           />
         </el-main>
       </el-container>
     </el-container>
     <Dialog ref="the_dialog"
+    />
+    <JsonDialog ref="the_json_dialog"
     />
   </span>
 </template>
@@ -41,6 +44,7 @@
     import Config from '@/config';
     import Dialog from './setting/Dialog';
     import bodyHandler from './main/bodyHandler';
+    import JsonDialog from './main/json-show-dialog';
 
     export default {
         name: "Main",
@@ -56,7 +60,8 @@
           Sider,
           Header,
           Body,
-          Dialog
+          Dialog,
+          JsonDialog
         },
         methods: {
           initHeight(){
@@ -101,6 +106,9 @@
           },
           doSetting(){
             this.$refs.the_dialog.open();
+          },
+          showJsonDialog(text){
+            this.$refs.the_json_dialog.open(text);
           }
         },
         mounted() {
