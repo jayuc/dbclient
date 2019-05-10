@@ -1,6 +1,6 @@
 <template>
   <span class="my_main_">
-    <div class="h10"></div>
+    <div :style="{height: headerTopHeight + 'px'}"></div>
     <el-container>
       <el-aside :width="asideWidth + 'px'">
         <Sider v-on:get-data="handlerData"
@@ -24,7 +24,7 @@
         </el-header>
         <el-main>
           <Body ref="the_body"
-                :bodyHeight = "bodyHeight"
+                :bodyHeight = "tbodyHeight"
                 v-on:get-json-str="showJsonDialog"
           />
         </el-main>
@@ -45,13 +45,15 @@
     import Dialog from './setting/Dialog';
     import bodyHandler from './main/bodyHandler';
     import JsonDialog from './main/json-show-dialog';
+    import $ from 'jquery';
 
     export default {
         name: "Main",
         data(){
           return {
             headerHeight: 240,
-            extractHeight: 138,
+            headerTopHeight: 10,
+            extractHeight: 20 + 24,  // 20表示下面el-main的padding;24是table body 上面文字高度
             bodyHeight: 300,
             asideWidth: 300
           }
@@ -63,9 +65,21 @@
           Dialog,
           JsonDialog
         },
+        computed: {
+          tbodyHeight(){
+            return this.computeBodyHeight();
+          }
+        },
         methods: {
           initHeight(){
-            this.bodyHeight = Config.get('navigatorHeight') - this.headerHeight - this.extractHeight;
+            this.bodyHeight = this.computeBodyHeight();
+          },
+          computeBodyHeight(){
+            // 全局顶部header的高度
+            let global_header_height = $('.__app-header__').height();
+            //console.log(global_header_height);
+            return Config.get('navigatorHeight') - this.headerHeight - this.extractHeight
+                          - this.headerTopHeight - global_header_height;
           },
           startGetData(status){
             this.$refs.the_body.setLoading(status);
@@ -78,7 +92,8 @@
             this.$refs.the_body.assignColumns(columns.result);
             this.$refs.the_body.assignTableData(bodyHandler.handleRows(data.result.rows));
             //console.log(columns.headerInfo);
-            this.$refs.the_body.assignTookTotal(this.handleTook(data.attributes.took), data.result.total, columns.headerInfo);
+            this.$refs.the_body
+              .assignTookTotal(this.handleTook(data.attributes.took), data.result.total, columns.headerInfo);
           },
           handleTook(took){
             return took/1000;
