@@ -99,6 +99,7 @@
   .my_json_tree__i_ .el-dialog__body{
     padding: 10px 20px 20px 20px;
     max-height: 460px;
+    min-height: 200px;
     overflow: auto;
   }
   .my_json_tree__i_ .el-dialog__header{
