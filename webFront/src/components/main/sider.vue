@@ -56,6 +56,7 @@
 
             // 修改table树高度
             setTimeout(() => {
+              //console.log(handler.computeTableStyle());
               $('.main_asider_item_tree_').find('.el-tree-node__children').css(handler.computeTableStyle());
               that.tableLoading = false;
             }, 500);

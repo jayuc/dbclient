@@ -139,6 +139,6 @@
     padding: 0 10px;
   }
   .my_main_ .el-main{
-    padding: 10px;
+    padding: 10px 10px 0 10px;
   }
 </style>

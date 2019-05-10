@@ -33,10 +33,10 @@ const computeTableStyle = () => {
   let connects = Config.get('connects');  //
   // 全局顶部header的高度
   let global_header_height = $('.__app-header__').height();
-  let extra = 20 + 20 + 20 + global_header_height;  // 20是连接树 连接两个字 那一行高度；后面两个20是头部高度和树第一层高度
+  let extra = 20 + 20 + 20 + 5 + global_header_height;  // 20是连接树 连接两个字 那一行高度；后面两个20是头部高度和树第一层高度；后面5是为了和右边table对齐
   return {
     overflow: 'auto',
-    maxHeight: navigatorHeight - extra - 20*(connects.length)
+    height: navigatorHeight - extra - 20*(connects.length)
   }
 };
 
