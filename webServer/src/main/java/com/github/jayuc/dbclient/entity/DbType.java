@@ -8,7 +8,8 @@ package com.github.jayuc.dbclient.entity;
 public enum DbType {
 	Oracle("oracle"),
 	Mysql("mysql"),
-	Redis("redis");
+	Redis("redis"),
+	Postgresql("postgresql");
 	
 	private final String name;
 	

@@ -40,6 +40,12 @@
 		</dependency>
 		
 		<dependency>
+			<groupId>postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>42.2.5</version>
+		</dependency>
+		
+		<dependency>
 		    <groupId>com.oracle</groupId>
 		    <artifactId>ojdbc</artifactId>
 		    <version>11.02</version>

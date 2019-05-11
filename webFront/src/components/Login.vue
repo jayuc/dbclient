@@ -12,7 +12,7 @@
         <el-button type="info" v-on:click="openDialog('Redis')">连接 Redis</el-button>
       </div>
       <div class="col_" style="margin-left: 18px">
-        <el-button type="warning" v-on:click="">连接 Postgresql</el-button>
+        <el-button type="warning" v-on:click="openDialog('Postgresql')">连接 Postgresql</el-button>
       </div>
       <div class="col_" style="margin-left: 36px">
         <el-button type="danger" v-on:click="">连接 Mongodb</el-button>
@@ -54,6 +54,12 @@
         name: 0,
         showName: true,
         showUserName: false
+      },
+      'Postgresql': {
+        port: 5432,
+        name: undefined,
+        showName: true,
+        showUserName: true
       }
     };
 

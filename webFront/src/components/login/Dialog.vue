@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="$attrs.dbData.type + ' 连接：'"
+  <el-dialog :title="computeTitle"
              :visible.sync="visible"
              width="400px"
              class="login_dialog_"
@@ -67,6 +67,11 @@
             userName: [{required: true, message: '请输入用户名', trigger: 'blur'}],
             password: [{required: true, message: '请输入数据库密码', trigger: 'blur'}],
           }
+        }
+      },
+      computed: {
+        computeTitle(){
+          return this.$attrs.dbData.type + ' 连接：';
         }
       },
       methods: {
@@ -171,9 +176,7 @@
         },
         // 处理dbId
         handleDbId(dbId, type){
-          if (typeof handlers.dbIdHandlers[type] === 'function'){
-            return handlers.dbIdHandlers[type](dbId);
-          }
+          return handlers.dbIdHandlers[type](dbId);
         }
       }
     }

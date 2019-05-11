@@ -74,7 +74,7 @@ public abstract class AbstractSqlHandler implements ISqlHandler {
 			LOG.debug("countSql: " + countSql);
 			JSONArray countList = DbUtil.queryJSONData(dataSources.getConnection(), countSql);
 			LOG.debug("total: " + countList);
-			total = countList.getJSONObject(0).getInteger("TOTAL");
+			total = countList.getJSONObject(0).getInteger("total");
 		} catch (SQLException e) {
 			LOG.error(e.getMessage() + " countSql: " + createCountSql(sql) + 
 					",sql: " + sql);
@@ -101,7 +101,7 @@ public abstract class AbstractSqlHandler implements ISqlHandler {
 	 * 组装sql count语句
 	 */
 	private String createCountSql(String sql) {
-		return "select count(*) TOTAL from (" + sql + ") " + SqlConfig.COUNT_SQL_ALIAS;
+		return "select count(*) total from (" + sql + ") " + SqlConfig.COUNT_SQL_ALIAS;
 	}
 	
 	/**

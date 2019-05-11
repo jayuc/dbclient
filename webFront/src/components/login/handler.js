@@ -12,6 +12,7 @@ const dbIdHandlers = {
   'Redis': produceRedisDbId,
   'Mysql': produceDbId,
   'Oracle': produceDbId,
+  'Postgresql': produceDbId,
 };
 
 // 创建连接
@@ -84,6 +85,7 @@ const getDatabase = {
   'Mysql': getMysqlDatabase,
   'Oracle': getMysqlDatabase,
   'Redis': getRedisDatabase,
+  'Postgresql': getMysqlDatabase,
 };
 
 export default {

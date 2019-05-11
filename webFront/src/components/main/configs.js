@@ -9,6 +9,7 @@ const tableSql = {
   'mysql': 'show tables',
   'oracle': 'select table_name from user_tables',
   'redis': 'getRedisAllKeys',
+  'postgresql': 'select tablename from pg_tables where schemaname=\'public\' limit 1000',
 };
 
 const tableQuery = {
@@ -42,6 +43,25 @@ const tableQuery = {
   'redis': {
     'string': (key) => {return 'get ' + key},
     'hash': (key) => {return 'hgetAll ' + key},
+  },
+  'postgresql': {
+    'query': (tableName) => {return 'select * from ' + tableName},
+    'tableStructure': (tableName) => {return 'SELECT ' +
+      'a.attname AS field, ' +
+      't.typname AS type, ' +
+      'a.attlen AS length, ' +
+      'a.atttypmod AS lengthvar, ' +
+      'a.attnotnull AS notnull, ' +
+      'b.description AS comment ' +
+      'FROM pg_class c, ' +
+      'pg_attribute a ' +
+      'LEFT OUTER JOIN pg_description b ON a.attrelid=b.objoid AND a.attnum = b.objsubid, ' +
+      'pg_type t ' +
+      'WHERE c.relname = \'' + tableName + '\' ' +
+      'and a.attnum > 0 ' +
+      'and a.attrelid = c.oid ' +
+      'and a.atttypid = t.oid ' +
+      'ORDER BY a.attnum limit 1000'},
   }
 };
 
@@ -49,7 +69,8 @@ const tableDesc = '数据库所有表';
 const tableNa = {
   'mysql': tableDesc,
   'oracle': tableDesc,
-  'redis': 'redis中所有key'
+  'redis': 'redis中所有key',
+  'postgresql': tableDesc,
 };
 
 const produceChildNode = (i, tableName) => {
@@ -65,13 +86,15 @@ const tableChildrenNode = {
   'mysql': produceChildNode,
   'oracle': produceChildNode,
   'redis': produceChildNodeByRedis,
+  'postgresql': produceChildNode,
 };
 
 const sqlurl = 'sql/execute';
 const tableUrl = {
   'mysql': sqlurl,
   'oracle': sqlurl,
-  'redis': 'redis/execute'
+  'redis': 'redis/execute',
+  'postgresql': sqlurl,
 };
 
 const _tn = (da, field) => {
@@ -88,7 +111,8 @@ const _tn_redis = (da, field) => {
 const tableName = {
   'mysql': _tn,
   'oracle': _tn,
-  'redis': _tn_redis
+  'redis': _tn_redis,
+  'postgresql': _tn,
 };
 
 const _tt = (da) => {
@@ -100,7 +124,8 @@ const _tt_redis = (da) => {
 const tableType = {
   'mysql': _tt,
   'oracle': _tt,
-  'redis': _tt_redis
+  'redis': _tt_redis,
+  'postgresql': _tt,
 };
 
 const _tcn = (da, field) => {
@@ -112,13 +137,15 @@ const _tcn_redis = (da, field) => {
 const tableChildName = {
   'mysql': _tcn,
   'oracle': _tcn,
-  'redis': _tcn_redis
+  'redis': _tcn_redis,
+  'postgresql': _tcn,
 };
 
 // 查询所有数据库语句
 const allDatabases = {
   'mysql': 'show databases',
-  'oracle': 'select name from v$database'
+  'oracle': 'select name from v$database',
+  'postgresql': 'select datname from pg_catalog.pg_database limit 100',
 };
 
 function getMysqlDbNameFromDbId(dbId) {
@@ -136,6 +163,7 @@ const getDbNames = {
   'mysql': getMysqlDbNameFromDbId,
   'oracle': getMysqlDbNameFromDbId,
   'redis': getRedisDbNameFromDbId,
+  'postgresql': getMysqlDbNameFromDbId,
 };
 
 function getRedisDbParamFromDbId(dbId) {
@@ -162,6 +190,7 @@ const getDbParam = {
   'mysql': getMysqlDbParamFromDbId,
   'oracle': getMysqlDbParamFromDbId,
   'redis': getRedisDbParamFromDbId,
+  'postgresql': getMysqlDbParamFromDbId,
 };
 
 //
@@ -169,6 +198,7 @@ const dbTypes = {
   'mysql': 'Mysql',
   'oracle': 'Oracle',
   'redis': 'Redis',
+  'postgresql': 'Postgresql',
 };
 
 function getMysqlDatabase(dbId) {
@@ -182,6 +212,7 @@ const getDatabase = {
   'mysql': getMysqlDatabase,
   'oracle': getMysqlDatabase,
   'redis': getRedisDatabase,
+  'postgresql': getMysqlDatabase,
 };
 
 export default {
