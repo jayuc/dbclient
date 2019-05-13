@@ -1,5 +1,6 @@
 package com.github.jayuc.dbclient.act;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -27,6 +28,15 @@ public class DefaultDBPoolsManager extends AbstractDBPoolsManager {
 	private Map<String, IDbPool> urlReposity = new ConcurrentHashMap<String, IDbPool>();
 	
 	private static final Logger log = LoggerFactory.getLogger(DefaultDBPoolsManager.class);
+	
+	// 参数检查map
+	private static final Map<String, String> paramCheckMap = new HashMap<String, String>();
+	
+	static {
+		paramCheckMap.put("redisuserName", "no");  // 不对redis的username进行检查
+		paramCheckMap.put("mongodbuserName", "no");  // 不对mongodb的username进行检查
+		paramCheckMap.put("mongodbpassword", "no");  // 不对mongodb的password进行检查
+	}
 
 	@Override
 	protected IDbPool createPool(IDbConfig config) throws PoolException {
@@ -69,18 +79,32 @@ public class DefaultDBPoolsManager extends AbstractDBPoolsManager {
 		if(0 == config.getPort()) {
 			sb.append("端口port不能为空，");
 		}
-		if(null == config.getName()) {
-			sb.append("数据库名name不能为空，");
+		if(needCheck(config.getType().getName(), "name")) {
+			if(null == config.getName()) {
+				sb.append("数据库名name不能为空，");
+			}
 		}
-		if(!"redis".equals(config.getType().getName()) && null == config.getUserName()) {
-			sb.append("用户名不能为空，");
+		if(needCheck(config.getType().getName(), "userName")) {
+			if(null == config.getUserName()) {
+				sb.append("用户名不能为空，");
+			}
 		}
-		if(null == config.getPassword()) {
-			sb.append("密码不能为空");
+		if(needCheck(config.getType().getName(), "password")) {
+			if(null == config.getPassword()) {
+				sb.append("密码不能为空");
+			}
 		}
 		if(sb.length() > 0) {
 			throw new PoolException(sb.toString());
 		}
+	}
+	
+	// 是否需要对改类型的改属性进行检验
+	private boolean needCheck(String name, String type) {
+		if(paramCheckMap.containsKey(name + type)) {
+			return false;
+		}
+		return true;
 	}
 
 }

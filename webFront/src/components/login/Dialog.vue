@@ -44,6 +44,7 @@
     export default {
       name: "login-dialog",
       data(){
+        let that = this;
         return {
           visible: false,
           formData: {
@@ -64,8 +65,8 @@
                   callback();
                 }, trigger: 'change'}],
             name: [{required: true, message: '请输入数据库名', trigger: 'blur'}],
-            userName: [{required: true, message: '请输入用户名', trigger: 'blur'}],
-            password: [{required: true, message: '请输入数据库密码', trigger: 'blur'}],
+            userName: [{required: that.$attrs.userNameRequired, message: '请输入用户名', trigger: 'blur'}],
+            password: [{required: that.$attrs.passwordRequired, message: '请输入数据库密码', trigger: 'blur'}],
           }
         }
       },

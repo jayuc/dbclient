@@ -9,6 +9,7 @@ public enum DbType {
 	Oracle("oracle"),
 	Mysql("mysql"),
 	Redis("redis"),
+	Mongodb("mongodb"),
 	Postgresql("postgresql");
 	
 	private final String name;

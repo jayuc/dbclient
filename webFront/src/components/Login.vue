@@ -15,7 +15,7 @@
         <el-button type="warning" v-on:click="openDialog('Postgresql')">连接 Postgresql</el-button>
       </div>
       <div class="col_" style="margin-left: 36px">
-        <el-button type="danger" v-on:click="">连接 Mongodb</el-button>
+        <el-button type="danger" v-on:click="openDialog('Mongodb')">连接 Mongodb</el-button>
       </div>
       <div class="col_">
         <el-button type="primary"
@@ -41,25 +41,41 @@
         port: 1522,        // 默认端口
         name: undefined,   // 默认数据库名
         showName: true,
-        showUserName: true
+        showUserName: true,
+        userNameRequired: true,   // 是否为必填项
+        passwordRequired: true,   // 是否为必填项
       },
       'Mysql': {
         port: 3306,
         name: undefined,
         showName: true,
-        showUserName: true
+        showUserName: true,
+        userNameRequired: true,   // 是否为必填项
+        passwordRequired: true,   // 是否为必填项
       },
       'Redis': {
         port: 6379,
         name: 0,
         showName: true,
-        showUserName: false
+        showUserName: false,
+        userNameRequired: true,   // 是否为必填项
+        passwordRequired: true,   // 是否为必填项
       },
       'Postgresql': {
         port: 5432,
         name: undefined,
         showName: true,
-        showUserName: true
+        showUserName: true,
+        userNameRequired: true,   // 是否为必填项
+        passwordRequired: true,   // 是否为必填项
+      },
+      'Mongodb': {
+        port: 27017,
+        name: undefined,
+        showName: true,
+        showUserName: true,
+        userNameRequired: false,   // 是否为必填项
+        passwordRequired: false,   // 是否为必填项
       }
     };
 
