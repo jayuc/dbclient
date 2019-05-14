@@ -166,6 +166,17 @@ public class MongodbSqlHandler implements ISqlHandler {
 						mongosql.setParamClass(new Class[]{String.class});
 						return mongosql;
 					}
+					if("find()".equals(sqlArr[sqlArr.length - 1])) {
+						String pstr = "";
+						for(int i=1; i<sqlArr.length - 1; i++) {
+							pstr += sqlArr[i] + ".";
+						}
+						mongosql.setLevel("db");
+						mongosql.setSql("getCollection");
+						mongosql.setParam(new String[] {pstr.substring(0, pstr.length() - 1)});
+						mongosql.setParamClass(new Class[]{String.class});
+						return mongosql;
+					}
 				}
 			}
 		}

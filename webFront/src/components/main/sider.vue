@@ -14,6 +14,7 @@
                :default-expanded-keys="tableTerrDefaultExpanded"
                v-loading="tableLoading"
                @node-click="tableNodeClick"
+               @node-expand="expendTableNode"
       />
     </div>
   </span>
@@ -235,6 +236,15 @@
           for(let i=0; i<list.length; i++){
             let title = $(list[i]).text();
             $(list[i]).attr('title', title);
+          }
+        },
+        expendTableNode(data, node, component){
+          if(node.level === 1){
+            let group = $(component.$el).find('.el-tree-node__children');
+            //console.log(group);
+            setTimeout(function () {
+              $(group[0]).css(handler.computeTableStyle());
+            }, 500);
           }
         }
       },
