@@ -5,18 +5,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.github.jayuc.dbclient.config.RedisConfig;
 import com.github.jayuc.dbclient.data.UserCacheData;
 import com.github.jayuc.dbclient.entity.UserData;
 import com.github.jayuc.dbclient.err.SqlHandlerException;
 import com.github.jayuc.dbclient.iter.ISqlHandler;
+import com.github.jayuc.dbclient.utils.MethodReturnUtil;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -134,7 +132,7 @@ public class RedisSqlHandler implements ISqlHandler {
 				
 				Object methodResult = method.invoke(jedis, params);
 				LOG.info("methodResult: " + methodResult);
-				result = parseResult(methodReturnClass, methodResult, params);
+				result = MethodReturnUtil.parse(methodReturnClass, methodResult);
 			}else {
 				throw new SqlHandlerException("方法名或参数不正确");
 			}
@@ -151,93 +149,6 @@ public class RedisSqlHandler implements ISqlHandler {
 			}
 		}
 		return result;
-	}
-	
-	//根据返回结果和返回结果类型解析数据
-	@SuppressWarnings("unchecked")
-	private Map<String, Object> parseResult(Class<?> clazz, Object obj, Object[] params) 
-			throws SqlHandlerException {
-		Map<String, Object> map = new HashMap<String, Object>();
-		final String field = "field";
-		final String value = "value";
-		if(null != obj) {
-			List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
-			List<String> headerList = new ArrayList<String>();
-			int total = 0;
-			if(String.class == clazz || Boolean.class == clazz) {  //
-				if(!"OK".equals(obj)) {
-					Map<String, Object> row = new HashMap<String, Object>();
-					row.put(value, obj);
-					list.add(row);
-					headerList.add(value);
-					total = 1;
-				}
-			}else if(Map.class == clazz) {  //map类型
-				Map<String, Object> row = (Map<String, Object>) obj;
-				Set<String> keys = row.keySet();
-				int len = keys.size();
-				if(len > RedisConfig.MAX_LINE) {
-					len = RedisConfig.MAX_LINE;
-				}
-				int i = 0;
-				for(String key:keys) {
-					if(i < len) {
-						Map<String, Object> r = new HashMap<String, Object>();
-						r.put(field, key);
-						r.put(value, row.get(key));
-						list.add(r);
-					}else {
-						break;
-					}
-					i ++;
-				}
-				headerList.add(field);
-				headerList.add(value);
-				total = keys.size();
-			}else if(Set.class == clazz) {
-				Set<String> row = (Set<String>) obj;
-				int len = row.size();
-				if(len > RedisConfig.MAX_LINE) {
-					len = RedisConfig.MAX_LINE;
-				}
-				int i = 0;
-				for(String key:row) {
-					if(i < len) {
-						Map<String, Object> r = new HashMap<String, Object>();
-						r.put(value, key);
-						list.add(r);
-					}else {
-						break;
-					}
-					i ++;
-				}
-				headerList.add(value);
-				total = row.size();
-			}else if(List.class == clazz) {
-				List<String> row = (List<String>) obj;
-				int len = row.size();
-				if(len > RedisConfig.MAX_LINE) {
-					len = RedisConfig.MAX_LINE;
-				}
-				int i = 0;
-				for(String key:row) {
-					if(i < len) {
-						Map<String, Object> r = new HashMap<String, Object>();
-						r.put(value, key);
-						list.add(r);
-					}else {
-						break;
-					}
-					i ++;
-				}
-				headerList.add(value);
-				total = row.size();
-			}
-			map.put("headers", headerList);
-			map.put("rows", list);
-			map.put("total", total);
-		}
-		return map;
 	}
 	
 	//解析sql

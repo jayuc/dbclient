@@ -4,12 +4,14 @@
 
 import Database from '@/model/Database';
 import user from '@/user';
+import loginHandler from '../login/handler';
 
 const tableSql = {
   'mysql': 'show tables',
   'oracle': 'select table_name from user_tables',
   'redis': 'getRedisAllKeys',
   'postgresql': 'select tablename from pg_tables where schemaname=\'public\' limit 1000',
+  'mongodb': 'show collections',
 };
 
 const tableQuery = {
@@ -62,6 +64,9 @@ const tableQuery = {
       'and a.attrelid = c.oid ' +
       'and a.atttypid = t.oid ' +
       'ORDER BY a.attnum limit 1000'},
+  },
+  'mongodb': {
+    'query': (tableName) => {return 'db.' + tableName + '.find()'}
   }
 };
 
@@ -71,6 +76,7 @@ const tableNa = {
   'oracle': tableDesc,
   'redis': 'redis中所有key',
   'postgresql': tableDesc,
+  'mongodb': '数据库中所有集合',
 };
 
 const produceChildNode = (i, tableName) => {
@@ -82,11 +88,17 @@ const produceChildNode = (i, tableName) => {
 const produceChildNodeByRedis = (i, tableName) => {
   return undefined;
 };
+const produceChildNodeByMongodb = (i, tableName) => {
+  let arr = [];
+  arr.push({id: 'q__' + i, label: '查询', type: 'query', tableName: tableName});
+  return arr;
+};
 const tableChildrenNode = {
   'mysql': produceChildNode,
   'oracle': produceChildNode,
   'redis': produceChildNodeByRedis,
   'postgresql': produceChildNode,
+  'mongodb': produceChildNodeByMongodb,
 };
 
 const sqlurl = 'sql/execute';
@@ -95,6 +107,7 @@ const tableUrl = {
   'oracle': sqlurl,
   'redis': 'redis/execute',
   'postgresql': sqlurl,
+  'mongodb': sqlurl,
 };
 
 const _tn = (da, field) => {
@@ -113,6 +126,7 @@ const tableName = {
   'oracle': _tn,
   'redis': _tn_redis,
   'postgresql': _tn,
+  'mongodb': _tn,
 };
 
 const _tt = (da) => {
@@ -126,6 +140,7 @@ const tableType = {
   'oracle': _tt,
   'redis': _tt_redis,
   'postgresql': _tt,
+  'mongodb': _tt,
 };
 
 const _tcn = (da, field) => {
@@ -139,6 +154,7 @@ const tableChildName = {
   'oracle': _tcn,
   'redis': _tcn_redis,
   'postgresql': _tcn,
+  'mongodb': _tcn,
 };
 
 // 查询所有数据库语句
@@ -146,6 +162,7 @@ const allDatabases = {
   'mysql': 'show databases',
   'oracle': 'select name from v$database',
   'postgresql': 'select datname from pg_catalog.pg_database limit 100',
+  'mongodb': 'show dbs',
 };
 
 function getMysqlDbNameFromDbId(dbId) {
@@ -158,12 +175,23 @@ function getRedisDbNameFromDbId(dbId) {
   return database.name;
 }
 
+function getMongodbDbNameFromDbId(dbId) {
+  let password = user.get('password');
+  //console.log(password);
+  if(password[dbId]){
+    return getMysqlDbNameFromDbId(dbId);
+  }else{
+    return getRedisDbNameFromDbId(dbId);
+  }
+}
+
 // 获取数据库类型
 const getDbNames = {
   'mysql': getMysqlDbNameFromDbId,
   'oracle': getMysqlDbNameFromDbId,
   'redis': getRedisDbNameFromDbId,
   'postgresql': getMysqlDbNameFromDbId,
+  'mongodb': getMongodbDbNameFromDbId,
 };
 
 function getRedisDbParamFromDbId(dbId) {
@@ -185,12 +213,21 @@ function getMysqlDbParamFromDbId(dbId) {
   }
 }
 
+function getMongodbDbParamFromDbId(dbId) {
+  if(loginHandler.haveMongodbPasswordByDbId(dbId)){
+    return getMysqlDbParamFromDbId(dbId);
+  }else{
+    return getRedisDbParamFromDbId(dbId);
+  }
+}
+
 // 获取当前连接参数
 const getDbParam = {
   'mysql': getMysqlDbParamFromDbId,
   'oracle': getMysqlDbParamFromDbId,
   'redis': getRedisDbParamFromDbId,
   'postgresql': getMysqlDbParamFromDbId,
+  'mongodb': getMongodbDbParamFromDbId,
 };
 
 //
@@ -199,6 +236,7 @@ const dbTypes = {
   'oracle': 'Oracle',
   'redis': 'Redis',
   'postgresql': 'Postgresql',
+  'mongodb': 'Mongodb',
 };
 
 function getMysqlDatabase(dbId) {
@@ -207,12 +245,20 @@ function getMysqlDatabase(dbId) {
 function getRedisDatabase(dbId) {
   return new Database(dbId);
 }
+function getMongodbDatabase(dbId) {
+  if(loginHandler.haveMongodbPasswordByDbId(dbId)){
+    return getMysqlDatabase(dbId);
+  }else{
+    return getRedisDatabase(dbId);
+  }
+}
 // 获取database
 const getDatabase = {
   'mysql': getMysqlDatabase,
   'oracle': getMysqlDatabase,
   'redis': getRedisDatabase,
   'postgresql': getMysqlDatabase,
+  'mongodb': getMongodbDatabase,
 };
 
 export default {

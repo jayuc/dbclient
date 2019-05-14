@@ -34,50 +34,10 @@
 <script>
     import Dialog from './login/Dialog';
     import user from '@/user';
+    import entity from './login/entity';
 
     // 数据库默认值
-    const dbValues = {
-      'Oracle': {
-        port: 1522,        // 默认端口
-        name: undefined,   // 默认数据库名
-        showName: true,
-        showUserName: true,
-        userNameRequired: true,   // 是否为必填项
-        passwordRequired: true,   // 是否为必填项
-      },
-      'Mysql': {
-        port: 3306,
-        name: undefined,
-        showName: true,
-        showUserName: true,
-        userNameRequired: true,   // 是否为必填项
-        passwordRequired: true,   // 是否为必填项
-      },
-      'Redis': {
-        port: 6379,
-        name: 0,
-        showName: true,
-        showUserName: false,
-        userNameRequired: true,   // 是否为必填项
-        passwordRequired: true,   // 是否为必填项
-      },
-      'Postgresql': {
-        port: 5432,
-        name: undefined,
-        showName: true,
-        showUserName: true,
-        userNameRequired: true,   // 是否为必填项
-        passwordRequired: true,   // 是否为必填项
-      },
-      'Mongodb': {
-        port: 27017,
-        name: undefined,
-        showName: true,
-        showUserName: true,
-        userNameRequired: false,   // 是否为必填项
-        passwordRequired: false,   // 是否为必填项
-      }
-    };
+    const dbValues = entity.dbValues;
 
     export default {
       name: "Login",

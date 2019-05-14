@@ -85,6 +85,7 @@ const showDataBases = {
   'oracle': _getDataBases,
   'redis': getRedisDataBases,
   'postgresql': _getDataBases,
+  'mongodb': _getDataBases,
 };
 
 // 获取当前数据库类型

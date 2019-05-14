@@ -40,11 +40,11 @@
     import handlers from './handler';
     import CookieUtil from '@/utils/CookieUtil';
     import InnerConfig from '@/config/innerConfig';
+    import entity from './entity';
 
     export default {
       name: "login-dialog",
       data(){
-        let that = this;
         return {
           visible: false,
           formData: {
@@ -54,20 +54,7 @@
             userName: undefined,
             password: undefined,
           },
-          rules: {
-            host: [{required: true, message: '请输入Ip地址', trigger: 'blur'}],
-            port: [{required: true, message: '请输入端口号', trigger: 'blur'},
-              {type: 'number', message: '必须为数字', trigger: 'change'},
-              {validator(rule, value, callback) {
-                  if(value > 65535){
-                    callback(new Error('端口号超过最大值'));
-                  }
-                  callback();
-                }, trigger: 'change'}],
-            name: [{required: true, message: '请输入数据库名', trigger: 'blur'}],
-            userName: [{required: that.$attrs.userNameRequired, message: '请输入用户名', trigger: 'blur'}],
-            password: [{required: that.$attrs.passwordRequired, message: '请输入数据库密码', trigger: 'blur'}],
-          }
+          rules: {}
         }
       },
       computed: {
@@ -105,7 +92,7 @@
                   User.set('connected', 'yes');
                   // password
                   let password = User.get('password');
-                  let _id = handlers.getDatabase[type](dbId).exclusionDbNameStr();
+                  let _id = handlers.getDatabase[type](dbId, that.havePassword()).exclusionDbNameStr();
                   if(typeof password === 'object'){
                     password[_id] = param.password;
                   }else{
@@ -146,6 +133,7 @@
           this.visible = true;
           this.formData.port = data.port;
           this.formData.name = data.name;
+          this.rules = entity.getRules(data);
         },
         resetFrom(){  //重置表单
           this.$refs.myForm.resetFields();
@@ -178,6 +166,13 @@
         // 处理dbId
         handleDbId(dbId, type){
           return handlers.dbIdHandlers[type](dbId);
+        },
+        // 是否有密码
+        havePassword(){
+          if(this.formData.password){
+            return true;
+          }
+          return false;
         }
       }
     }

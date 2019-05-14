@@ -6,6 +6,7 @@ import AjaxUtil from '@/utils/AjaxUtil';
 import User from '@/user';
 import ResultUtil from '@/utils/ResultUtil';
 import Database from '@/model/Database';
+import StringUtil from '@/utils/StringUtil';
 
 // 处理db id
 const dbIdHandlers = {
@@ -13,6 +14,7 @@ const dbIdHandlers = {
   'Mysql': produceDbId,
   'Oracle': produceDbId,
   'Postgresql': produceDbId,
+  'Mongodb': produceMongodbDbId,
 };
 
 // 创建连接
@@ -33,6 +35,7 @@ const connect = (that, param, fun) => {
       let dbId = data.attributes.dbId;
       if(dbId){
         User.set('dbId', dbId);
+        setHavePassword(dbId, param);
       }
       if(typeof fun === 'function'){
         fun(data, dbId);
@@ -44,6 +47,22 @@ const connect = (that, param, fun) => {
     that.$message.error('连接出错，错误原因：' + err.message);
   });
 };
+
+// 设置
+function setHavePassword(dbId, param) {
+  if(param.type === 'Mongodb'){
+    let pass = User.get('password');
+    if(typeof pass !== 'object'){
+      pass = {};
+      User.set('password', pass);
+    }
+    if(StringUtil.isBlank(param.password)){
+      pass[dbId] = false;
+    }else{
+      pass[dbId] = true;
+    }
+  }
+}
 
 // 获取db id 判断是否已经连接
 function getDbId(item) {
@@ -68,14 +87,22 @@ function produceRedisDbId(dbId) {
   return joinStr(item.type, null, item.host, item.port, item.name);
 }
 
+function produceMongodbDbId(dbId) {
+  if(haveMongodbPasswordByDbId(dbId)){
+    return produceDbId(dbId);
+  }else{
+    return produceRedisDbId(dbId);
+  }
+}
+
 function joinStr(_type, _user, _url, _port, _name) {
   let user = _user ? _user + '@' : '';
   let name = _name ? '/' + _name : '';
   return '[' + _type + ']' + user + _url + ':' + _port + name;
 }
 
-function getMysqlDatabase(dbId) {
-  return new Database(dbId, true);
+function getMysqlDatabase(dbId, havePassword) {
+  return new Database(dbId, havePassword);
 }
 function getRedisDatabase(dbId) {
   return new Database(dbId);
@@ -86,6 +113,13 @@ const getDatabase = {
   'Oracle': getMysqlDatabase,
   'Redis': getRedisDatabase,
   'Postgresql': getMysqlDatabase,
+  'Mongodb': getMysqlDatabase,
+};
+
+// 判断mongodb dbId里面是否有密码
+const haveMongodbPasswordByDbId = (dbId) => {
+  let password = User.get('password');
+  return !!password[dbId];
 };
 
 export default {
@@ -93,4 +127,5 @@ export default {
   connect,
   getDatabase,
   getDbId,
+  haveMongodbPasswordByDbId,
 }

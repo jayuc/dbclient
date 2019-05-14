@@ -68,7 +68,9 @@ public abstract class AbstractDBPoolsManager implements IDBPoolsManager {
 				log.debug("向reposity中添加id为 " + keys);
 				reposity.put(keys, pool);
 				log.debug("向password reposity仓库中添加，key: " + urlId);
-				passwrodReposity.put(urlId, config.getPassword());
+				if(null != config.getPassword()) {
+					passwrodReposity.put(urlId, config.getPassword());
+				}
 			}
 			return map;
 		}
@@ -90,8 +92,10 @@ public abstract class AbstractDBPoolsManager implements IDBPoolsManager {
 	protected void checkPassword(IDbConfig config, String urlId) throws PoolException {
 		log.debug("reposity password: " + passwrodReposity.get(urlId));
 		log.debug("config password: " + config.getPassword());
-		if(!passwrodReposity.get(urlId).equals(config.getPassword())) {
-			throw new PoolException("密码不正确");
+		if(null != passwrodReposity.get(urlId)) {
+			if(!passwrodReposity.get(urlId).equals(config.getPassword())) {
+				throw new PoolException("密码不正确");
+			}
 		}
 	}
 
@@ -104,10 +108,11 @@ public abstract class AbstractDBPoolsManager implements IDBPoolsManager {
 		String host = config.getHost().replace(".", "_");
 		String url = config.getType().getName() + "_" + host + "_" 
 				+ config.getPort() + "_" + config.getName();
-		if("redis".equals(config.getType().getName())) {
+		if(StringUtil.isBlank(config.getUserName())) {
 			return url;
+		}else {
+			return  url + "_" + config.getUserName();
 		}
-		return  url + "_" + config.getUserName();
 	}
 	
 	protected abstract IDbPool createPool(IDbConfig config) throws PoolException;

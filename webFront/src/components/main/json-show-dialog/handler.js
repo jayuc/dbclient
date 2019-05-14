@@ -66,6 +66,7 @@ function isObject(value) {
 }
 
 function getTypeByValue(value) {
+  //console.log(value);
   let type = typeof value;
   if(type !== 'undefined' && !value){
     return item('null', 'red6c');
@@ -82,6 +83,8 @@ function getTypeByValue(value) {
       return item('undefined', 'red6c');
     case "object":
       return item('{...}', 'brown');
+    case "boolean":
+      return item(value, 'red6c');
   }
   function item(value, className) {
     return {
