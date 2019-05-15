@@ -79,6 +79,12 @@ public abstract class AbstractMyDataSources implements IMyDataSources {
 		dataSource.setUrl(url);
 		dataSource.setUsername(config.getUserName());
 		dataSource.setPassword(config.getPassword());
+		dataSource.setMaxWait(60000);
+		dataSource.setRemoveAbandoned(true);
+		dataSource.setRemoveAbandonedTimeout(1800);
+		dataSource.setTimeBetweenEvictionRunsMillis(60000);
+		dataSource.setMinEvictableIdleTimeMillis(25200000);
+		dataSource.setLogAbandoned(true);
 		try {
 			dataSource.init();
 			dataSource.createPhysicalConnection();
