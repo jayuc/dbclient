@@ -10,10 +10,10 @@
 环境：java1.8  maven</br>
 入口文件：com.github.jayuc.dbclient.DbclientApplication</br>
 启动：java运行入口文件即可</br>
-***注意***：配置文件/src/main/resources/application.properties 中的 spring.profiles.active=dev 开发时必须配置为dev,否则会出现跨域异常，生成环境请配置prod。</br>
+***注意***：*配置文件/src/main/resources/application.properties 中的 spring.profiles.active=dev 开发时必须配置为dev,否则会出现跨域异常，生成环境请配置prod。*</br>
 ### 前端
 环境：javascript  nodejs  npm</br>
-初始化项目：执行 npm install</br>
+初始化项目：执行 `npm install`</br>
 启动：执行package.json中script中的 node start</br>
 ## 部署
 ## docker镜像
