@@ -5,6 +5,7 @@
 ## 项目简介
 项目为一个web项目，包括后台(webServer)和前端(webFront)两个子项目。后台是java + springboot项目；前端是vue + element-ui项目。</br>
 界面风格：</br>
+
 ## 开发
 ### 后台
 环境：java1.8  maven</br>
