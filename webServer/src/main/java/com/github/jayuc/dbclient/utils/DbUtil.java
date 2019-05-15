@@ -219,7 +219,7 @@ public class DbUtil {
 	        try{
 	            int  length = rs.getMetaData().getColumnCount();
 	            for(int i=0;i<length;i++){
-	            	String  key  = rs.getMetaData().getColumnName(i+1);
+	            	String  key  = rs.getMetaData().getColumnName(i+1).toLowerCase();
 	            	String  classType = rs.getMetaData().getColumnClassName(i+1);
 	            	jsonObject.put(key,Class.forName(classType).cast(rs.getObject(i+1)));
 	            }
