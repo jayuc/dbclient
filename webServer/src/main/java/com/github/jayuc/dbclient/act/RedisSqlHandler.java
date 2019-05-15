@@ -123,13 +123,6 @@ public class RedisSqlHandler implements ISqlHandler {
 				Class<?> methodReturnClass = method.getReturnType();
 				LOG.info("return class type: " + methodReturnClass.getName());
 				
-				//用户 redis index
-				UserData userData = userCacheData.getUserData(token);
-				LOG.info("user cache data: " + userData);
-				if(null != userData) {
-					
-				}
-				
 				Object methodResult = method.invoke(jedis, params);
 				LOG.info("methodResult: " + methodResult);
 				result = MethodReturnUtil.parse(methodReturnClass, methodResult);
