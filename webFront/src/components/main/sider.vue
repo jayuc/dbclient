@@ -163,6 +163,8 @@
         },
         tableNodeClick(data, node){
           //console.log(data);
+          //console.log(node.level);
+          let level = node.level;
           let query;
           let tableInfo;
           if(entity.tableQuery[this.currentDb]){
@@ -183,18 +185,20 @@
             });
           }
           // 查询表信息
-          if (data.type === 'tableStructure' && typeof tableInfo === 'function'){
-            AjaxUtil.get('sql/execute', {sql: tableInfo(data.tableName)}).then((data) => {
-              //console.log(data);
-              let result = data.result;
-              if(result.headers instanceof Array
+          if(data.type){
+            if (data.type === 'tableStructure' && typeof tableInfo === 'function'){
+              AjaxUtil.get('sql/execute', {sql: tableInfo(data.tableName)}).then((data) => {
+                //console.log(data);
+                let result = data.result;
+                if(result.headers instanceof Array
                   && result.headers.length > 0
                   && result.rows.length > 0){
-                that.$emit('query-table-info', result.rows[0][result.headers[0]]);
-              }
-            });
-          }else{
-            that.$emit('query-table-info', '');
+                  that.$emit('query-table-info', result.rows[0][result.headers[0]]);
+                }
+              });
+            }else{
+              that.$emit('query-table-info', '');
+            }
           }
         },
         selectConnectNode(dbId){
