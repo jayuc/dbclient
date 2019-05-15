@@ -26,5 +26,6 @@
 ***注意***：*配置文件/src/main/resources/application.properties 中的 spring.profiles.active=dev 修改为prod。*</br>
 3.运行项目： `java -jar dbclent.xx.xx.jar`</br>
 ## docker镜像
-`docker run -d -p 8004:8004 -v /home/jayu/log/dbclient:/app/log db/client:v1.0.0`
-***说明***：*/app/log为日志所在文件夹*
+`docker run -d -p 8004:8004 -v /home/jayu/log/dbclient:/app/log db/client:v1.0.0`</br>
+***说明***：*/app/log为日志所在文件夹*</br>
+[下载镜像](https://pan.baidu.com/s/1tBQBZ1iYryeNr8Hor7FOfw) 提前码：fb2r
