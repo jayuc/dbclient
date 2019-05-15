@@ -6,6 +6,8 @@
 项目为一个web项目，包括后台(webServer)和前端(webFront)两个子项目。后台是java + springboot项目；前端是vue + element-ui项目。</br>
 界面风格：</br>
 ![登陆](https://github.com/jayuc/dbclient/blob/master/profile/profile1.png)</br>
+![主页](https://github.com/jayuc/dbclient/blob/master/profile/p2.png)</br>
+![json页](https://github.com/jayuc/dbclient/blob/master/profile/p3.png)</br>
 ## 开发
 ### 后台
 环境：java1.8  maven</br>
