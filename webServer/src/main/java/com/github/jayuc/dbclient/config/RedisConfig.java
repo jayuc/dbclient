@@ -14,6 +14,6 @@ public class RedisConfig {
 	public static boolean QUERY_VALIDATE = true;
 	
 	// 最多查询多少条记录
-	public static int MAX_LINE = 500;
+	public static int MAX_LINE = 100;
 
 }
