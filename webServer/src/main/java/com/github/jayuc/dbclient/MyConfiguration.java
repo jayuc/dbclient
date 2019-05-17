@@ -25,9 +25,9 @@ public class MyConfiguration extends WebMvcConfigurerAdapter {
 		if("dev".equals(active)) {
 			registry.addMapping("/**")  
             .allowCredentials(true)  
-            .allowedHeaders("*")  
             .allowedOrigins("*")  
-            .allowedMethods("*"); 
+            .maxAge(3600)
+            .allowedMethods("POST", "GET", "PUT", "OPTIONS", "DELETE");
 		}
     } 
 	

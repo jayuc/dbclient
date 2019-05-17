@@ -122,8 +122,9 @@ function handleUrl(options) {
 
 // 在服务挂机时，强制刷新页面
 function forceRefresh(status) {
+  //console.log(status);
   if(status === 'error'){
-    window.location.reload();
+    //window.location.reload();
   }
 }
 

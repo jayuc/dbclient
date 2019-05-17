@@ -2,6 +2,8 @@
   <span>
     <div class="main_header_sql_tip_">
       请输入语句:
+      <span class="red" style="margin-left: 100px;font-size: 12px">提示：</span>
+      <span style="font-size: 12px">执行{{executeTipText}}</span>
       <a href="#/">
         <i class="el-icon-back main_header_sql_back_" title="返回创建连接页面"></i>
       </a>
@@ -14,10 +16,15 @@
               v-model="sql"
               ref="textarea"
               :draggable="false"
+              @keyup.119.native="execute"
     />
     <div class="main_header_sql_btn_">
       <el-button @click="clearSql" size="mini">清空</el-button>
-      <el-button type="primary" @click="execute" size="mini">执行</el-button>
+      <el-button type="primary"
+                 @click="execute"
+                 size="mini"
+                 :title="executeTipText"
+      >执行</el-button>
       <a class="main_header_sql_btn_a_">切换数据库：</a>
       <el-select v-model="databaseName"
                  size="mini"
@@ -79,7 +86,8 @@
           upClass: 'inline_block_show',
           downClass: 'inline_block_show',
           databaseName: '',
-          databaseOptions: []
+          databaseOptions: [],
+          executeTipText: '快捷键: F8'
         }
       },
       methods: {

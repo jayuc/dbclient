@@ -8,6 +8,7 @@
              label-width="105px"
              :rules="rules"
              ref="myForm"
+             @keyup.enter.native="connect"
     >
       <el-form-item label="Ip地址：" prop="host">
         <el-input v-model="formData.host"></el-input>
@@ -67,6 +68,7 @@
           this.close();
         },
         connect(){
+          //console.log('-------- start connect...');
           let that = this;
           let type = this.$attrs.dbData.type;
           this.$refs.myForm.validate((valid) => {
