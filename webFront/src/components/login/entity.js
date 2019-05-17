@@ -26,7 +26,7 @@ const dbValues = {
     showName: true,
     showUserName: false,
     userNameRequired: true,   // 是否为必填项
-    passwordRequired: true,   // 是否为必填项
+    passwordRequired: false,   // 是否为必填项
   },
   'Postgresql': {
     port: 5432,

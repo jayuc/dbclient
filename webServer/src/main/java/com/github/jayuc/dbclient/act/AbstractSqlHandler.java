@@ -128,9 +128,12 @@ public abstract class AbstractSqlHandler implements ISqlHandler {
 	protected int getLimit(String token) {
 		UserData userData = getUserData(token);
 		LOG.debug("userData: " + userData);
-		return (null != userData) ? 
-				(userData.getLimit() > 0) ? userData.getLimit() : SqlConfig.LIMIT 
-						: SqlConfig.LIMIT;
+		if(null != userData) {
+			int limit = (userData.getLimit() > SqlConfig.MAX_LIMIT) ? SqlConfig.MAX_LIMIT : userData.getLimit();
+			return limit > 0 ? limit : SqlConfig.LIMIT;
+		}else {
+			return SqlConfig.LIMIT;
+		}
 	}
 
 	//一般表示非select查询

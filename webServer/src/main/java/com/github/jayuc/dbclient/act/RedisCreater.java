@@ -6,10 +6,12 @@ import org.springframework.stereotype.Component;
 
 import com.github.jayuc.dbclient.config.RedisConfig;
 import com.github.jayuc.dbclient.entity.DbPool;
+import com.github.jayuc.dbclient.entity.RedisObj;
 import com.github.jayuc.dbclient.err.PoolException;
 import com.github.jayuc.dbclient.iter.IDbConfig;
 import com.github.jayuc.dbclient.iter.IDbCreate;
 import com.github.jayuc.dbclient.iter.IDbPool;
+import com.github.jayuc.dbclient.utils.StringUtil;
 
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -24,7 +26,7 @@ public class RedisCreater implements IDbCreate {
 	
 	private final static Logger LOG = LoggerFactory.getLogger(RedisCreater.class);
 
-	@SuppressWarnings("resource")
+	@SuppressWarnings({ "unused" })
 	@Override
 	public IDbPool create(IDbConfig config) throws PoolException {
 		LOG.debug("redis create start");
@@ -40,15 +42,29 @@ public class RedisCreater implements IDbCreate {
 		} catch (Exception e) {
 			throw new PoolException("redis非法库");
 		}
-		JedisPool redisPool = new JedisPool(redisConfig, config.getHost(), 
-				config.getPort(), RedisConfig.TIME_OUT, config.getPassword(), 
-				dbNum);
+		RedisObj redisObj = new RedisObj();
+		JedisPool redisPool = null;
+		if(StringUtil.isBlank(config.getPassword())) {
+			redisPool = new JedisPool(redisConfig, config.getHost(), config.getPort(), 
+					RedisConfig.TIME_OUT);
+		}else {
+			redisPool = new JedisPool(redisConfig, config.getHost(), 
+					config.getPort(), RedisConfig.TIME_OUT, config.getPassword());
+		}
+		
+		if(null == redisPool) {
+			throw new PoolException("redis连接池创建失败");
+		}else {
+			redisObj.setJedisPool(redisPool);
+			redisObj.setDbNum(dbNum);
+		}
+		
 		try {
 			redisPool.getResource();
 		} catch (Exception e) {
 			throw new PoolException("redis连接池创建失败了");
 		}
-		pool.setPool(redisPool);
+		pool.setPool(redisObj);
 		LOG.debug("redis create end");
 		return pool;
 	}

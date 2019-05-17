@@ -11,13 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.github.jayuc.dbclient.data.UserCacheData;
-import com.github.jayuc.dbclient.entity.UserData;
+import com.github.jayuc.dbclient.entity.RedisObj;
 import com.github.jayuc.dbclient.err.SqlHandlerException;
 import com.github.jayuc.dbclient.iter.ISqlHandler;
 import com.github.jayuc.dbclient.utils.MethodReturnUtil;
 
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
 
 /**
  * redis 处理器
@@ -42,9 +41,13 @@ public class RedisSqlHandler implements ISqlHandler {
 		Jedis jedis = null;
 		Map<String, Object> result = new HashMap<String, Object>();
 		try {
-			jedis = ((JedisPool) pool).getResource();
+			RedisObj redisObj = (RedisObj) pool;
+			jedis = redisObj.getJedisPool().getResource();
 			SqlProperty sqlproperty = parseSql(sql);
 			LOG.info("parse sql property: " + sqlproperty);
+			
+			//选择库
+			jedis.select(redisObj.getDbNum());
 			
 			int paramNum = sqlproperty.paramNumber;
 			String methodName = sqlproperty.methodName;

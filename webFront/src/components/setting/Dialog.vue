@@ -29,10 +29,19 @@
         return {
           visible: false,
           formData: {
-            limit: 10
+            limit: 20
           },
           rules: {
-            limit: [{type: 'number', message: '必须为数字', trigger: 'change'}]
+            limit: [{type: 'number', message: '必须为数字', trigger: 'change'},
+              {validator(rule, value, callback) {
+                if(value > 100){
+                  callback(new Error('最多显示100条'));
+                }
+                if(value === 0){
+                  callback(new Error('显示个数需要大于0'));
+                }
+                callback();
+              }, trigger: 'change'}]
           }
         }
       },

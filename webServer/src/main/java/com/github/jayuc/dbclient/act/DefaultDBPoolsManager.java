@@ -36,6 +36,7 @@ public class DefaultDBPoolsManager extends AbstractDBPoolsManager {
 		paramCheckMap.put("redisuserName", "no");  // 不对redis的username进行检查
 		paramCheckMap.put("mongodbuserName", "no");  // 不对mongodb的username进行检查
 		paramCheckMap.put("mongodbpassword", "no");  // 不对mongodb的password进行检查
+		paramCheckMap.put("redispassword", "no");    // 不对redis的密码进行检查
 	}
 
 	@Override
