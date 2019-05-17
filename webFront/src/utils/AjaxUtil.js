@@ -71,7 +71,7 @@ function doAjaxByPromise(_url, _data, _options) {
       },
       error: function (errmsg, status) {
         reject(errmsg);
-        forceRefresh(status);
+        //forceRefresh(status);
       }
     });
   });
@@ -103,7 +103,7 @@ function doAjax(_options) {
     success: options.success,
     error: (err, status) => {
       options.error(err);
-      forceRefresh(status);
+      //forceRefresh(status);
     }
   });
 }
@@ -124,7 +124,7 @@ function handleUrl(options) {
 function forceRefresh(status) {
   //console.log(status);
   if(status === 'error'){
-    //window.location.reload();
+    window.location.reload();
   }
 }
 
