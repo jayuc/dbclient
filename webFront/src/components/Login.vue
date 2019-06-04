@@ -21,7 +21,16 @@
         <el-button type="primary"
                    icon="el-icon-d-arrow-right"
                    circle
+                   title="前进"
                    @click="gotoMain"
+        />
+      </div>
+      <div class="col_" style="text-align: left">
+        <el-button type="primary"
+                   icon="el-icon-edit"
+                   circle
+                   title="问题反馈"
+                   @click="gotoFeedback"
         />
       </div>
     </div>
@@ -66,6 +75,9 @@
           }else{
             this.$message.warning('还未连接，请先连接');
           }
+        },
+        gotoFeedback(){
+          this.$router.push("/feedback");
         }
       },
       components: {
