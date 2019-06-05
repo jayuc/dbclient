@@ -27,7 +27,8 @@
 </template>
 
 <script>
-  import AjaxUtil from '@/utils/AjaxUtil';
+    import AjaxUtil from '@/utils/AjaxUtil';
+    import ResultUtil from '@/utils/ResultUtil';
 
     export default {
       name: "publishIssueDialog",
@@ -52,12 +53,23 @@
           this.$refs.form.validate((valid) => {
             if (valid) {   //验证成功
               AjaxUtil.post('feedback/publish', param).then((data) => {
-                console.log(data);
+                //console.log(data);
+                ResultUtil.handle(data, () => {
+                  that.$message.success('添加成功');
+                  // 触发添加成功事件
+                  let temp = {
+                    title: that.formData.title,
+                    content: that.formData.content,
+                    status: '0',
+                    id: data.attributes.id,
+                  };
+                  that.$emit('publish-dialog', temp);
+                  that.close();
+                }, that);
               });
             }
           });
-          console.log(this.formData);
-          //this.close();
+          //console.log(this.formData);
         },
         cancel(){
           this.close();

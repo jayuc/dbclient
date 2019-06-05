@@ -1,65 +1,83 @@
 <template>
   <div class="publishIssueIndexMain">
+    <div class="title">
+      问题反馈：
+    </div>
     <div class="header">
       <el-button type="primary"
                  @click="openIssue"
-                 size="small"
+                 size="mini"
       >
-        新增
+        新 增
       </el-button>
     </div>
-    <div>
-      <p v-for="item in list"
-         :pt="item.id"
-         @click="getDetails"
-      >
-        {{item.index}}：{{item.title}}
-      </p>
+    <div ref="contentWrapper">
+      <item v-for="item in list"
+            v-bind:data="item"
+            v-bind:key="item.index"
+      />
     </div>
     <publish-issue-dialog ref="dialog"
+                          v-on:publish-dialog="publishDialog"
     />
   </div>
 </template>
 
 <script>
     import PublishIssueDialog from './publishIssueDialog';
+    import AjaxUtil from '@/utils/AjaxUtil';
+    import $ from 'jquery';
+    import Item from './item';
 
     export default {
       name: "publish-issue-index",
       data(){
         return {
-          list: [
-            {title: '第一个问题', id: 'a', index: 1},
-            {title: '第一个问题', id: 'v', index: 2},
-          ]
+          list: [],
         }
       },
       methods: {
-        getDetails(e){
-          console.log(e.target);
-        },
         openIssue(){
           this.$refs.dialog.open();
+        },
+        publishDialog(data){
+          //console.log(data);
+          let item = data;
+          item.index = this.list.length + 1;
+          this.list.push(item);
         }
       },
       components: {
-        PublishIssueDialog
+        PublishIssueDialog,
+        Item,
+      },
+      mounted() {
+        let contentWrapper = this.$refs.contentWrapper;
+        let that = this;
+        //console.log(contentWrapper);
+        //console.log(this.list);
+        AjaxUtil.get('feedback/getList').then((data) => {
+          //console.log(data);
+          if(data.result.total === 0){
+            $(contentWrapper).append('<div style="margin-top: 10px;color: #909399">暂无数据</div>')
+          }else{
+            that.list = data.result.rows;
+          }
+        });
       }
     }
 </script>
 
 <style>
   .publishIssueIndexMain{
-    margin: 20px;
+    margin: 10px 20px;
   }
   .publishIssueIndexMain .header{
     padding-bottom: 5px;
     border-bottom: 1px solid #409EFF;
   }
-  .publishIssueIndexMain p{
-    line-height: 16px;
-    padding-bottom: 7px;
-    border-bottom: 1px solid #EBEEF5;
-    cursor: pointer;
+  .publishIssueIndexMain .title{
+    padding: 0 0 5px 0;
+    font-size: 16px;
   }
 </style>
