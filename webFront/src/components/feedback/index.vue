@@ -10,6 +10,13 @@
       >
         新 增
       </el-button>
+      <el-button size="mini"
+                 type="info"
+                 style="float: right"
+                 @click="gotoHome"
+      >
+        返 回
+      </el-button>
     </div>
     <div ref="contentWrapper">
       <item v-for="item in list"
@@ -45,6 +52,10 @@
           let item = data;
           item.index = this.list.length + 1;
           this.list.push(item);
+        },
+        gotoHome(){
+          // 跳转到登陆页
+          this.$router.push("/");
         }
       },
       components: {
