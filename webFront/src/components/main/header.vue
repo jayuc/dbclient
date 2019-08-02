@@ -19,17 +19,26 @@
               @keyup.119.native="execute"
     />
     <div class="main_header_sql_btn_">
-      <el-button @click="clearSql" size="mini">清空</el-button>
+      <el-button @click="clearSql"
+                 size="mini"
+                 :disabled="buttonDisabled"
+      >
+        清空
+      </el-button>
       <el-button type="primary"
                  @click="execute"
                  size="mini"
                  :title="executeTipText"
-      >执行</el-button>
+                 :disabled="buttonDisabled"
+      >
+        执行
+      </el-button>
       <a class="main_header_sql_btn_a_">切换数据库：</a>
       <el-select v-model="databaseName"
                  size="mini"
                  style="width: 156px"
                  @change="selectChange"
+                 :disabled="buttonDisabled"
       >
         <el-option
           v-for="item in databaseOptions"
@@ -46,6 +55,7 @@
                    type="info"
                    :class="downClass"
                    title="向下"
+                   :disabled="buttonDisabled"
         />
         <el-button icon="el-icon-arrow-up"
                    size="mini"
@@ -54,6 +64,7 @@
                    plain
                    :class="upClass"
                    title="向上"
+                   :disabled="buttonDisabled"
         />
         <el-button icon="el-icon-minus"
                    size="mini"
@@ -62,6 +73,7 @@
                    @click="toInitHeight"
                    :class="initClass"
                    title="恢复"
+                   :disabled="buttonDisabled"
         />
       </div>
     </div>
@@ -87,7 +99,8 @@
           downClass: 'inline_block_show',
           databaseName: '',
           databaseOptions: [],
-          executeTipText: '快捷键: F8'
+          executeTipText: '快捷键: F8',
+          buttonDisabled: false,    // 按钮是否处于禁用状态
         }
       },
       methods: {
@@ -119,13 +132,19 @@
           }
           this.$emit('start-get-data', true);
           let that = this;
+          // 禁用按钮
+          this.buttonDisable();
           AjaxUtil.get('sql/execute', this.getParam()).then((data) => {
             console.log(data);
             that.$emit('start-get-data', false);
             that.$emit('get-data', data);
             ResultUtil.handle(data, null, that);
+            // 解除按钮禁用
+            that.buttonEnable();
           }, (err) => {
             that.$emit('start-get-data', false);
+            // 解除按钮禁用
+            that.buttonEnable();
             that.$message.error('请求出错，错误原因：' + err.message);
           });
         },
@@ -186,14 +205,24 @@
           let that = this;
           param.name = dbName;
           //console.log(param);
+          // 进行按钮禁用
+          this.buttonDisable();
           loginHandler.connect(this, param, (data, dbId) => {
             //console.log(data);
             //console.log(dbId);
             that.$emit('select-database', dbId);
+            // 解除按钮禁用
+            that.buttonEnable();
           });
         },
         doSetting(){
           this.$emit('setting');
+        },
+        buttonDisable(){
+          this.buttonDisabled = true;
+        },
+        buttonEnable(){
+          this.buttonDisabled = false;
         }
       },
       mounted() {
