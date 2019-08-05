@@ -22,6 +22,9 @@ const tableQuery = {
       let database = new Database(user.get('dbId'), true).name;
       return 'select table_comment from information_schema.TABLES ' +
         'where TABLE_SCHEMA=\'' + database + '\' and TABLE_NAME= \'' + tableName + '\''
+    },
+    'tableIndex': (tableName) => {
+      return 'show index from ' + tableName;
     }
   },
   'oracle': {
@@ -40,6 +43,9 @@ const tableQuery = {
     'tableInfo': (tableName) => {
       return 'select comments from user_tab_comments ' +
         'where table_name=\'' + tableName + '\'';
+    },
+    'tableIndex': (tableName) => {
+      return 'select * from user_indexes where table_name=upper(\'' + tableName + '\')';
     }
   },
   'redis': {
@@ -64,6 +70,9 @@ const tableQuery = {
       'and a.attrelid = c.oid ' +
       'and a.atttypid = t.oid ' +
       'ORDER BY a.attnum limit 1000'},
+    'tableIndex': (tableName) => {
+      return 'select * from pg_indexes where tablename=\'' + tableName + '\'';
+    }
   },
   'mongodb': {
     'query': (tableName) => {return 'db.' + tableName + '.find()'}
@@ -83,6 +92,7 @@ const produceChildNode = (i, tableName) => {
   let arr = [];
   arr.push({id: 'q__' + i, label: '查询', type: 'query', tableName: tableName});
   arr.push({id: 'c__' + i, label: '表结构',type: 'tableStructure', tableName: tableName});
+  arr.push({id: 'i__' + i, label: '表索引',type: 'tableIndex', tableName: tableName});
   return arr;
 };
 const produceChildNodeByRedis = (i, tableName) => {

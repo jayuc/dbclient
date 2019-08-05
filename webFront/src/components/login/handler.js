@@ -18,7 +18,7 @@ const dbIdHandlers = {
 };
 
 // 创建连接
-const connect = (that, param, fun) => {
+const connect = (that, param, fun, reject) => {
   // 正在加载
   const loading = that.$loading({
     lock: true,
@@ -40,11 +40,18 @@ const connect = (that, param, fun) => {
       if(typeof fun === 'function'){
         fun(data, dbId);
       }
-    }, that);
+    }, that, () => {
+      if(typeof reject === 'function'){
+        reject();
+      }
+    });
   }, (err) => {
     loading.close();  //关闭正在加载
     console.log(err);
     that.$message.error('连接出错，错误原因：' + err.message);
+    if(typeof reject === 'function'){
+      reject();
+    }
   });
 };
 

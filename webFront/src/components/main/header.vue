@@ -213,6 +213,9 @@
             that.$emit('select-database', dbId);
             // 解除按钮禁用
             that.buttonEnable();
+          }, () => {
+            // 解除按钮禁用
+            that.buttonEnable();
           });
         },
         doSetting(){
