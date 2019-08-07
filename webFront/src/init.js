@@ -4,11 +4,16 @@
 
 import NavigatorUtil from '@/utils/NavigatorUtil';
 import Config from '@/config';
+import entryLoginCookie from '@/model/LoginCacheCookie';
 
 //项目初始化创建任务
 const init = () => {
 
+  // 初始化浏览器数据
   initNavigator();
+
+  // 从cookie中提取登陆数据到内存中
+  entryLoginCookie.loadLoginDataFromCookie();
 
 };
 

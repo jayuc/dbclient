@@ -5,6 +5,8 @@
  */
 
 export default {
-    //定义的cookei名
-    cookieName: '_tokensu',
+  //定义的cookei名
+  cookieName: '_tokensu',
+  // 定义缓存登陆信息
+  loginCacheName: 'loginCache',
 }

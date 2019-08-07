@@ -11,16 +11,49 @@
              @keyup.enter.native="connect"
     >
       <el-form-item label="Ip地址：" prop="host">
+        <!--
         <el-input v-model="formData.host"></el-input>
+        -->
+        <el-autocomplete class="inline-input"
+                         style="width: 255px"
+                         v-model="formData.host"
+                         :fetch-suggestions="queryTipByHost"
+                         @select="selectTip"
+        />
       </el-form-item>
       <el-form-item label="端口：" prop="port">
+
         <el-input v-model.number="formData.port"></el-input>
+        <!--
+        <el-autocomplete class="inline-input"
+                         style="width: 255px"
+                         v-model.number="formData.port"
+                         :fetch-suggestions="queryTipByPort"
+                         @select="selectTip"
+        />
+        -->
       </el-form-item>
       <el-form-item label="数据库名：" prop="name" v-if="$attrs.dbData.showName">
+        <!--
         <el-input v-model="formData.name"></el-input>
+        -->
+        <el-autocomplete class="inline-input"
+                         style="width: 255px"
+                         v-model="formData.name"
+                         :fetch-suggestions="queryTipByName"
+                         @select="selectTip"
+        />
       </el-form-item>
       <el-form-item label="用户名：" prop="userName" v-if="$attrs.dbData.showUserName">
+        <!--
         <el-input v-model="formData.userName"></el-input>
+        -->
+        <el-autocomplete class="inline-input"
+                         style="width: 255px"
+                         v-model="formData.userName"
+                         :fetch-suggestions="queryTipByUsername"
+                         @select="selectTip"
+        />
       </el-form-item>
       <el-form-item label="用户密码：" prop="password">
         <el-input v-model="formData.password"
@@ -42,6 +75,9 @@
     import CookieUtil from '@/utils/CookieUtil';
     import InnerConfig from '@/config/innerConfig';
     import entity from './entity';
+    import LoginData from '@/model/LoginData';
+    import LoginDb from '@/model/LoginDb';
+    import entryCacheCookie from '@/model/LoginCacheCookie';
 
     export default {
       name: "login-dialog",
@@ -64,13 +100,56 @@
         }
       },
       methods: {
+        queryTipByHost(str, callback){
+          this.queryTip(str, callback, 'host');
+        },
+        queryTipByPort(str, callback){
+          this.queryTip(str, callback, 'port');
+        },
+        queryTipByName(str, callback){
+          this.queryTip(str, callback, 'name');
+        },
+        queryTipByUsername(str, callback){
+          this.queryTip(str, callback, 'userName');
+        },
+        queryTip(str, callback, type){
+          // console.log(str);
+          let arr = [];
+          let cache = entryCacheCookie.getLoginDataCache();
+          let dbType = this.currentDbType();
+          if(cache[dbType]){
+            let d = this.formData;
+            arr = cache[dbType].getColumn(type, new LoginData(d.host, d.port, d.name, d.userName), str);
+          }
+          // console.log(arr);
+          callback(arr);
+        },
+        selectTip(item){
+          // console.log(item);
+          let cache = entryCacheCookie.getLoginDataCache();
+          let dbType = this.currentDbType();
+          if(cache[dbType]){
+            let d = this.formData;
+            let column = cache[dbType].getEmptyColumn(new LoginData(d.host, d.port, d.name, d.userName));
+            // console.log(column);
+            for(let index in this.formData){
+              if(column[index] instanceof Array && column[index].length === 1
+                    && column[index][0] != this.formData[index] && column[index][0]){
+                this.formData[index] = column[index][0];
+              }
+            }
+          }
+        },
         cancel(){
           this.close();
+        },
+        currentDbType(){
+          return this.$attrs.dbData.type;
         },
         connect(){
           //console.log('-------- start connect...');
           let that = this;
-          let type = this.$attrs.dbData.type;
+          let type = this.currentDbType();
           this.$refs.myForm.validate((valid) => {
             if(valid){   //验证成功
               let param = that.filterFormData();
@@ -110,12 +189,32 @@
                 if(token){
                   CookieUtil.set(InnerConfig.cookieName, token, 1000);
                 }
+                // 连接成功后执行
+                that.afterConnected(param);
                 that.close();
                 //跳转到主页面
                 that.$router.push("/main");
               });
             }
           });
+        },
+        // 连接成功或执行
+        afterConnected(param){
+          //console.log(param);
+
+          // 缓存数据
+          let cache = entryCacheCookie.getLoginDataCache();
+          let type = this.currentDbType();
+          let loginData = new LoginData(param.host, param.port, param.name, param.userName);
+          if(cache[type]){
+            cache[type].addLoginData(loginData);
+          }else{
+            cache[type] = new LoginDb(loginData);
+          }
+          // console.log(cache);
+          let cacheCookie = new entryCacheCookie.LoginCacheCookie(cache[type]);
+          // console.log(cacheCookie);
+          cacheCookie.cookie(type);
         },
         //过滤表单
         filterFormData(){
@@ -133,8 +232,12 @@
         },
         open(data){
           this.visible = true;
+          // 初始化表单数据
           this.formData.port = data.port;
           this.formData.name = data.name;
+          this.formData.host = undefined;
+          this.formData.userName = undefined;
+          this.formData.password = undefined;
           this.rules = entity.getRules(data);
         },
         resetFrom(){  //重置表单

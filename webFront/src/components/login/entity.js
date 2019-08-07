@@ -22,7 +22,7 @@ const dbValues = {
   },
   'Redis': {
     port: 6379,
-    name: 0,
+    name: '0',
     showName: true,
     showUserName: false,
     userNameRequired: true,   // 是否为必填项
@@ -49,8 +49,8 @@ const dbValues = {
 // 获取验证规则
 const getRules = (options) => {
   return {
-    host: [{required: true, message: '请输入Ip地址', trigger: 'blur'}],
-    port: [{required: true, message: '请输入端口号', trigger: 'blur'},
+    host: [{required: true, message: '请输入Ip地址', trigger: 'change'}],
+    port: [{required: true, message: '请输入端口号', trigger: 'change'},
       {type: 'number', message: '必须为数字', trigger: 'change'},
       {validator(rule, value, callback) {
           if(value > 65535){
@@ -58,9 +58,9 @@ const getRules = (options) => {
           }
           callback();
         }, trigger: 'change'}],
-    name: [{required: true, message: '请输入数据库名', trigger: 'blur'}],
-    userName: [{required: options.userNameRequired, message: '请输入用户名', trigger: 'blur'}],
-    password: [{required: options.passwordRequired, message: '请输入数据库密码', trigger: 'blur'}],
+    name: [{required: true, message: '请输入数据库名', trigger: 'change'}],
+    userName: [{required: options.userNameRequired, message: '请输入用户名', trigger: 'change'}],
+    password: [{required: options.passwordRequired, message: '请输入数据库密码', trigger: 'change'}],
   };
 };
 

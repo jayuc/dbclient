@@ -7,6 +7,8 @@ import User from '@/user';
 import ResultUtil from '@/utils/ResultUtil';
 import Database from '@/model/Database';
 import StringUtil from '@/utils/StringUtil';
+import Config from '@/config';
+import InnerConfig from '@/config/innerConfig';
 
 // 处理db id
 const dbIdHandlers = {

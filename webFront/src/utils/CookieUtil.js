@@ -1,3 +1,6 @@
+
+import StringUtil from './StringUtil';
+
 /**
  * 设置cookie
  * @param name cookie名
@@ -28,15 +31,49 @@ function get(name) {
 }
 
 /**
+ * 获取cookie （模糊匹配）
+ * @param name
+ * @returns {Array}
+ */
+function getLike(name) {
+  let suf = "=";
+  let result = [];
+  if(StringUtil.isBlank(name)){
+    console.warn('匹配字符串不能为空');
+    return result;
+  }
+  if(name.indexOf(suf) != -1){
+    console.error("不支持带'='的字符串");
+    return result;
+  }
+  let ca = document.cookie.split(';');
+  for(let i = 0; i < ca.length; i++) {
+    let c = ca[i];
+    while(c.charAt(0) == ' ') c = c.substring(1);
+    let firstEqu = c.indexOf(suf);
+    let ind = c.indexOf(name);
+    if(ind != -1 && ind < firstEqu){
+      result.push(item(c.substring(0, firstEqu), c.substring(firstEqu+1, c.length)));
+    }
+  }
+  return result;
+}
+
+function item(key, value) {
+  return {key: key, value: value};
+}
+
+/**
  * 清除cookie
  * @param name
  */
 function clear(name) {
-  setCookie(name, "", -1);
+  set(name, "", -1);
 }
 
 export default {
     set,
     get,
+    getLike,
     clear
 }
