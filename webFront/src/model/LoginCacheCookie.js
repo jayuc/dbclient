@@ -5,6 +5,7 @@
 
 import innerConfig from '../config/innerConfig';
 import CookieUtil from '../utils/CookieUtil';
+import CodeUtil from '../utils/CodeUtil';
 import LoginDb from './LoginDb';
 import LoginData from './LoginData';
 import Config from '../config';
@@ -20,13 +21,25 @@ function LoginCacheCookie(cache) {
 }
 
 LoginCacheCookie.prototype = {
-  cookie: function (type) {
+  cookie: function (type, loginData) {
+    if(!loginData instanceof LoginData){
+      return ;
+    }
     let cookieName = cookieKey(type);
     let cook = CookieUtil.get(cookieName);
-    if(cook){
-      CookieUtil.clear(cookieName);
+    let obj = JSON.parse(cook);
+    // console.log(obj);
+    // console.log(obj.db[loginData.generateId()]);
+    if(obj){
+      if(obj.db && obj.db[loginData.generateId()]){
+
+      }else{
+        CookieUtil.clear(cookieName);
+        this.cookieCache(cookieName);
+      }
+    }else{
+      this.cookieCache(cookieName);
     }
-    this.cookieCache(cookieName);
   },
   cookieCache: function (cookieName) {
     CookieUtil.set(cookieName, JSON.stringify(this.cache), 1000);
@@ -69,7 +82,8 @@ function parseLoginDbFromStr(str) {
     result = new LoginDb();
     for(let index in data){
       let d = data[index];
-      result.addLoginData(new LoginData(d.host, d.port, d.name, d.userName));
+      result.addLoginData(new LoginData(CodeUtil.decode(d.host), CodeUtil.decode(d.port),
+        CodeUtil.decode(d.name), CodeUtil.decode(d.userName), CodeUtil.decode(d.password)));
     }
   }
   return result;

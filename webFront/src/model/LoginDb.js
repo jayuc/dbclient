@@ -3,6 +3,7 @@
  */
 
 import LoginData from './LoginData';
+import CodeUtil from '../utils/CodeUtil';
 
 function LoginDb(loginData) {
   this.db = {};
@@ -25,12 +26,13 @@ LoginDb.prototype = {
     // console.log(loginData);
     for (let index in this.db){
       // console.log(compareLoginData(this.db[index], loginData, type));
+      let decodeValue = CodeUtil.decode(this.db[index][type]);
       if(compareLoginData(this.db[index], loginData, type)
-        && (!tipText || this.db[index][type].indexOf(tipText) > -1)
-        && this.db[index][type] != tipText){
-        if(!tm[this.db[index][type]]){
-          column.push(item(this.db[index][type]));
-          tm[this.db[index][type]] = '1';
+        && (!tipText || decodeValue.indexOf(tipText) > -1)
+        && decodeValue != tipText){
+        if(!tm[decodeValue]){
+          column.push(item(decodeValue));
+          tm[decodeValue] = '1';
         }
       }
     }
@@ -41,7 +43,13 @@ LoginDb.prototype = {
    * @param loginData
    */
   getEmptyColumn: function(loginData){
-    let column = new LoginData([], [], [], []);
+    let column = {
+      host: [],
+      port: [],
+      name: [],
+      userName: [],
+      password: []
+    };
     if(!loginData instanceof LoginData){
       return column;
     }
@@ -71,7 +79,12 @@ LoginDb.prototype = {
 // type 为排除这个属性
 function compareLoginData(l1, l2, type) {
   for(let index in l2){
-    if(index != type && l2[index] && l2[index] != l1[index]){
+    // console.log(index);
+    let decodel1 = CodeUtil.decode(l1[index]);
+    let decodel2 = CodeUtil.decode(l2[index]);
+    // console.log(decodel1);
+    // console.log(decodel2);
+    if(index != type && decodel2 && decodel2 != decodel1){
       return false;
     }
   }
@@ -81,12 +94,14 @@ function compareLoginData(l1, l2, type) {
 function compareAndGetEmptyColumn(l1, l2) {
   let obj = {};
   for(let index in l2){
-    if(l2[index]){
-      if(l2[index] != l1[index]){
+    let decodel1 = CodeUtil.decode(l1[index]);
+    let decodel2 = CodeUtil.decode(l2[index]);
+    if(decodel2){
+      if(decodel2 != decodel1){
         return false;
       }
-    }else if(l1[index]){
-      obj[index] = l1[index];
+    }else if(decodel1){
+      obj[index] = decodel1;
     }
   }
   return obj;

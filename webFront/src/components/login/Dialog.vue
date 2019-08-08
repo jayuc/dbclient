@@ -119,7 +119,7 @@
           let dbType = this.currentDbType();
           if(cache[dbType]){
             let d = this.formData;
-            arr = cache[dbType].getColumn(type, new LoginData(d.host, d.port, d.name, d.userName), str);
+            arr = cache[dbType].getColumn(type, new LoginData(d.host, d.port, d.name, d.userName, d.password), str);
           }
           // console.log(arr);
           callback(arr);
@@ -130,7 +130,7 @@
           let dbType = this.currentDbType();
           if(cache[dbType]){
             let d = this.formData;
-            let column = cache[dbType].getEmptyColumn(new LoginData(d.host, d.port, d.name, d.userName));
+            let column = cache[dbType].getEmptyColumn(new LoginData(d.host, d.port, d.name, d.userName, d.password));
             // console.log(column);
             for(let index in this.formData){
               if(column[index] instanceof Array && column[index].length === 1
@@ -205,7 +205,7 @@
           // 缓存数据
           let cache = entryCacheCookie.getLoginDataCache();
           let type = this.currentDbType();
-          let loginData = new LoginData(param.host, param.port, param.name, param.userName);
+          let loginData = new LoginData(param.host, param.port, param.name, param.userName, param.password);
           if(cache[type]){
             cache[type].addLoginData(loginData);
           }else{
@@ -214,7 +214,7 @@
           // console.log(cache);
           let cacheCookie = new entryCacheCookie.LoginCacheCookie(cache[type]);
           // console.log(cacheCookie);
-          cacheCookie.cookie(type);
+          cacheCookie.cookie(type, loginData);
         },
         //过滤表单
         filterFormData(){
