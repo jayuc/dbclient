@@ -91,7 +91,7 @@
       },
       methods: {
         showDetails(row){
-          console.log(row);
+          // console.log(row);
           this.detailData = [];
           let data = this.tableObj[row.token];
           if(data){
@@ -99,7 +99,7 @@
               this.detailData.push(data[index]);
             }
           }
-          console.log(data);
+          // console.log(data);
           // 打开详情窗口
           this.openDetail();
         },
