@@ -1,16 +1,21 @@
 package com.github.jayuc.dbclient.act;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.jayuc.dbclient.entity.DbType;
 import com.github.jayuc.dbclient.err.PoolException;
 import com.github.jayuc.dbclient.iter.IDBPoolsManager;
 import com.github.jayuc.dbclient.iter.IDbConfig;
 import com.github.jayuc.dbclient.iter.IDbPool;
+import com.github.jayuc.dbclient.param.DbCreateParam;
 import com.github.jayuc.dbclient.utils.IdUtils;
 import com.github.jayuc.dbclient.utils.StringUtil;
 
@@ -81,6 +86,43 @@ public abstract class AbstractDBPoolsManager implements IDBPoolsManager {
 		log.debug("删除pool,id为: " + token);
 		reposity.remove(token);
 		return true;
+	}
+	
+	// 用户使用情况
+	public Map<String, List<DbCreateParam>> getUserUseing(){
+		Map<String, List<DbCreateParam>> map = new HashMap<>();
+		Set<String> keys = reposity.keySet();
+		keys.forEach((item) -> {
+			String token = item.substring(0, 32);
+			String url = item.substring(32);
+			DbCreateParam obj = convertUrl(url);
+			if(map.containsKey(token)) {
+				map.get(token).add(obj);
+			}else {
+				List<DbCreateParam> list = new ArrayList<>();
+				list.add(obj);
+				map.put(token, list);
+			}
+		});
+		return map;
+	}
+	
+	private DbCreateParam convertUrl(String url) {
+		DbCreateParam item = new DbCreateParam();
+		if(null != url) {
+			String[] arr = url.split("_");
+			item.setType(DbType.getDbTypeByName(arr[0]));
+			item.setHost(arr[1] + "." + arr[2] + "." + arr[3] + "." + arr[4]);
+			item.setPort(Integer.valueOf(arr[5]));
+			if(arr.length > 6) {
+				item.setName(arr[6]);
+			}
+//			System.out.println(arr.length);
+			if(arr.length > 7) {
+				item.setUserName(arr[7]);
+			}
+		}
+		return item;
 	}
 	
 	/**

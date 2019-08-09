@@ -25,13 +25,22 @@
                    @click="gotoMain"
         />
       </div>
-      <div class="col_" style="text-align: left">
+      <div class="col_" style="text-align: left;width: 40px;">
         <el-button type="primary"
                    icon="el-icon-edit"
                    circle
                    title="问题反馈"
                    @click="gotoFeedback"
         />
+      </div>
+      <div class="col_">
+        <a href="#/userStatistic">
+          <el-button type="primary"
+                     icon="el-icon-tickets"
+                     circle
+                     title="用户统计"
+          />
+        </a>
       </div>
     </div>
     <Dialog ref="dialog"

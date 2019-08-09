@@ -32,4 +32,15 @@ public enum DbType {
 		return name + "Creater";
 	}
 	
+	// 通过name 获取枚举
+	public static DbType getDbTypeByName(String name) {
+		DbType[] ds = DbType.values();
+		for(DbType d:ds) {
+			if(d.getName().equals(name)) {
+				return d;
+			}
+		}
+		return null;
+	}
+	
 }

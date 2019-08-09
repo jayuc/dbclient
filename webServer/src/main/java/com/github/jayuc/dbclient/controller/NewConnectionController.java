@@ -1,15 +1,18 @@
 package com.github.jayuc.dbclient.controller;
 
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.github.jayuc.dbclient.act.AbstractDBPoolsManager;
 import com.github.jayuc.dbclient.entity.Result;
 import com.github.jayuc.dbclient.err.PoolException;
 import com.github.jayuc.dbclient.iter.IDBPoolsManager;
@@ -53,6 +56,11 @@ public class NewConnectionController {
 		log.debug("请求结束并返回结果");
 		
 		return map.getResult();
+	}
+	
+	@GetMapping("/getUserUseing")
+	public Map<String, List<DbCreateParam>> getUserUseing(){
+		return ((AbstractDBPoolsManager)dbPoolManager).getUserUseing();
 	}
 	
 	/**
