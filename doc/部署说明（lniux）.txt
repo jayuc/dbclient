@@ -1,0 +1,3 @@
+
+# 此版本为linux 部署说明
+一键部署：执行./packDocker.sh 脚本生成docker镜像，参数说明：第一个参数为生成docker镜像位置，默认在项目的 target文件夹下面。
