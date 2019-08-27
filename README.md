@@ -18,11 +18,11 @@
 ### 前端
 环境：javascript  nodejs  npm</br>
 初始化项目：执行 `npm install`</br>
-启动：执行package.json中script中的 `node start`</br>
+启动：执行package.json中script中的 `npm start`</br>
 配置服务ip:/static/config.js 中的 restRoot 配置成后台服务ip地址</br>
 ## 部署
 **步骤**：</br>
-1.打包前端项目：执行 `node build` ，执行成功后会在/dist/目录下面出现index.html文件和static文件夹。把/static/config.js 中的 restRoot 改为"/"</br>
+1.打包前端项目：执行 `npm build` ，执行成功后会在/dist/目录下面出现index.html文件和static文件夹。把/static/config.js 中的 restRoot 改为"/"</br>
 2.打包后台项目：将前端项目打包的index.html和static文件夹复制到后台/src/main/resources/static/文件夹下面执行 `mvn package`，得到dbclent.xx.xx.jar。</br>
 ***注意***：*配置文件/src/main/resources/application.properties 中的 spring.profiles.active=dev 修改为prod。*</br>
 3.运行项目： `java -jar dbclent.xx.xx.jar`</br>
