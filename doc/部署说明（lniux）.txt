@@ -1,3 +1,8 @@
 
 # 此版本为linux 部署说明
+
+第一步：修改配置
+在/dbclient/doc 中，修改下面三个文件的配置 
+ application.properties, config.js, DockFile
+
 一键部署：执行./packDocker.sh 脚本生成docker镜像，参数说明：第一个参数为生成docker镜像位置，默认在项目的 target文件夹下面。
