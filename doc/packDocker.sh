@@ -46,9 +46,9 @@ if [ -d "node_modules" ]; then
   echo "node modules already exists"
 else
   echo "node modules is not exist, start npm install ..."
-  npm install
 fi
 
+npm install
 echo "start node build ..."
 node ./build/build.js
 
