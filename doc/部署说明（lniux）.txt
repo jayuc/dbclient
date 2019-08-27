@@ -3,6 +3,7 @@
 
 第一步：修改配置
 在/dbclient/doc 中，修改下面三个文件的配置 
- application.properties, config.js, DockFile
+ application.properties, config.js, DockerFile
+注意：DockerFile中的项目版本号要和代码中项目的版本号一致；如果不一致，dock镜像不能构建成功。
 
 一键部署：执行./packDocker.sh 脚本生成docker镜像，参数说明：第一个参数为生成docker镜像位置，默认在项目的 target文件夹下面。

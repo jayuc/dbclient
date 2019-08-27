@@ -1,4 +1,4 @@
-FROM ubuntu18/jre8:1.1.2
+FROM ubuntu18/jre8:v1.1.2
 MAINTAINER yujie
 ENV REFRESHED_AT 2019-08-27
 WORKDIR /usr
