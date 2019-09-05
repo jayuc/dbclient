@@ -10,7 +10,11 @@
              @keyup.enter.native="execute"
     	>
 			<el-form-item label="表 名：" prop="tableName">
-				<el-input v-model="formData.tableName" style="width: 140px"></el-input>
+				<el-input v-model="formData.tableName" 
+						  style="width: 140px"
+						  @change="checkTableName"
+				>
+				</el-input>
 				<i class="el-icon-success success" v-show="tableSuccessIcon"></i>
 				<i class="el-icon-error error" v-show="tableFailIcon"></i>
 			</el-form-item>
@@ -30,6 +34,7 @@
 						   plain
 						   @click="showFieldEdit"
 						   v-show="!fieldEditBoxShow"
+						   :disabled="addFeildButtonDisabled"
 				>
 					添加
 				</el-button>
@@ -61,10 +66,11 @@
 				</el-button>
 			</el-form-item>
 			<el-form-item label="上传excel：" prop="tableName">
-				<el-upload 	action=""
+				<el-upload 	:action="uploadUrl"
 							:on-preview="handlePreview"
 							:on-remove="handleRemove"
 							:before-remove="beforeRemove"
+							:on-success="afterFileSuccess"
 							:limit="1"
 							:on-exceed="handleExceed"
 							:file-list="fileList">
@@ -86,6 +92,7 @@
 <script>
 
 	import handler from './handler.js';
+	import Config from '@/config';
 
 	export default {
 		name: 'excel-dialog',
@@ -94,14 +101,17 @@
 				visible: false, // 是否显示
 				initRow: 1,   // 初始化列的值
 				initFeildValue: '',
+				uploadUrl: Config.get('restRoot') + 'upload/file/one',  // 图片上传地址
 				realFeilds: {},  // 真实字段值
 				formData: {
 					tableName: undefined,
 					tableFields: [],
+					filePath: '',
 				},
 				tableSuccessIcon: false,  // 表名 成功标识
 				tableFailIcon: false,  // 表名 失败标识
 				fieldEditBoxShow: false,  // 列与字段对应关系 是否显示
+				addFeildButtonDisabled: true,
 				fileList: []
 			}
 		},
@@ -136,6 +146,36 @@
 				}
 				return true;
 			},
+			checkTableName(value){
+				// console.log(value);
+				let that = this;
+				handler.queryTableContruct(value, (construct) => {
+					// console.log(construct);
+					if(construct){
+						that.realFeilds = construct;
+						that.enableAddField(false);
+						that.enableTableIncon(true);
+					}else{
+						that.enableAddField(true);
+						that.formData.tableFields = [];
+						that.hideFieldEdit();
+						that.enableTableIncon(false);
+						that.$message.error('表名不正确，数据库中无此表');
+					}
+				})
+			},
+			enableTableIncon(boolean){
+				if(boolean){
+					this.tableSuccessIcon = true;
+					this.tableFailIcon = false;
+				}else{
+					this.tableSuccessIcon = false;
+					this.tableFailIcon = true;
+				}
+			},
+			enableAddField(boolean){
+				this.addFeildButtonDisabled = boolean;
+			},
 			deleteFeild(field){
 				this.formData.tableFields.splice(this.formData.tableFields.indexOf(field), 1);
 			},
@@ -152,6 +192,14 @@
 			close(){
 				this.visible = false;
 				this.resetForm();
+			},
+			afterFileSuccess(file){
+				// console.log(file);
+				if(file.status == 1){
+					this.formData.filePath = file.path;
+				}else{
+					this.$message.error('上传文件出错：' + file.errorInfo);
+				}
 			},
 			handleRemove(file, fileList) {
 				console.log(file, fileList);
@@ -172,6 +220,7 @@
 				this.initFeildValue = '';
 				this.initRow = 1;
 				this.realFeilds = {};
+				this.fileList = [];
 			}
 		}
 	}
