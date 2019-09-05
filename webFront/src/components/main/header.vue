@@ -47,6 +47,15 @@
           :value="item.value">
         </el-option>
       </el-select>
+      <el-button size="mini"
+                 type="primary"
+                 style="margin-left: 10px"
+                 plain
+                 @click="openExcelDialog"
+                 v-show="importExcelShow"
+      >
+        导入Excel文件
+      </el-button>
       <div class="main_header_sql_btn_inner_btn_">
         <el-button icon="el-icon-arrow-down"
                    size="mini"
@@ -77,6 +86,7 @@
         />
       </div>
     </div>
+    <ExcelDialog ref="excel_dialog" />
   </span>
 </template>
 
@@ -88,6 +98,7 @@
     import TextareaUtil from '@/utils/TextareaUtil';
     import handler from './handler';
     import loginHandler from '../login/handler';
+    import ExcelDialog from './importData/excelDialog';
 
     export default {
       name: "main-header",
@@ -101,9 +112,16 @@
           databaseOptions: [],
           executeTipText: '快捷键: F8',
           buttonDisabled: false,    // 按钮是否处于禁用状态
+          importExcelShow: false,    // 导入excel是否显示
         }
       },
+      components: {
+        ExcelDialog
+      },
       methods: {
+        openExcelDialog(){
+          this.$refs.excel_dialog.open();
+        },
         clearSql(){
           this.sql = '';
           let data = {
@@ -197,6 +215,7 @@
           }, (err) => {
             console.error(err);
           });
+          this.showImportExcel();
         },
         selectChange(dbName){
           //console.log(dbName);
@@ -217,6 +236,9 @@
             // 解除按钮禁用
             that.buttonEnable();
           });
+        },
+        showImportExcel(){
+          this.importExcelShow = handler.shouldImportExcel();
         },
         doSetting(){
           this.$emit('setting');

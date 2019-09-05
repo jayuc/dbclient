@@ -30,7 +30,7 @@ const connect = (that, param, fun, reject) => {
   });
   AjaxUtil.post('newcon/create', param).then((data) => {
     loading.close();  //关闭正在加载
-    console.log(data);
+    // console.log(data);
     ResultUtil.handle(data, () => {
       that.$message.success('连接成功');
       // 数据库编号
@@ -42,6 +42,7 @@ const connect = (that, param, fun, reject) => {
       if(typeof fun === 'function'){
         fun(data, dbId);
       }
+      Config.set("currentDbType", param.type);
     }, that, () => {
       if(typeof reject === 'function'){
         reject();

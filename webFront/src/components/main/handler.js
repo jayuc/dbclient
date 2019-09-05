@@ -110,6 +110,18 @@ const getDbParamFromDbId = (dbId) => {
   return temp;
 };
 
+// 导入excel数据库类型
+const importExcelDbType = ['mysql', 'oracle'];
+const shouldImportExcel = () => {
+  let currentDbType = Config.get("currentDbType");
+  for(let i=0; i<importExcelDbType.length; i++){
+    if(currentDbType.toLowerCase() === importExcelDbType[i].toLowerCase()){
+      return true;
+    }
+  }
+  return false;
+};
+
 export default {
   produceTables,
   computeTableStyle,
@@ -118,4 +130,5 @@ export default {
   getDbTypeFromDbId,
   getDbNameFromDbId,
   getDbParamFromDbId,
+  shouldImportExcel,
 }

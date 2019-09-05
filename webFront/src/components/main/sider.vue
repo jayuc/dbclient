@@ -108,6 +108,9 @@
               let _id = entity.getDatabase[this.currentDb](dbId).exclusionDbNameStr();
               user.set('connectIndex', Config.get('connectPos')[_id]);
 
+              // console.log(this.currentDb);
+              Config.set('currentDbType', this.currentDb);
+
               this.loadTableTree();
 
               // 触发选中事件
