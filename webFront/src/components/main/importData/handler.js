@@ -39,7 +39,7 @@ const containFeild = (feild, arr, realFeilds) => {
 };
 
 const intLike = ['int', 'number', 'float', 'double', 'decimal'];
-const dateLike = ['date', 'timestamp'];
+const dateLike = ['date', 'time', 'year'];
 // 是否为指定类型
 const canType = (str, type) => {
 	let s = str.toLowerCase();

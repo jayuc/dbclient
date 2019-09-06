@@ -153,7 +153,7 @@
           // 禁用按钮
           this.buttonDisable();
           AjaxUtil.get('sql/execute', this.getParam()).then((data) => {
-            console.log(data);
+            // console.log(data);
             that.$emit('start-get-data', false);
             that.$emit('get-data', data);
             ResultUtil.handle(data, null, that);
