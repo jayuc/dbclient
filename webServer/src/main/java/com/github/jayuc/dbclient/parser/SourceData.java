@@ -5,32 +5,32 @@ import java.util.List;
 
 public class SourceData {
 	
-	List<String[]> allList = new ArrayList<>();
-	List<String[]> normalList = new ArrayList<>();
-	List<String[]> abnormalList = new ArrayList<>();
-	List<String> errorInfoList = new ArrayList<>();
+	List<Object[]> allList = new ArrayList<>();
+	List<Object[]> normalList = new ArrayList<>();
+	List<Object[]> abnormalList = new ArrayList<>();
+	List<Object> errorInfoList = new ArrayList<>();
 	
-	public List<String[]> getAllList() {
+	public List<Object[]> getAllList() {
 		return allList;
 	}
-	public List<String[]> getNormalList() {
+	public List<Object[]> getNormalList() {
 		return normalList;
 	}
-	public List<String[]> getAbnormalList() {
+	public List<Object[]> getAbnormalList() {
 		return abnormalList;
 	}
-	public List<String> getErrorInfoList() {
+	public List<Object> getErrorInfoList() {
 		return errorInfoList;
 	}
 	
-	public void putAll(String[] normal) {
+	public void putAll(Object[] normal) {
 		allList.add(normal);
 	}
-	public void putNormal(String[] normal) {
+	public void putNormal(Object[] normal) {
 		normalList.add(normal);
 	}
 	
-	public void putAbnormal(String[] abnormal, String errorInfo) {
+	public void putAbnormal(Object[] abnormal, String errorInfo) {
 		abnormalList.add(abnormal);
 		errorInfoList.add(errorInfo);
 	}

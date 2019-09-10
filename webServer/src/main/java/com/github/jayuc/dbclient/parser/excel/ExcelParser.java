@@ -3,10 +3,7 @@ package com.github.jayuc.dbclient.parser.excel;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -18,21 +15,15 @@ import com.github.jayuc.dbclient.parser.TypeHandler;
 import com.github.jayuc.dbclient.utils.StringUtil;
 
 public class ExcelParser implements SourceParser {
-	
-	private final static Map<String, String> FILE_TYPE = new HashMap<>();
-	static {
-		FILE_TYPE.put("D0CF11E0", "xls");
-		FILE_TYPE.put("504B0304", "xlsx");
-	}
 
 	@Override
-	public List<String[]> parse(InputStream inputStream) throws Exception {
+	public List<Object[]> parse(InputStream inputStream) throws Exception {
 		SourceData data = parseAndCheck(inputStream, null);
 		return data.getAllList();
 	}
 
 	@Override
-	public List<String[]> parse(String sourcePath) throws Exception {
+	public List<Object[]> parse(String sourcePath) throws Exception {
 		InputStream fs = inputStream(sourcePath);
 		return parse(fs);
 	}
@@ -78,7 +69,7 @@ public class ExcelParser implements SourceParser {
 					int firstCellNum = row.getFirstCellNum();
 					//获得当前行的列数
 					int lastCellNum = row.getPhysicalNumberOfCells();
-					String[] cells = new String[lastCellNum];
+					Object[] cells = new Object[lastCellNum];
 					int normal = 1;  // 1表示数据正常， 2 表示数据异常
 					StringBuilder errorSB = new StringBuilder();
 					//循环当前行
@@ -107,7 +98,7 @@ public class ExcelParser implements SourceParser {
 	}
 	
 	private HandlerResult getCellValue(Cell cell, TypeHandler handler) {
-		String cellValue = "";
+		Object cellValue = "";
 		if(cell == null){
 			return new HandlerResult(1, cellValue);
 		}
@@ -115,16 +106,16 @@ public class ExcelParser implements SourceParser {
 		//判断数据的类型
 		switch (cell.getCellType()){
 			case Cell.CELL_TYPE_NUMERIC: //数字
-				cellValue = String.valueOf(cell.getNumericCellValue());
+				cellValue = cell.getNumericCellValue();
 				break;
 			case Cell.CELL_TYPE_STRING: //字符串
-				cellValue = String.valueOf(cell.getStringCellValue());
+				cellValue = cell.getStringCellValue();
 				break;
 			case Cell.CELL_TYPE_BOOLEAN: //Boolean
-				cellValue = String.valueOf(cell.getBooleanCellValue());
+				cellValue = cell.getBooleanCellValue();
 				break;
 			case Cell.CELL_TYPE_FORMULA: //公式
-				cellValue = String.valueOf(cell.getCellFormula());
+				cellValue = cell.getCellFormula();
 				break;
 			case Cell.CELL_TYPE_BLANK: //空值 
 				cellValue = "";
@@ -138,12 +129,11 @@ public class ExcelParser implements SourceParser {
 				errorInfo = "未知类型";
 				break;
 		}
-		cellValue = cellValue.trim();
 		HandlerResult result = new HandlerResult(1, cellValue);
 		if(StringUtil.isBlank(errorInfo)) {
 			if(handler != null) {
 				try {
-					handler.handle(cellValue);
+					result.value = handler.handle(cellValue);
 				} catch (Exception e) {
 					result.status = 2;
 					result.errorInfo = "类型转换出错";
@@ -158,9 +148,9 @@ public class ExcelParser implements SourceParser {
 	
 	private class HandlerResult{
 		int status;
-		String value;
+		Object value;
 		String errorInfo;
-		public HandlerResult(int status, String value) {
+		public HandlerResult(int status, Object value) {
 			super();
 			this.status = status;
 			this.value = value;

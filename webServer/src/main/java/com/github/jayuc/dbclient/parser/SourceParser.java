@@ -5,9 +5,9 @@ import java.util.List;
 
 public interface SourceParser {
 	
-	List<String[]> parse(InputStream inputStream) throws Exception;
+	List<Object[]> parse(InputStream inputStream) throws Exception;
 	
-	List<String[]> parse(String sourcePath) throws Exception;
+	List<Object[]> parse(String sourcePath) throws Exception;
 	
 	SourceData parseAndCheck(InputStream inputStream, List<TypeHandler> typeHandlers) throws Exception;
 	

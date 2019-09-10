@@ -18,7 +18,7 @@ public class ExcelParserTest {
 		
 		try {
 //			List<List<String[]>> list = ExcelUtil.readExcel(new FileInputStream(path));
-			List<String[]> list = parser.parse(path);
+			List<Object[]> list = parser.parse(path);
 			System.out.println(list);
 		} catch (Exception e) {
 			e.printStackTrace();
