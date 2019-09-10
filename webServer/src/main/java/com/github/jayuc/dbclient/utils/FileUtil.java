@@ -1,5 +1,8 @@
 package com.github.jayuc.dbclient.utils;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 public class FileUtil {
 	
 	// 对文件追加内容
@@ -33,6 +36,29 @@ public class FileUtil {
 			return appendUtf8String(path, content);
 		}
 		return b;
+	}
+	
+	/**
+	 * 获取文件的 魔数
+	 * @param is
+	 * @return
+	 * @throws IOException 
+	 */
+	public static String getMagicNumber(InputStream fs, int number) throws IOException {
+		if(fs != null) {
+			byte[] bs = new byte[fs.available()];
+			fs.read(bs);
+			StringBuilder magicNumber = new StringBuilder();
+	        //一个字节对应魔数的两位
+	        int magicNumberByteLength = number/2;
+	        for (int i = 0; i < magicNumberByteLength; i++) {
+	            magicNumber.append(Integer.toHexString(bs[i] >> 4 & 0xF));
+	            magicNumber.append(Integer.toHexString(bs[i] & 0xF));
+	        }
+	        fs.close();
+	        return magicNumber.toString().toUpperCase();
+		}
+		return null;
 	}
 
 }
