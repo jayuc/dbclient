@@ -16,5 +16,11 @@ public class TaskResult {
 	public void successAdd() {
 		success ++;
 	}
+	
+	public synchronized void add(int t, int s, int f) {
+		total += t;
+		success += s;
+		fail += f;
+	}
 
 }

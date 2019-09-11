@@ -10,9 +10,9 @@ import javax.sql.DataSource;
 
 public class BatchInsertTask implements Callable<TaskResult> {
 	
-	private String sql;
-	private DataSource dataSource;
-	private List<Object[]> data;
+	private final String sql;
+	private final DataSource dataSource;
+	private final List<Object[]> data;
 
 	public BatchInsertTask(String sql, DataSource dataSource, List<Object[]> data) {
 		super();

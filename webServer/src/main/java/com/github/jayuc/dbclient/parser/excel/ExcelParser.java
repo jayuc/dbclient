@@ -75,7 +75,7 @@ public class ExcelParser implements SourceParser {
 					//循环当前行
 					for(int cellNum = firstCellNum; cellNum<lastCellNum;cellNum++){
 						TypeHandler handler = null;
-						if(typeHandlers != null) {
+						if(typeHandlers != null && typeHandlers.size() > rowNum) {
 							handler = typeHandlers.get(rowNum);
 						}
 						Cell cell = row.getCell(cellNum);
