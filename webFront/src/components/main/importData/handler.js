@@ -98,8 +98,67 @@ const queryTableContruct = (tableName, callback) => {
 	}
 };
 
+// 生成 sql语句
+const createSql = (fieldArr, tableName) => {
+	if(!tableName || tableName.length == 0){
+		return "";
+	}
+	let sl = "insert into " + tableName + " (";
+	let sr = ") values (";
+	// console.log(fieldArr);
+	if(fieldArr instanceof Array && fieldArr.length > 0){
+		for(let i=0; i<fieldArr.length; i++){
+			let item = fieldArr[i];
+			let value = item.value.toUpperCase();
+			if(item && value && value.length > 0){
+				if(i == fieldArr.length - 1){
+					sl += value;
+					sr += "?)";
+				}else{
+					sl += value + " ,";
+					sr += "? ,";
+				}
+				
+			}
+		}
+		return sl + sr;
+	}
+	return "";
+};
+
+// 生成字段约束规则
+const createFieldRules = (arr, fields) => {
+	let sords = [];
+	let result = {};
+	for(let i=0; i<arr.length; i++){
+		let item = arr[i];
+		result[item.index] = fields[item.value];
+		sords.push(item.index + '');
+	}
+	return {
+		sords,
+		result
+	};
+};
+
+// 提交导入任务
+const submitTask = (param, resolve, reject) => {
+	AjaxUtil.post('batch/insert', param).then((data) => {
+		if(typeof resolve === 'function'){
+			resolve(data);
+		}
+	}, (e) => {
+		if(typeof reject === 'function'){
+			reject(e);
+		}
+	});
+};
+
 export default {
 	contain,
 	containFeild,
 	queryTableContruct,
+	submitTask,
+	createSql,
+	createFieldRules,
 }

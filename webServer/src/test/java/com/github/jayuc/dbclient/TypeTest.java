@@ -14,8 +14,8 @@ public class TypeTest {
 	@Test
 	public void test() {
 		
-		String str = "2019-09-11 16:23";
-		String i = "11";
+		String str = "2019-09-11 16:23 ";
+		String i = "11 ";
 		long now = System.currentTimeMillis();
 		Object obj = new Object();
 		
@@ -95,22 +95,22 @@ public class TypeTest {
 //			e.printStackTrace();
 //		}
 		try {
-			System.out.println(date.handle("2019-01-10 12:45:01"));
+			System.out.println(date.handle("2019-01-10 12:45:01 "));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		try {
-			System.out.println(date.handle("12:45:01"));
+			System.out.println(date.handle("12:45:01 "));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		try {
-			System.out.println(date.handle("2019-01-10"));
+			System.out.println(date.handle(" 2019-01-10"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		try {
-			System.out.println(date.handle("2019"));
+			System.out.println(date.handle("2019 "));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

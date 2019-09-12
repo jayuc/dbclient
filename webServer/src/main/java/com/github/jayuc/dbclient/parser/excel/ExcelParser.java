@@ -29,6 +29,18 @@ public class ExcelParser implements SourceParser {
 	}
 
 	@Override
+	public List<String[]> parse2(InputStream inputStream) throws Exception {
+		SourceData data = parseAndCheck(inputStream, null);
+		return data.getAllStringList();
+	}
+
+	@Override
+	public List<String[]> parse2(String sourcePath) throws Exception {
+		InputStream fs = inputStream(sourcePath);
+		return parse2(fs);
+	}
+
+	@Override
 	public SourceData parseAndCheck(InputStream inputStream, List<TypeHandler> typeHandlers) throws Exception {
 		Workbook workbook = WorkbookFactory.create(inputStream);
 		SourceData result = new SourceData();
@@ -70,6 +82,7 @@ public class ExcelParser implements SourceParser {
 					//获得当前行的列数
 					int lastCellNum = row.getPhysicalNumberOfCells();
 					Object[] cells = new Object[lastCellNum];
+					String[] stringCells = new String[lastCellNum];
 					int normal = 1;  // 1表示数据正常， 2 表示数据异常
 					StringBuilder errorSB = new StringBuilder();
 					//循环当前行
@@ -81,16 +94,17 @@ public class ExcelParser implements SourceParser {
 						Cell cell = row.getCell(cellNum);
 						HandlerResult cellResult = getCellValue(cell, handler);
 						cells[cellNum] = cellResult.value;
+						stringCells[cellNum] = cellResult.originValue;
 						if(cellResult.status == 2) {
 							normal = 2;
 							errorSB.append(cellNum + ": " + cellResult.errorInfo + ";");
 						}
 					}
-					result.putAll(cells);
+					result.putAll(cells, stringCells);
 					if(normal == 1) {
-						result.putNormal(cells);
+						result.putNormal(cells, stringCells);
 					}else if(normal == 2) {
-						result.putAbnormal(cells, errorSB.toString());
+						result.putAbnormal(cells, errorSB.toString(), stringCells);
 					}
 				}
 			}
@@ -130,16 +144,19 @@ public class ExcelParser implements SourceParser {
 				break;
 		}
 		HandlerResult result = new HandlerResult(1, cellValue);
+		result.originValue = String.valueOf(cellValue);
 		if(StringUtil.isBlank(errorInfo)) {
 			if(handler != null) {
 				try {
 					result.value = handler.handle(cellValue);
 				} catch (Exception e) {
+					result.value = String.valueOf(cellValue);
 					result.status = 2;
 					result.errorInfo = "类型转换出错";
 				}
 			}
 		}else {
+			result.value = "";
 			result.status = 2;
 			result.errorInfo = errorInfo;
 		}
@@ -149,6 +166,7 @@ public class ExcelParser implements SourceParser {
 	private class HandlerResult{
 		int status;
 		Object value;
+		String originValue;
 		String errorInfo;
 		public HandlerResult(int status, Object value) {
 			super();
