@@ -7,8 +7,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.sql.DataSource;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -26,9 +24,9 @@ import com.github.jayuc.dbclient.utils.StringUtil;
 public class Configuration {
 	
 	@Value("${insert.batch.size}")
-	private int batchSize = 400;
+	private int batchSize;
 	@Value("${insert.thread.size}")
-	private int threadSize = 4;
+	private int threadSize;
 	
 	private static Map<String, TypeHandler> typeHandlers = new HashMap<>();
 	static {
@@ -37,11 +35,12 @@ public class Configuration {
 		typeHandlers.put("date", new DateTypeHandler());
 	}
 	
-	public TaskFork newTaskFork(DataSource dataSource, String sql) {
-		return new DefaultTaskFork()
-				.batchSize(batchSize)
-				.dataSource(dataSource)
-				.sql(sql);
+	public TaskFork newTaskFork() {
+		DefaultTaskFork fork = new DefaultTaskFork();
+		if(batchSize > 0) {
+			fork.setBatchSize(batchSize);
+		}
+		return fork;
 	}
 	
 	public ExecutorService newExecutor() {
@@ -67,14 +66,12 @@ public class Configuration {
 	
 	public List<TypeHandler> typeHandlers(String[] type){
 		List<TypeHandler> list = new ArrayList<TypeHandler>();
-		if(type != null && type.length > 0) {
-			for(String t:type) {
-				String tl = t.toLowerCase();
-				if(typeHandlers.containsKey(tl)) {
-					list.add(typeHandlers.get(tl));
-				}else {
-					list.add(null);
-				}
+		for(String t:type) {
+			String tl = t.toLowerCase();
+			if(typeHandlers.containsKey(tl)) {
+				list.add(typeHandlers.get(tl));
+			}else {
+				list.add(null);
 			}
 		}
 		return list;

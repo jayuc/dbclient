@@ -7,8 +7,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,8 +24,6 @@ import com.github.jayuc.dbclient.utils.ResultUtils;
 @Service
 public class BatchInsertService {
 	
-	private final Logger LOG = LoggerFactory.getLogger(BatchInsertService.class);
-	
 	@Autowired
 	private Configuration configuration;
 	private ExecutorService executor;
@@ -37,7 +33,6 @@ public class BatchInsertService {
 	
 	public Map<String, Object> insert(BatchInsertParam param){
 		Result result = ResultUtils.simpleResult();
-		LOG.info("提交导入任务...");
 		
 		if(parser == null) {
 			parser = configuration.newParser(param.getSourceType());
@@ -46,41 +41,34 @@ public class BatchInsertService {
 			executor = configuration.newExecutor();
 		}
 		if(fork == null) {
-			fork = configuration.newTaskFork(null, param.getSql());
+			fork = configuration.newTaskFork();
 		}
 		
 		if(parser != null) {
 			try {
 				
-				SourceData data = parser.parseAndCheck(param.getSourcePath(), null);
-				TaskResult tr = new TaskResult();
-				tr.addError(data.getAbnormalStringList());
-				resultMap.put(IdUtils.generateId(), tr);
+				SourceData data = parser.parseAndCheck(param.getSourcePath(), configuration.typeHandlers(param.getRules()));
 				List<Object[]> list = data.getNormalList();
 				if(list.size() > 0) {
 					List<BatchInsertTask> tasks = fork.fork(list);
 					if(tasks.size() > 0) {
+						TaskResult tr = new TaskResult();
+						resultMap.put(IdUtils.generateId(), tr);
 //						new TaskThread(tasks, tr).start();
 					}else {
-						LOG.error("无可导入数据");
 						result.setError("无可导入数据");
 					}
 				}else {
-					LOG.error("无可导入数据");
 					result.setError("无可导入数据");
 				}
 				
 			} catch (Exception e) {
-				LOG.error("解析出错", e);
-				e.printStackTrace();
 				result.setError("解析出错");
 			}
 		}else {
-			LOG.error("文件类型不正确");
 			result.setError("文件类型不正确");
 		}
 		
-		LOG.info("提交任务完成， " + result.getResult().toString());
 		return result.getResult();
 	}
 	

@@ -12,9 +12,5 @@ public interface SourceParser {
 	SourceData parseAndCheck(InputStream inputStream, List<TypeHandler> typeHandlers) throws Exception;
 	
 	SourceData parseAndCheck(String sourcePath, List<TypeHandler> typeHandlers) throws Exception;
-	
-	List<String[]> parse2(InputStream inputStream) throws Exception;
-	
-	List<String[]> parse2(String sourcePath) throws Exception;
 
 }

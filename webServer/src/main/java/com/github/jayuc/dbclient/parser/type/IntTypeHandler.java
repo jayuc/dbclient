@@ -17,9 +17,4 @@ public class IntTypeHandler extends AbstractTypeHandler {
 		return (Integer)obj;
 	}
 
-	@Override
-	protected String string(Object obj) throws Exception {
-		return Integer.toString((int)obj);
-	}
-
 }

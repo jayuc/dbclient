@@ -36,9 +36,4 @@ public class DateTypeHandler extends AbstractTypeHandler {
 		return (Date)obj;
 	}
 
-	@Override
-	protected String string(Object obj) throws Exception {
-		return DateUtil.DateToString((Date)obj);
-	}
-
 }

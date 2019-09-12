@@ -12,9 +12,4 @@ public class StringTypeHandler extends AbstractTypeHandler {
 		return obj.toString();
 	}
 
-	@Override
-	protected String string(Object obj) throws Exception {
-		return obj.toString().trim();
-	}
-
 }
