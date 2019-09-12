@@ -19,7 +19,7 @@
 				<i class="el-icon-error error" v-show="tableFailIcon"></i>
 			</el-form-item>
 			<el-form-item label="列 => 字段：">
-				<el-tag :key="field.index"
+				<el-tag :key="field.id"
 						v-for="field in formData.tableFields"
 						closable
 						size="small"
@@ -28,7 +28,7 @@
 						:disable-transitions="false"
 						@close="deleteFeild(field)"
 				>
-					{{field.index}} => {{field.value}}
+					{{field.id}} => {{field.value}}
 				</el-tag>
 				<el-button type="primary"
 						   plain
@@ -38,8 +38,6 @@
 				>
 					添加
 				</el-button>
-				<i class="el-icon-success success" v-show="tableFieldokIcon"></i>
-				<i class="el-icon-error error" v-show="tableFieldnoIcon"></i>
 			</el-form-item>
 			<el-form-item label="" v-show="fieldEditBoxShow">
 				<span>编辑 列 => 字段 ：</span>
@@ -82,8 +80,6 @@
 							>
 								点击上传
 							</el-button>
-							<i class="el-icon-success success" v-show="fileokIcon"></i>
-							<i class="el-icon-error error" v-show="filenoIcon"></i>
 				</el-upload>
 			</el-form-item>
 		</el-form>
@@ -104,7 +100,6 @@
 			return {
 				visible: false, // 是否显示
 				initRow: 1,   // 初始化列的值
-				maxRow: 1,  // 最大值
 				initFeildValue: '',
 				uploadUrl: Config.get('restRoot') + 'upload/file/one',  // 图片上传地址
 				realFeilds: {},  // 真实字段值
@@ -115,10 +110,6 @@
 				},
 				tableSuccessIcon: false,  // 表名 成功标识
 				tableFailIcon: false,  // 表名 失败标识
-				tableFieldokIcon: false,  // 字段 成功标识
-				tableFieldnoIcon: false,  // 字段 失败标识
-				fileokIcon: false,  // 文件 成功标识
-				filenoIcon: false,  // 文件 失败标识
 				fieldEditBoxShow: false,  // 列与字段对应关系 是否显示
 				addFeildButtonDisabled: true,
 				fileList: []
@@ -126,50 +117,8 @@
 		},
 		methods: {
 			execute(){
-				if(this.checkForm()){
-					let formData = this.formData;
-					// console.log(formData);
-					// console.log(this.realFeilds);
-					let sr = handler.createFieldRules(formData.tableFields, this.realFeilds);
-					let param = {
-						sourcePath: formData.filePath,
-						sourceType: 'excel',
-						sql: handler.createSql(formData.tableFields, formData.tableName),
-						rules: sr.result,
-						sorts: JSON.stringify(sr.sords),
-					};
-					// console.log(param);
-					handler.submitTask(param, (data) => {
-						console.log(data);
-						if(data.status === 'error'){
-							this.$message.error("出错: " + data.errorInfo);
-							return;
-						}
-					}, (e) => {
-						this.$message.error("提交任务出错");
-					})
-				}
-			},
-			checkForm(){
-				let errorInfo = '';
-				let formData = this.formData;
-				if(!(formData.tableName && formData.tableName.length > 0)){
-					this.enableTableIncon(false);
-					errorInfo += '表名不能为空， ';
-				}
-				if(!(formData.tableFields.length > 0)){
-					errorInfo += '字段不能为空， ';
-					this.enableTableFieldIncon(false);
-				}
-				if(!(formData.filePath && formData.filePath.length > 0)){
-					errorInfo += '文件不能为空， ';
-					this.enableFileIncon(false);
-				}
-				if(errorInfo.length > 0){
-					this.$message.error("出错: " + errorInfo);
-					return false;
-				}
-				return true;
+
+
 			},
 			addFeild(){
 				let arr = this.formData.tableFields;
@@ -181,14 +130,9 @@
 					return;
 				}
 				if(this.checkRow()){
-					let item = {index: this.initRow, value: field};
+					let item = {id: this.initRow, value: field};
 					this.formData.tableFields.push(item);
-					this.maxRow++;
 					this.initRow++;
-					if(this.maxRow > this.initRow){
-						this.initRow = --this.maxRow;
-					}
-					this.initFeildValue = '';
 				}
 			},
 			checkRow(){
@@ -220,24 +164,6 @@
 					}
 				})
 			},
-			enableTableFieldIncon(boolean){
-				if(boolean){
-					this.tableFieldokIcon = true;
-					this.tableFieldnoIcon = false;
-				}else{
-					this.tableFieldokIcon = false;
-					this.tableFieldnoIcon = true;
-				}
-			},
-			enableFileIncon(boolean){
-				if(boolean){
-					this.fileokIcon = true;
-					this.filenoIcon = false;
-				}else{
-					this.fileokIcon = false;
-					this.filenoIcon = true;
-				}
-			},
 			enableTableIncon(boolean){
 				if(boolean){
 					this.tableSuccessIcon = true;
@@ -255,16 +181,9 @@
 			},
 			showFieldEdit(){
 				this.fieldEditBoxShow = true;
-				this.tableFieldnoIcon = false;
-				this.tableFieldokIcon = false;
 			},
 			hideFieldEdit(){
 				this.fieldEditBoxShow = false;
-				if(this.formData.tableFields.length > 0){
-					this.enableTableFieldIncon(true);
-				}else{
-					this.enableTableFieldIncon(false);
-				}
 			},
 			open(){
 				this.visible = true;
@@ -278,19 +197,15 @@
 				// console.log(file);
 				if(file.status == 1){
 					this.formData.filePath = file.path;
-					this.enableFileIncon(true);
 				}else{
-					this.enableFileIncon(false);
 					this.$message.error('上传文件出错：' + file.errorInfo);
 				}
 			},
 			handleRemove(file, fileList) {
-				// console.log(file, fileList);
-				this.formData.filePath = '';
-				this.enableFileIncon(false);
+				console.log(file, fileList);
 			},
 			handlePreview(file) {
-				// console.log(file);
+				console.log(file);
 			},
 			handleExceed(files, fileList) {
 				this.$message.warning(`当前限制选择 1 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
