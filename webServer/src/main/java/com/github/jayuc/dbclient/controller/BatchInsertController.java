@@ -2,10 +2,12 @@ package com.github.jayuc.dbclient.controller;
 
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.jayuc.dbclient.entity.Result;
@@ -18,11 +20,14 @@ import com.github.jayuc.dbclient.utils.StringUtil;
 @RequestMapping("/batch")
 public class BatchInsertController {
 	
+	private final Logger LOG = LoggerFactory.getLogger(BatchInsertController.class);
+	
 	@Autowired
 	BatchInsertService batchService;
 
 	@RequestMapping(value = "/insert", method = RequestMethod.POST)
-	public Map<String, Object> insert(@RequestParam("param") BatchInsertParam param){
+	public Map<String, Object> insert(@ModelAttribute("param") BatchInsertParam param){
+		LOG.info("批量导入： " + param);
 		Result result = ResultUtils.simpleResult();
 		if(checkParam(result, param.getSql(), "sql") 
 				|| checkParam(result, param.getSourcePath(), "文件地址") 
