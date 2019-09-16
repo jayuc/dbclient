@@ -3,7 +3,12 @@ package com.github.jayuc.dbclient.parser.excel;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
+
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -41,7 +46,7 @@ public class ExcelParser implements SourceParser {
 	}
 
 	@Override
-	public SourceData parseAndCheck(InputStream inputStream, List<TypeHandler> typeHandlers) throws Exception {
+	public SourceData parseAndCheck(InputStream inputStream, Map<Integer, TypeHandler> typeHandlers) throws Exception {
 		Workbook workbook = WorkbookFactory.create(inputStream);
 		SourceData result = new SourceData();
 		foreachRow(workbook, result, typeHandlers);
@@ -49,7 +54,7 @@ public class ExcelParser implements SourceParser {
 	}
 
 	@Override
-	public SourceData parseAndCheck(String sourcePath, List<TypeHandler> typeHandlers) throws Exception {
+	public SourceData parseAndCheck(String sourcePath, Map<Integer, TypeHandler> typeHandlers) throws Exception {
 		InputStream fs = inputStream(sourcePath);
 		return parseAndCheck(fs, typeHandlers);
 	}
@@ -58,7 +63,7 @@ public class ExcelParser implements SourceParser {
 		return new FileInputStream(path);
 	}
 	
-	private void foreachRow(Workbook workbook, SourceData result, List<TypeHandler> typeHandlers) {
+	private void foreachRow(Workbook workbook, SourceData result, Map<Integer, TypeHandler> typeHandlers) {
 		if(workbook != null) {
 			for(int sheetNum = 0; sheetNum < workbook.getNumberOfSheets(); sheetNum ++) {
 				//获得当前sheet工作表
@@ -82,14 +87,16 @@ public class ExcelParser implements SourceParser {
 					//获得当前行的列数
 					int lastCellNum = row.getPhysicalNumberOfCells();
 					Object[] cells = new Object[lastCellNum];
+					List<Object> normalCells = new ArrayList<Object>();
 					String[] stringCells = new String[lastCellNum];
 					int normal = 1;  // 1表示数据正常， 2 表示数据异常
+					int hasValue = 0;  // 
 					StringBuilder errorSB = new StringBuilder();
 					//循环当前行
 					for(int cellNum = firstCellNum; cellNum<lastCellNum;cellNum++){
 						TypeHandler handler = null;
-						if(typeHandlers != null && typeHandlers.size() > rowNum) {
-							handler = typeHandlers.get(rowNum);
+						if(typeHandlers != null) {
+							handler = typeHandlers.get(cellNum+1);
 						}
 						Cell cell = row.getCell(cellNum);
 						HandlerResult cellResult = getCellValue(cell, handler);
@@ -99,12 +106,20 @@ public class ExcelParser implements SourceParser {
 							normal = 2;
 							errorSB.append(cellNum + ": " + cellResult.errorInfo + ";");
 						}
+						if(handler != null) {
+							normalCells.add(cellResult.value);
+						}
+						if(StringUtil.isBlank(cellResult.originValue)) {
+							hasValue++;
+						}
 					}
-					result.putAll(cells, stringCells);
-					if(normal == 1) {
-						result.putNormal(cells, stringCells);
-					}else if(normal == 2) {
-						result.putAbnormal(cells, errorSB.toString(), stringCells);
+					if(hasValue < (lastCellNum - firstCellNum)) {
+						result.putAll(cells, stringCells);
+						if(normal == 1) {
+							result.putNormal(normalCells.toArray(), stringCells);
+						}else if(normal == 2) {
+							result.putAbnormal(cells, errorSB.toString(), stringCells);
+						}
 					}
 				}
 			}
@@ -120,7 +135,14 @@ public class ExcelParser implements SourceParser {
 		//判断数据的类型
 		switch (cell.getCellType()){
 			case Cell.CELL_TYPE_NUMERIC: //数字
-				cellValue = cell.getNumericCellValue();
+				if(org.apache.poi.ss.usermodel.DateUtil.isCellDateFormatted(cell)){
+					Date date = cell.getDateCellValue();
+					if(date != null){
+						cellValue = new SimpleDateFormat("yyyy-MM-dd").format(date);
+					}
+				}else {
+					cellValue = cell.getNumericCellValue();
+				}
 				break;
 			case Cell.CELL_TYPE_STRING: //字符串
 				cellValue = cell.getStringCellValue();
@@ -150,7 +172,7 @@ public class ExcelParser implements SourceParser {
 				try {
 					result.value = handler.handle(cellValue);
 				} catch (Exception e) {
-					result.value = String.valueOf(cellValue);
+					result.value = cellValue;
 					result.status = 2;
 					result.errorInfo = "类型转换出错";
 				}

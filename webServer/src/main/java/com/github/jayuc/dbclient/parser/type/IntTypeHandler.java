@@ -10,11 +10,19 @@ public class IntTypeHandler extends AbstractTypeHandler {
 	@Override
 	protected Object doHandle(Object obj) throws Exception {
 		
+		if(Double.class == obj.getClass()) {
+			return ((Double)obj).intValue();
+		}
+		
 		if(String.class == obj.getClass()) {
 			return Integer.valueOf((String) obj);
 		}
 		
-		return (Integer)obj;
+		if(Float.class == obj.getClass()) {
+			return ((Float)obj).intValue();
+		}
+		
+		return (int)obj;
 	}
 
 	@Override

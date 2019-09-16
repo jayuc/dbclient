@@ -52,7 +52,7 @@ public class BatchInsertService {
 		if(parser != null) {
 			try {
 				
-				SourceData data = parser.parseAndCheck(param.getSourcePath(), null);
+				SourceData data = parser.parseAndCheck(param.getSourcePath(), configuration.typeHandlers(param.getRules()));
 				TaskResult tr = new TaskResult();
 				tr.addError(data.getAbnormalStringList());
 				resultMap.put(IdUtils.generateId(), tr);
@@ -64,10 +64,16 @@ public class BatchInsertService {
 					}else {
 						LOG.error("无可导入数据");
 						result.setError("无可导入数据");
+						if(data.getErrorInfoList().size() > 0) {
+							result.setProperty("onlyError", "yes");
+						}
 					}
 				}else {
 					LOG.error("无可导入数据");
 					result.setError("无可导入数据");
+					if(data.getErrorInfoList().size() > 0) {
+						result.setProperty("onlyError", "yes");
+					}
 				}
 				
 			} catch (Exception e) {

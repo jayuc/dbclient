@@ -65,19 +65,17 @@ public class Configuration {
 		return parser;
 	}
 	
-	public List<TypeHandler> typeHandlers(String[] type){
-		List<TypeHandler> list = new ArrayList<TypeHandler>();
-		if(type != null && type.length > 0) {
-			for(String t:type) {
-				String tl = t.toLowerCase();
-				if(typeHandlers.containsKey(tl)) {
-					list.add(typeHandlers.get(tl));
-				}else {
-					list.add(null);
+	public Map<Integer, TypeHandler> typeHandlers(Map<Integer, String> type){
+		Map<Integer, TypeHandler> map = new HashMap<>();
+		if(type != null) {
+			type.forEach((k, v) -> {
+				String t = v.toLowerCase();
+				if(typeHandlers.containsKey(t)) {
+					map.put(k, typeHandlers.get(t));
 				}
-			}
+			});
 		}
-		return list;
+		return map;
 	}
 	
 }

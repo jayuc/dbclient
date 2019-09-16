@@ -126,6 +126,23 @@ const createSql = (fieldArr, tableName) => {
 	return "";
 };
 
+const foreachFields = (fields, index) => {
+	if(fields.length > 0 && fields[0].index > index){
+		return 0;
+	}
+	for(let i=0; i<(fields.length-1); i++){
+		let pre = fields[i];
+		let next = fields[i+1];
+		// console.log(i);
+		// console.log(pre);
+		// console.log(next);
+		if(next.index > index && pre.index < index){
+			return i+1;
+		}
+	}
+	return -1;
+};
+
 // 生成字段约束规则
 const createFieldRules = (arr, fields) => {
 	let sords = [];
@@ -161,4 +178,5 @@ export default {
 	submitTask,
 	createSql,
 	createFieldRules,
+	foreachFields,
 }

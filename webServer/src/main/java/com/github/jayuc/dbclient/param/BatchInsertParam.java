@@ -12,7 +12,6 @@ public class BatchInsertParam {
 	private String sql;
 	private String sourcePath;
 	private String sourceType;
-	private String[] sorts;
 	private Map<Integer, String> rules;
 
 }

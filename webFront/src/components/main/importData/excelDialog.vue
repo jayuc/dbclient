@@ -136,7 +136,7 @@
 						sourceType: 'excel',
 						sql: handler.createSql(formData.tableFields, formData.tableName),
 						rules: sr.result,
-						sorts: JSON.stringify(sr.sords),
+						// sorts: JSON.stringify(sr.sords),
 					};
 					// console.log(param);
 					handler.submitTask(param, (data) => {
@@ -182,11 +182,19 @@
 				}
 				if(this.checkRow()){
 					let item = {index: this.initRow, value: field};
-					this.formData.tableFields.push(item);
-					this.maxRow++;
-					this.initRow++;
-					if(this.maxRow > this.initRow){
-						this.initRow = --this.maxRow;
+					if(item.index >= this.maxRow){
+						this.formData.tableFields.push(item);
+						this.initRow++;
+						this.maxRow = this.initRow;
+					}else{
+						this.initRow = this.maxRow;
+						let index = handler.foreachFields(this.formData.tableFields, item.index);
+						// console.log(index);
+						if(index > -1){
+							this.formData.tableFields.splice(index, 0, item);
+						}else{
+							this.formData.tableFields.push(item);
+						}
 					}
 					this.initFeildValue = '';
 				}
@@ -214,7 +222,7 @@
 					}else{
 						that.enableAddField(true);
 						that.formData.tableFields = [];
-						that.hideFieldEdit();
+						that.fieldEditBoxShow = false;
 						that.enableTableIncon(false);
 						that.$message.error('表名不正确，数据库中无此表');
 					}
@@ -306,6 +314,13 @@
 				this.initRow = 1;
 				this.realFeilds = {};
 				this.fileList = [];
+				this.tableSuccessIcon = false;
+				this.tableFailIcon = false;
+				this.fileokIcon = false;
+				this.filenoIcon = false;
+				this.tableFieldokIcon = false;
+				this.tableFieldnoIcon = false;
+				this.fieldEditBoxShow = false;
 			}
 		}
 	}
