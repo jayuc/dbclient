@@ -8,13 +8,15 @@ import java.util.concurrent.Callable;
 
 import javax.sql.DataSource;
 
+import com.github.jayuc.dbclient.parser.RowData;
+
 public class BatchInsertTask implements Callable<TaskResult> {
 	
 	private final String sql;
 	private final DataSource dataSource;
-	private final List<Object[]> data;
+	private final List<RowData> data;
 
-	public BatchInsertTask(String sql, DataSource dataSource, List<Object[]> data) {
+	public BatchInsertTask(String sql, DataSource dataSource, List<RowData> data) {
 		super();
 		this.sql = sql;
 		this.dataSource = dataSource;
@@ -30,9 +32,9 @@ public class BatchInsertTask implements Callable<TaskResult> {
 			long start = System.currentTimeMillis();
 			PreparedStatement statement = conn.prepareStatement(sql);
 			conn.setAutoCommit(false);
-			for(Object[] item:data) {
-				for(int i=0; i<item.length; i++) {
-					statement.setObject(i+1, item[i]);
+			for(RowData item:data) {
+				for(int i=0; i<item.getData().length; i++) {
+					statement.setObject(i+1, item.getData()[i]);
 				}
 				statement.addBatch();
 			}
@@ -45,10 +47,14 @@ public class BatchInsertTask implements Callable<TaskResult> {
 						result.successAdd();
 					}else {
 						failList.add(i);
+						result.addFailData(this.data.get(i));
 					}
 				}
 			} catch (Exception e) {
-				
+				if(this.data.size() == 1) {
+					result.addError(e.getMessage(), this.data.get(0).getIndex());
+				}
+				result.addFailData(this.data);
 			} finally {
 				try {
 					statement.close();
@@ -62,9 +68,6 @@ public class BatchInsertTask implements Callable<TaskResult> {
 			long end = System.currentTimeMillis();
 			result.setTook(end - start);
 			result.setFail(result.getTotal() - result.getSuccess());
-			if(failList.size() > 0) {
-				result.setFailRows(failList);
-			}
 		}
 		return result;
 	}

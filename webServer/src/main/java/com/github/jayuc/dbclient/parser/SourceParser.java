@@ -6,9 +6,9 @@ import java.util.Map;
 
 public interface SourceParser {
 	
-	List<Object[]> parse(InputStream inputStream, int ignore) throws Exception;
+	List<RowData> parse(InputStream inputStream, int ignore) throws Exception;
 	
-	List<Object[]> parse(String sourcePath, int ignore) throws Exception;
+	List<RowData> parse(String sourcePath, int ignore) throws Exception;
 	
 	SourceData parseAndCheck(InputStream inputStream, Map<Integer, TypeHandler> typeHandlers, int ignore) throws Exception;
 	

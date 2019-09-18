@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.junit.Test;
 
+import com.github.jayuc.dbclient.parser.RowData;
 import com.github.jayuc.dbclient.parser.excel.ExcelParser;
 
 public class ExcelParserTest {
@@ -18,7 +19,7 @@ public class ExcelParserTest {
 		
 		try {
 //			List<List<String[]>> list = ExcelUtil.readExcel(new FileInputStream(path));
-			List<Object[]> list = parser.parse(path, 1);
+			List<RowData> list = parser.parse(path, 1);
 			System.out.println(list);
 		} catch (Exception e) {
 			e.printStackTrace();

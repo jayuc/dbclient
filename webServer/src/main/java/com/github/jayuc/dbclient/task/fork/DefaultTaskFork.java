@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import com.github.jayuc.dbclient.parser.RowData;
 import com.github.jayuc.dbclient.task.BatchInsertTask;
 
 public class DefaultTaskFork implements TaskFork {
@@ -31,13 +32,13 @@ public class DefaultTaskFork implements TaskFork {
 	}
 
 	@Override
-	public List<BatchInsertTask> fork(List<Object[]> list) {
+	public List<BatchInsertTask> fork(List<RowData> list) {
 		List<BatchInsertTask> result = new ArrayList<BatchInsertTask>();
-		List<Object[]> item = new ArrayList<Object[]>();
+		List<RowData> item = new ArrayList<RowData>();
 		for(int i=0; i<list.size(); i++) {
 			if(item.size() >= batchSize) {
 				result.add(new BatchInsertTask(sql, dataSource, item));
-				item = new ArrayList<Object[]>();
+				item = new ArrayList<RowData>();
 			}
 			item.add(list.get(i));
 		}

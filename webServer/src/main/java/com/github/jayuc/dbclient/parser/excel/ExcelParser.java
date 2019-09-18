@@ -14,6 +14,8 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+
+import com.github.jayuc.dbclient.parser.RowData;
 import com.github.jayuc.dbclient.parser.SourceData;
 import com.github.jayuc.dbclient.parser.SourceParser;
 import com.github.jayuc.dbclient.parser.TypeHandler;
@@ -22,13 +24,13 @@ import com.github.jayuc.dbclient.utils.StringUtil;
 public class ExcelParser implements SourceParser {
 
 	@Override
-	public List<Object[]> parse(InputStream inputStream, int ignore) throws Exception {
+	public List<RowData> parse(InputStream inputStream, int ignore) throws Exception {
 		SourceData data = parseAndCheck(inputStream, null, ignore);
 		return data.getAllList();
 	}
 
 	@Override
-	public List<Object[]> parse(String sourcePath, int ignore) throws Exception {
+	public List<RowData> parse(String sourcePath, int ignore) throws Exception {
 		InputStream fs = inputStream(sourcePath);
 		return parse(fs, ignore);
 	}
@@ -120,9 +122,9 @@ public class ExcelParser implements SourceParser {
 						}
 					}
 					if(hasValue < (lastCellNum - firstCellNum)) {
-						result.putAll(cells, stringCells);
+						result.putAll(new RowData(rowNum+1, cells), stringCells);
 						if(normal == 1) {
-							result.putNormal(normalCells.toArray(), stringCells);
+							result.putNormal(new RowData(rowNum+1, normalCells.toArray()), stringCells);
 						}else if(normal == 2) {
 							result.putAbnormal(cells, errorSB.toString(), stringCells, rowNum+1);
 						}

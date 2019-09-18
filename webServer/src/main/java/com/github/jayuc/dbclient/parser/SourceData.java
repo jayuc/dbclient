@@ -5,19 +5,19 @@ import java.util.List;
 
 public class SourceData {
 	
-	List<Object[]> allList = new ArrayList<>();
+	List<RowData> allList = new ArrayList<>();
 	List<String[]> allStringList = new ArrayList<>();
-	List<Object[]> normalList = new ArrayList<>();
+	List<RowData> normalList = new ArrayList<>();
 	List<String[]> normalStringList = new ArrayList<>();
 	List<Object[]> abnormalList = new ArrayList<>();
 	List<String[]> abnormalStringList = new ArrayList<>();
 	List<String> errorInfoList = new ArrayList<>();
 	List<Integer> failRows = new ArrayList<>();
 	
-	public List<Object[]> getAllList() {
+	public List<RowData> getAllList() {
 		return allList;
 	}
-	public List<Object[]> getNormalList() {
+	public List<RowData> getNormalList() {
 		return normalList;
 	}
 	public List<Object[]> getAbnormalList() {
@@ -39,11 +39,11 @@ public class SourceData {
 		return failRows;
 	}
 	
-	public void putAll(Object[] normal, String[] slist) {
+	public void putAll(RowData normal, String[] slist) {
 		allList.add(normal);
 		allStringList.add(slist);
 	}
-	public void putNormal(Object[] normal, String[] slist) {
+	public void putNormal(RowData normal, String[] slist) {
 		normalList.add(normal);
 		normalStringList.add(slist);
 	}

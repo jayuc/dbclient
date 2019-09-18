@@ -1,8 +1,6 @@
 package com.github.jayuc.dbclient.task;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -17,6 +15,7 @@ import com.github.jayuc.dbclient.parser.TypeHandler;
 import com.github.jayuc.dbclient.parser.excel.ExcelParser;
 import com.github.jayuc.dbclient.parser.type.DateTypeHandler;
 import com.github.jayuc.dbclient.parser.type.IntTypeHandler;
+import com.github.jayuc.dbclient.parser.type.NumberTypeHandler;
 import com.github.jayuc.dbclient.parser.type.StringTypeHandler;
 import com.github.jayuc.dbclient.task.fork.DefaultTaskFork;
 import com.github.jayuc.dbclient.task.fork.TaskFork;
@@ -35,6 +34,7 @@ public class Configuration {
 		typeHandlers.put("string", new StringTypeHandler());
 		typeHandlers.put("int", new IntTypeHandler());
 		typeHandlers.put("date", new DateTypeHandler());
+		typeHandlers.put("number", new NumberTypeHandler());
 	}
 	
 	public TaskFork newTaskFork(DataSource dataSource, String sql) {
@@ -42,6 +42,10 @@ public class Configuration {
 				.batchSize(batchSize)
 				.dataSource(dataSource)
 				.sql(sql);
+	}
+	
+	public int batchSize() {
+		return batchSize;
 	}
 	
 	public ExecutorService newExecutor() {

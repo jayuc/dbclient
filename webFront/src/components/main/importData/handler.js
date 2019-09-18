@@ -38,8 +38,9 @@ const containFeild = (feild, arr, realFeilds) => {
 	return 'true';
 };
 
-const intLike = ['int', 'number', 'float', 'double', 'decimal'];
+const intLike = ['int'];
 const dateLike = ['date', 'time', 'year'];
+const numberLike = ['number', 'float', 'double', 'decimal'];
 // 是否为指定类型
 const canType = (str, type) => {
 	let s = str.toLowerCase();
@@ -48,6 +49,8 @@ const canType = (str, type) => {
 		arr = intLike;
 	}else if(type == 'date'){
 		arr = dateLike;
+	}else if(type == 'number'){
+		arr = numberLike;
 	}
 	for(let i=0; i<arr.length; i++){
 		if(s.indexOf(arr[i]) != -1){
@@ -71,9 +74,14 @@ const handlerFields = (rows) => {
 				result[name] = 'date';
 				continue;
 			}
+			if(canType(type, 'number')){
+				result[name] = 'number';
+				continue;
+			}
 			result[name] = 'string';
 		}
 	}
+	// console.log(result);
 	return result;
 };
 // 查询表结构
