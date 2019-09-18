@@ -12,8 +12,8 @@ public class TaskResult {
 	private int success = 0;
 	private int fail = 0;
 	private long took;
-	private List<Integer> failList;
-	private List<String[]> errorList = new ArrayList<String[]>();;
+	private List<Integer> failRows = new ArrayList<>();
+	private List<String> errorList = new ArrayList<String>();;
 	
 	public void successAdd() {
 		success ++;
@@ -25,12 +25,14 @@ public class TaskResult {
 		fail += f;
 	}
 	
-	public synchronized void addError(List<String[]> list) {
+	public synchronized void addError(List<String> list, List<Integer> rows) {
 		errorList.addAll(list);
+		failRows.addAll(rows);
 	}
 	
-	public synchronized void addError(String[] error) {
+	public synchronized void addError(String error, int row) {
 		errorList.add(error);
+		failRows.add(row);
 	}
 
 }

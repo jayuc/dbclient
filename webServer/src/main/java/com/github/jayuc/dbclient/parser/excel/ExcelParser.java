@@ -22,48 +22,48 @@ import com.github.jayuc.dbclient.utils.StringUtil;
 public class ExcelParser implements SourceParser {
 
 	@Override
-	public List<Object[]> parse(InputStream inputStream) throws Exception {
-		SourceData data = parseAndCheck(inputStream, null);
+	public List<Object[]> parse(InputStream inputStream, int ignore) throws Exception {
+		SourceData data = parseAndCheck(inputStream, null, ignore);
 		return data.getAllList();
 	}
 
 	@Override
-	public List<Object[]> parse(String sourcePath) throws Exception {
+	public List<Object[]> parse(String sourcePath, int ignore) throws Exception {
 		InputStream fs = inputStream(sourcePath);
-		return parse(fs);
+		return parse(fs, ignore);
 	}
 
 	@Override
-	public List<String[]> parse2(InputStream inputStream) throws Exception {
-		SourceData data = parseAndCheck(inputStream, null);
+	public List<String[]> parse2(InputStream inputStream, int ignore) throws Exception {
+		SourceData data = parseAndCheck(inputStream, null, ignore);
 		return data.getAllStringList();
 	}
 
 	@Override
-	public List<String[]> parse2(String sourcePath) throws Exception {
+	public List<String[]> parse2(String sourcePath, int ignore) throws Exception {
 		InputStream fs = inputStream(sourcePath);
-		return parse2(fs);
+		return parse2(fs, ignore);
 	}
 
 	@Override
-	public SourceData parseAndCheck(InputStream inputStream, Map<Integer, TypeHandler> typeHandlers) throws Exception {
+	public SourceData parseAndCheck(InputStream inputStream, Map<Integer, TypeHandler> typeHandlers, int ignore) throws Exception {
 		Workbook workbook = WorkbookFactory.create(inputStream);
 		SourceData result = new SourceData();
-		foreachRow(workbook, result, typeHandlers);
+		foreachRow(workbook, result, typeHandlers, ignore);
 		return result;
 	}
 
 	@Override
-	public SourceData parseAndCheck(String sourcePath, Map<Integer, TypeHandler> typeHandlers) throws Exception {
+	public SourceData parseAndCheck(String sourcePath, Map<Integer, TypeHandler> typeHandlers, int ignore) throws Exception {
 		InputStream fs = inputStream(sourcePath);
-		return parseAndCheck(fs, typeHandlers);
+		return parseAndCheck(fs, typeHandlers, ignore);
 	}
 	
 	private InputStream inputStream(String path) throws FileNotFoundException {
 		return new FileInputStream(path);
 	}
 	
-	private void foreachRow(Workbook workbook, SourceData result, Map<Integer, TypeHandler> typeHandlers) {
+	private void foreachRow(Workbook workbook, SourceData result, Map<Integer, TypeHandler> typeHandlers, int ignore) {
 		if(workbook != null) {
 			for(int sheetNum = 0; sheetNum < workbook.getNumberOfSheets(); sheetNum ++) {
 				//获得当前sheet工作表
@@ -72,11 +72,17 @@ public class ExcelParser implements SourceParser {
 					continue;
 				}
 				//获得当前sheet的开始行
-				int firstRowNum  = sheet.getFirstRowNum();
+				int firstRowNum  = sheet.getFirstRowNum()+1;
 				//获得当前sheet的结束行
 				int lastRowNum = sheet.getLastRowNum();
+				if(ignore > 0) {
+					firstRowNum = ignore;
+				}
+				if(ignore > lastRowNum) {
+					return;
+				}
 				//循环除了第一行的所有行
-				for(int rowNum = firstRowNum+1;rowNum <= lastRowNum;rowNum++){
+				for(int rowNum = firstRowNum;rowNum <= lastRowNum;rowNum++){
 					//获得当前行
 					Row row = sheet.getRow(rowNum);
 					if(row == null){
@@ -118,7 +124,7 @@ public class ExcelParser implements SourceParser {
 						if(normal == 1) {
 							result.putNormal(normalCells.toArray(), stringCells);
 						}else if(normal == 2) {
-							result.putAbnormal(cells, errorSB.toString(), stringCells);
+							result.putAbnormal(cells, errorSB.toString(), stringCells, rowNum+1);
 						}
 					}
 				}

@@ -63,7 +63,7 @@ public class BatchInsertTask implements Callable<TaskResult> {
 			result.setTook(end - start);
 			result.setFail(result.getTotal() - result.getSuccess());
 			if(failList.size() > 0) {
-				result.setFailList(failList);
+				result.setFailRows(failList);
 			}
 		}
 		return result;

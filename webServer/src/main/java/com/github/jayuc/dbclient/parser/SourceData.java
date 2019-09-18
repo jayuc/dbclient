@@ -11,7 +11,8 @@ public class SourceData {
 	List<String[]> normalStringList = new ArrayList<>();
 	List<Object[]> abnormalList = new ArrayList<>();
 	List<String[]> abnormalStringList = new ArrayList<>();
-	List<Object> errorInfoList = new ArrayList<>();
+	List<String> errorInfoList = new ArrayList<>();
+	List<Integer> failRows = new ArrayList<>();
 	
 	public List<Object[]> getAllList() {
 		return allList;
@@ -22,7 +23,7 @@ public class SourceData {
 	public List<Object[]> getAbnormalList() {
 		return abnormalList;
 	}
-	public List<Object> getErrorInfoList() {
+	public List<String> getErrorInfoList() {
 		return errorInfoList;
 	}
 	public List<String[]> getAllStringList() {
@@ -34,6 +35,9 @@ public class SourceData {
 	public List<String[]> getAbnormalStringList() {
 		return abnormalStringList;
 	}
+	public List<Integer> getFailRows(){
+		return failRows;
+	}
 	
 	public void putAll(Object[] normal, String[] slist) {
 		allList.add(normal);
@@ -44,10 +48,11 @@ public class SourceData {
 		normalStringList.add(slist);
 	}
 	
-	public void putAbnormal(Object[] abnormal, String errorInfo, String[] slist) {
+	public void putAbnormal(Object[] abnormal, String errorInfo, String[] slist, int row) {
 		abnormalList.add(abnormal);
 		errorInfoList.add(errorInfo);
 		abnormalStringList.add(slist);
+		failRows.add(row);
 	}
 
 }

@@ -6,16 +6,16 @@ import java.util.Map;
 
 public interface SourceParser {
 	
-	List<Object[]> parse(InputStream inputStream) throws Exception;
+	List<Object[]> parse(InputStream inputStream, int ignore) throws Exception;
 	
-	List<Object[]> parse(String sourcePath) throws Exception;
+	List<Object[]> parse(String sourcePath, int ignore) throws Exception;
 	
-	SourceData parseAndCheck(InputStream inputStream, Map<Integer, TypeHandler> typeHandlers) throws Exception;
+	SourceData parseAndCheck(InputStream inputStream, Map<Integer, TypeHandler> typeHandlers, int ignore) throws Exception;
 	
-	SourceData parseAndCheck(String sourcePath, Map<Integer, TypeHandler> typeHandlers) throws Exception;
+	SourceData parseAndCheck(String sourcePath, Map<Integer, TypeHandler> typeHandlers, int ignore) throws Exception;
 	
-	List<String[]> parse2(InputStream inputStream) throws Exception;
+	List<String[]> parse2(InputStream inputStream, int ignore) throws Exception;
 	
-	List<String[]> parse2(String sourcePath) throws Exception;
+	List<String[]> parse2(String sourcePath, int ignore) throws Exception;
 
 }

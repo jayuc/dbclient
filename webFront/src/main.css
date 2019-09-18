@@ -26,6 +26,10 @@ body {
   display: block;
 }
 
+.el-dialog__body{
+  padding: 10px 20px;
+}
+
 .h10{
   height: 10px;
 }

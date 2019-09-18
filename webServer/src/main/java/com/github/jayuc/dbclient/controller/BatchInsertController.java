@@ -8,11 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.jayuc.dbclient.entity.Result;
 import com.github.jayuc.dbclient.param.BatchInsertParam;
 import com.github.jayuc.dbclient.service.BatchInsertService;
+import com.github.jayuc.dbclient.task.TaskResult;
 import com.github.jayuc.dbclient.utils.ResultUtils;
 import com.github.jayuc.dbclient.utils.StringUtil;
 
@@ -35,6 +37,16 @@ public class BatchInsertController {
 			return result.getResult();
 		}
 		return batchService.insert(param);
+	}
+	
+	@RequestMapping(value="/progress", method=RequestMethod.GET)
+	public Map<String, Object> progress(@RequestParam("taskId") String taskId){
+		LOG.info("获取导入进度： taskId(" + taskId + ")");
+		Result result = ResultUtils.simpleResult();
+		TaskResult task = batchService.processResult(taskId);
+		result.setProperty("taskResult", task);
+		LOG.debug(result.getResult().toString());
+		return result.getResult();
 	}
 	
 	private boolean checkParam(Result result, String field, String error) {

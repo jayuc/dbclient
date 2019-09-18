@@ -67,6 +67,13 @@
 					完成
 				</el-button>
 			</el-form-item>
+			<el-form-item label="起始行：" prop="startRow">
+				<el-input v-model.number="formData.startRow" 
+						  style="width: 140px"
+						  @change="checkStartRow"
+				>
+				</el-input>
+			</el-form-item>
 			<el-form-item label="上传excel：" prop="tableName">
 				<el-upload 	:action="uploadUrl"
 							:on-preview="handlePreview"
@@ -112,6 +119,7 @@
 					tableName: undefined,
 					tableFields: [],
 					filePath: '',
+					startRow: 2,
 				},
 				tableSuccessIcon: false,  // 表名 成功标识
 				tableFailIcon: false,  // 表名 失败标识
@@ -136,15 +144,20 @@
 						sourceType: 'excel',
 						sql: handler.createSql(formData.tableFields, formData.tableName),
 						rules: sr.result,
+						startRow: formData.startRow,
 						// sorts: JSON.stringify(sr.sords),
 					};
 					// console.log(param);
 					handler.submitTask(param, (data) => {
-						console.log(data);
+						// console.log(data);
 						if(data.status === 'error'){
 							this.$message.error("出错: " + data.errorInfo);
+							if(data.attributes.onlyError == 'yes'){
+								this.$emit('open-progress', data.attributes.taskResult);
+							}
 							return;
 						}
+						this.$emit('submit-task-after', data.attributes);
 					}, (e) => {
 						this.$message.error("提交任务出错");
 					})
@@ -197,6 +210,12 @@
 						}
 					}
 					this.initFeildValue = '';
+				}
+			},
+			checkStartRow(value){
+				let i = parseInt(value);
+				if(isNaN(i)){
+					this.formData.startRow = 2;
 				}
 			},
 			checkRow(){
@@ -312,6 +331,7 @@
 				this.formData.tableFields = [];
 				this.initFeildValue = '';
 				this.initRow = 1;
+				this.maxRow = 1;
 				this.realFeilds = {};
 				this.fileList = [];
 				this.tableSuccessIcon = false;

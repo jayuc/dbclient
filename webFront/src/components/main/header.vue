@@ -51,7 +51,7 @@
                  type="primary"
                  style="margin-left: 10px"
                  plain
-                 @click="openExcelDialog"
+                 @click="openExcelDialog(true)"
                  v-show="importExcelShow"
       >
         导入Excel文件
@@ -86,7 +86,16 @@
         />
       </div>
     </div>
-    <ExcelDialog ref="excel_dialog" />
+    <ExcelDialog ref="excel_dialog" 
+                 v-on:open-progress="openExcelProgress" 
+                 v-on:submit-task-after="submitTaskAfter"
+    />
+    <ExcelDialogProgress ref="excel_dialog_progress"
+                         v-on:show-fail-detail="showFailDetail" 
+                         v-on:close-excel-dialog="openExcelDialog(false)"
+    />
+    <ErrorDetail ref="error_detail" 
+    />
   </span>
 </template>
 
@@ -99,6 +108,8 @@
     import handler from './handler';
     import loginHandler from '../login/handler';
     import ExcelDialog from './importData/excelDialog';
+    import ExcelDialogProgress from './importData/progress';
+    import ErrorDetail from './importData/errorDetail';
 
     export default {
       name: "main-header",
@@ -116,11 +127,37 @@
         }
       },
       components: {
-        ExcelDialog
+        ExcelDialog,
+        ExcelDialogProgress,
+        ErrorDetail,
       },
       methods: {
-        openExcelDialog(){
-          this.$refs.excel_dialog.open();
+        submitTaskAfter(data){
+          this.openExcelDialog(false);
+          this.openExcelProgress(data.taskResult);
+          let that = this;
+          let timer = setInterval(() => {
+            AjaxUtil.get('batch/progress', {taskId: data.taskId}).then((da) => {
+              if(that.$refs.excel_dialog_progress.computeNumberAndPercentage(da.attributes.taskResult)){
+                clearInterval(timer);
+              }
+            }, () => {
+              clearInterval(timer);
+            })
+          }, 1000);
+        },
+        showFailDetail(data){
+          this.$refs.error_detail.open(data);
+        },
+        openExcelProgress(data){
+          this.$refs.excel_dialog_progress.open(data);
+        },
+        openExcelDialog(boolean){
+          if(boolean){
+            this.$refs.excel_dialog.open();
+          }else{
+            this.$refs.excel_dialog.close();
+          }
         },
         clearSql(){
           this.sql = '';

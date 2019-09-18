@@ -7,11 +7,12 @@ import lombok.ToString;
 
 @Data
 @ToString
-public class BatchInsertParam {
+public class BatchInsertParam extends SqlDataParam {
 	
 	private String sql;
 	private String sourcePath;
 	private String sourceType;
+	private int startRow;  // 
 	private Map<Integer, String> rules;
 
 }

@@ -7,12 +7,16 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
+import javax.sql.DataSource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.github.jayuc.dbclient.entity.Result;
+import com.github.jayuc.dbclient.err.PoolException;
+import com.github.jayuc.dbclient.iter.IDBPoolsManager;
 import com.github.jayuc.dbclient.param.BatchInsertParam;
 import com.github.jayuc.dbclient.parser.SourceData;
 import com.github.jayuc.dbclient.parser.SourceParser;
@@ -22,11 +26,15 @@ import com.github.jayuc.dbclient.task.TaskResult;
 import com.github.jayuc.dbclient.task.fork.TaskFork;
 import com.github.jayuc.dbclient.utils.IdUtils;
 import com.github.jayuc.dbclient.utils.ResultUtils;
+import com.github.jayuc.dbclient.utils.StringUtil;
 
 @Service
 public class BatchInsertService {
 	
 	private final Logger LOG = LoggerFactory.getLogger(BatchInsertService.class);
+	
+	@Autowired
+	IDBPoolsManager dbPoolManager;
 	
 	@Autowired
 	private Configuration configuration;
@@ -46,21 +54,28 @@ public class BatchInsertService {
 			executor = configuration.newExecutor();
 		}
 		if(fork == null) {
-			fork = configuration.newTaskFork(null, param.getSql());
+			try {
+				fork = configuration.newTaskFork((DataSource)(dbPoolManager.getDbPool(getTikeByParam(param)).getPool()), param.getSql());
+			} catch (PoolException e) {
+				LOG.error("获取数据源异常", e);
+			}
 		}
 		
 		if(parser != null) {
 			try {
 				
-				SourceData data = parser.parseAndCheck(param.getSourcePath(), configuration.typeHandlers(param.getRules()));
+				SourceData data = parser.parseAndCheck(param.getSourcePath(), configuration.typeHandlers(param.getRules()), param.getStartRow()-1);
 				TaskResult tr = new TaskResult();
-				tr.addError(data.getAbnormalStringList());
-				resultMap.put(IdUtils.generateId(), tr);
+				tr.addError(data.getErrorInfoList(), data.getFailRows());
+				tr.setTotal(data.getAllList().size());
+				tr.setFail(data.getAbnormalList().size());
+				String taskId = IdUtils.generateId();
+				resultMap.put(taskId, tr);
 				List<Object[]> list = data.getNormalList();
 				if(list.size() > 0) {
 					List<BatchInsertTask> tasks = fork.fork(list);
 					if(tasks.size() > 0) {
-//						new TaskThread(tasks, tr).start();
+						new TaskThread(tasks, tr).start();
 					}else {
 						LOG.error("无可导入数据");
 						result.setError("无可导入数据");
@@ -75,6 +90,8 @@ public class BatchInsertService {
 						result.setProperty("onlyError", "yes");
 					}
 				}
+				result.setProperty("taskResult", tr);
+				result.setProperty("taskId", taskId);
 				
 			} catch (Exception e) {
 				LOG.error("解析出错", e);
@@ -88,6 +105,26 @@ public class BatchInsertService {
 		
 		LOG.info("提交任务完成， " + result.getResult().toString());
 		return result.getResult();
+	}
+	
+	public TaskResult processResult(String taskId) {
+		TaskResult tr = resultMap.get(taskId);
+		if((tr.getSuccess() + tr.getFail()) >= tr.getTotal()) {
+			return tr;
+		}
+		TaskResult result = new TaskResult();
+		result.setTotal(tr.getTotal());
+		result.setSuccess(tr.getSuccess());
+		result.setFail(tr.getFail());
+		return result;
+	}
+	
+	//获取token和dbId的组合
+	private String getTikeByParam(BatchInsertParam param) {
+		if(StringUtil.isBlank(param.getDbId()) || StringUtil.isBlank(param.getToken())) {
+			return null;
+		}
+		return param.getToken() + param.getDbId();
 	}
 	
 	private class TaskThread extends Thread{
@@ -104,7 +141,7 @@ public class BatchInsertService {
 				List<Future<TaskResult>> futures = executor.invokeAll(tasks);
 				for(Future<TaskResult> future:futures) {
 					TaskResult t = future.get();
-					result.add(t.getTotal(), t.getSuccess(), t.getFail());
+					result.add(0, t.getSuccess(), t.getFail());
 				}
 			} catch (InterruptedException | ExecutionException e) {
 				e.printStackTrace();
