@@ -136,16 +136,14 @@
 			execute(){
 				if(this.checkForm()){
 					let formData = this.formData;
-					// console.log(formData);
+					console.log(formData);
 					// console.log(this.realFeilds);
-					let sr = handler.createFieldRules(formData.tableFields, this.realFeilds);
 					let param = {
 						sourcePath: formData.filePath,
 						sourceType: 'excel',
 						sql: handler.createSql(formData.tableFields, formData.tableName),
-						rules: sr.result,
+						rules: handler.createFieldRules(formData.tableFields, this.realFeilds),
 						startRow: formData.startRow,
-						// sorts: JSON.stringify(sr.sords),
 					};
 					// console.log(param);
 					handler.submitTask(param, (data) => {
@@ -329,6 +327,7 @@
 			resetForm(){
 				this.formData.tableName = undefined;
 				this.formData.tableFields = [];
+				this.formData.filePath = '';
 				this.initFeildValue = '';
 				this.initRow = 1;
 				this.maxRow = 1;

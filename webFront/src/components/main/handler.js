@@ -58,13 +58,15 @@ const produceTableOption = (node) => {
 function _getDataBases(dbType) {
   return new Promise((resolve, reject) => {
     AjaxUtil.get('sql/execute', {sql: entity.allDatabases[dbType]}).then((data) => {
-      let field = data.result.headers[0];
-      let arr = [];
-      let rows = data.result.rows;
-      for(let i=0; i<rows.length; i++){
-        arr.push({value: rows[i][field].toLowerCase(), label: rows[i][field].toLowerCase()});
+      if(data.result.headers instanceof Array && data.result.headers.length > 0){
+        let field = data.result.headers[0];
+        let arr = [];
+        let rows = data.result.rows;
+        for(let i=0; i<rows.length; i++){
+          arr.push({value: rows[i][field].toLowerCase(), label: rows[i][field].toLowerCase()});
+        }
+        resolve(arr);
       }
-      resolve(arr);
     }, (err) => {
       reject(err);
     });

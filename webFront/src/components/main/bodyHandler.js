@@ -118,12 +118,16 @@ const handleHeaders = (arr) => {
 
 // 计算字符串所占px
 const computeMaxStrPx = (str) => {
-  if(typeof str === 'string'){
-    let singlePx = bodyLetterWidth;
-    if(StringUtil.containChinese(str)){
-      singlePx = chineseSingleWidth;
+  if(str){
+    if(typeof str === 'string'){
+      let singlePx = bodyLetterWidth;
+      if(StringUtil.containChinese(str)){
+        singlePx = chineseSingleWidth;
+      }
+      return (str.replace(/[\r\n] +/g,"")).length*singlePx + extraWidth;
+    }else{ // 如果不是字符串，则转换成字符串
+      return computeMaxStrPx(str + '');
     }
-    return (str.replace(/[\r\n] +/g,"")).length*singlePx + extraWidth;
   }
   return 0;
 };

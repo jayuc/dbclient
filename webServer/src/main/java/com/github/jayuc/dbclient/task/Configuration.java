@@ -17,6 +17,7 @@ import com.github.jayuc.dbclient.parser.type.DateTypeHandler;
 import com.github.jayuc.dbclient.parser.type.IntTypeHandler;
 import com.github.jayuc.dbclient.parser.type.NumberTypeHandler;
 import com.github.jayuc.dbclient.parser.type.StringTypeHandler;
+import com.github.jayuc.dbclient.parser.type.YearTypeHandler;
 import com.github.jayuc.dbclient.task.fork.DefaultTaskFork;
 import com.github.jayuc.dbclient.task.fork.TaskFork;
 import com.github.jayuc.dbclient.utils.StringUtil;
@@ -35,6 +36,7 @@ public class Configuration {
 		typeHandlers.put("int", new IntTypeHandler());
 		typeHandlers.put("date", new DateTypeHandler());
 		typeHandlers.put("number", new NumberTypeHandler());
+		typeHandlers.put("year", new YearTypeHandler());
 	}
 	
 	public TaskFork newTaskFork(DataSource dataSource, String sql) {

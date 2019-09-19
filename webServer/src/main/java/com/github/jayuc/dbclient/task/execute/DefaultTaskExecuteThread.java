@@ -61,16 +61,9 @@ public class DefaultTaskExecuteThread extends Thread {
 			List<RowData> failData = new ArrayList<RowData>();
 			for(Future<TaskResult> future:futures) {
 				TaskResult t = future.get();
-				if(t.getFail() > 0) {
-					if(batchSize == 1 || t.getFail() == 1) {
-						taskResult.add(t.getSuccess(), t.getFail());
-						taskResult.addError(t.getErrorList().get(0), t.getFailRows().get(0));
-					}else {
-						failData.addAll(t.getFailData());
-					}
-				}else {
-					taskResult.add(t.getSuccess(), t.getFail());
-				}
+				taskResult.add(t.getSuccess(), t.getFail());
+				failData.addAll(t.getFailData());
+				taskResult.addError(t.getErrorList(), t.getFailRows());
 			}
 			LOG.info("fail data: " + failData.size());
 			if(failData.size() > 0) {

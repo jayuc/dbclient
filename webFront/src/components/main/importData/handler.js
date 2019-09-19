@@ -39,7 +39,8 @@ const containFeild = (feild, arr, realFeilds) => {
 };
 
 const intLike = ['int'];
-const dateLike = ['date', 'time', 'year'];
+const dateLike = ['date', 'time'];
+const yearLike = ['year'];
 const numberLike = ['number', 'float', 'double', 'decimal'];
 // 是否为指定类型
 const canType = (str, type) => {
@@ -51,6 +52,8 @@ const canType = (str, type) => {
 		arr = dateLike;
 	}else if(type == 'number'){
 		arr = numberLike;
+	}else if(type == 'year'){
+		arr = yearLike;
 	}
 	for(let i=0; i<arr.length; i++){
 		if(s.indexOf(arr[i]) != -1){
@@ -60,12 +63,22 @@ const canType = (str, type) => {
 	return false;
 };
 
-const handlerFields = (rows) => {
+const dbColumn = {
+	'mysql': {
+		type: 'Type',
+		name: 'Field'
+	},
+	'oracle': {
+		type: 'DATA_TYPE',
+		name: 'COLUMN_NAME'
+	}
+};
+const handlerFields = (rows, dbType) => {
 	let result = {};
 	if(rows instanceof Array){
 		for(let i=0; i<rows.length; i++){
-			let type = rows[i]['Type'];
-			let name = rows[i]['Field'].toLowerCase();
+			let type = rows[i][dbColumn[dbType]['type']];
+			let name = rows[i][dbColumn[dbType]['name']].toLowerCase();
 			if(canType(type, 'int')){
 				result[name] = 'int';
 				continue;
@@ -76,6 +89,10 @@ const handlerFields = (rows) => {
 			}
 			if(canType(type, 'number')){
 				result[name] = 'number';
+				continue;
+			}
+			if(canType(type, 'year')){
+				result[name] = 'year';
 				continue;
 			}
 			result[name] = 'string';
@@ -98,7 +115,9 @@ const queryTableContruct = (tableName, callback) => {
 				callback(false);
 			}else if(data.result.total > 0){
 				// console.log(data.result.rows);
-				callback(handlerFields(data.result.rows));
+				callback(handlerFields(data.result.rows, currentDbType));
+			}else if(data.result.total == 0){
+				callback(false);
 			}
 		}, () => {
 			callback(false);
@@ -113,7 +132,7 @@ const createSql = (fieldArr, tableName) => {
 	}
 	let sl = "insert into " + tableName + " (";
 	let sr = ") values (";
-	// console.log(fieldArr);
+	console.log(fieldArr);
 	if(fieldArr instanceof Array && fieldArr.length > 0){
 		for(let i=0; i<fieldArr.length; i++){
 			let item = fieldArr[i];
@@ -153,17 +172,12 @@ const foreachFields = (fields, index) => {
 
 // 生成字段约束规则
 const createFieldRules = (arr, fields) => {
-	let sords = [];
 	let result = {};
 	for(let i=0; i<arr.length; i++){
 		let item = arr[i];
 		result[item.index] = fields[item.value];
-		sords.push(item.index + '');
 	}
-	return {
-		sords,
-		result
-	};
+	return result;
 };
 
 // 提交导入任务

@@ -35,6 +35,7 @@ public class TaskResult {
 	public synchronized void addError(String error, int row) {
 		errorList.add(error);
 		failRows.add(row);
+		fail ++;
 	}
 	
 	public synchronized void addFailData(List<RowData> data) {

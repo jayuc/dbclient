@@ -29,18 +29,20 @@ const tableQuery = {
   },
   'oracle': {
     'query': (tableName) => {return 'select * from ' + tableName},
-    'tableStructure': (tableName) => {
+    'tableStructure': (_tableName) => {
       //return 'select dbms_metadata.get_ddl(\'TABLE\',\'' + tableName.toUpperCase() + '\') from dual'
       /**
        * 怎么查询表结构需要好好考虑一下
        */
+      let tableName = _tableName.toUpperCase();
       return 'select t_c.*,t_e.comments from ' +
               '(select col.COLUMN_NAME,col.DATA_TYPE || \'(\' || col.DATA_LENGTH || \')\' DATA_TYPE,col.DATA_DEFAULT,col.NULLABLE ' +
               'from user_tab_columns col where col.TABLE_NAME = \'' + tableName + '\') t_c, ' +
               '(select coe.COMMENTS,coe.COLUMN_NAME from user_col_comments coe where coe.TABLE_NAME = \'' + tableName +'\') t_e ' +
               'where t_c.column_name = t_e.column_name(+) and rownum < 1000';
     },
-    'tableInfo': (tableName) => {
+    'tableInfo': (_tableName) => {
+      let tableName = _tableName.toUpperCase();
       return 'select comments from user_tab_comments ' +
         'where table_name=\'' + tableName + '\'';
     },

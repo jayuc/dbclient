@@ -74,6 +74,7 @@ export default {
 			this.$emit('show-fail-detail', this.errorDetails);
 		},
 		open(data){
+			this.reset();
 			this.visible = true;
 			this.computeNumberAndPercentage(data);
 		},
@@ -82,6 +83,16 @@ export default {
 			if(boolean){
 				this.$emit('close-excel-dialog');
 			}
+			this.reset();
+		},
+		reset(){
+			this.total = 0;
+			this.success = 0;
+			this.fail = 0;
+			this.percentage = 0;
+			this.failClick = false;
+			this.finished = false;
+			this.title = '导入进度：';
 		}
 	}
 }
