@@ -132,7 +132,7 @@ const createSql = (fieldArr, tableName) => {
 	}
 	let sl = "insert into " + tableName + " (";
 	let sr = ") values (";
-	console.log(fieldArr);
+	// console.log(fieldArr);
 	if(fieldArr instanceof Array && fieldArr.length > 0){
 		for(let i=0; i<fieldArr.length; i++){
 			let item = fieldArr[i];

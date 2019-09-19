@@ -136,7 +136,7 @@
 			execute(){
 				if(this.checkForm()){
 					let formData = this.formData;
-					console.log(formData);
+					// console.log(formData);
 					// console.log(this.realFeilds);
 					let param = {
 						sourcePath: formData.filePath,
