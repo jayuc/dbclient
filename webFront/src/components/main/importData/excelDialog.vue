@@ -7,7 +7,6 @@
 		<el-form :model="formData"
              label-width="92px"
 			 size="mini"
-             @keyup.enter.native="execute"
     	>
 			<el-form-item label="表 名：" prop="tableName">
 				<el-input v-model="formData.tableName" 
@@ -104,6 +103,7 @@
 
 	import handler from './handler.js';
 	import Config from '@/config';
+	import LoadingUtil from '@/utils/LoadingUtil';
 
 	export default {
 		name: 'excel-dialog',
@@ -135,6 +135,8 @@
 		methods: {
 			execute(){
 				if(this.checkForm()){
+					let loading = LoadingUtil.createLoading(this, '正在处理数据...');
+					let startTime = new Date().getTime();
 					let formData = this.formData;
 					// console.log(formData);
 					// console.log(this.realFeilds);
@@ -148,15 +150,24 @@
 					// console.log(param);
 					handler.submitTask(param, (data) => {
 						// console.log(data);
+						loading.close();
 						if(data.status === 'error'){
 							this.$message.error("出错: " + data.errorInfo);
 							if(data.attributes.onlyError == 'yes'){
-								this.$emit('open-progress', data.attributes.taskResult);
+								let d = data.attributes.taskResult;
+								d.startTime = startTime;
+								this.$emit('open-progress', d);
 							}
 							return;
 						}
-						this.$emit('submit-task-after', data.attributes);
+						let d = data.attributes;
+						if(d.taskResult){
+							d.taskResult.startTime = startTime;
+						}
+						// console.log(d);
+						this.$emit('submit-task-after', d);
 					}, (e) => {
+						loading.close();
 						this.$message.error("提交任务出错");
 					})
 				}

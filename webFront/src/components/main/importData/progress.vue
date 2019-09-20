@@ -6,7 +6,7 @@
 	>
 		<el-progress :percentage="percentage" :stroke-width="12"></el-progress>
 		<div class="h10"></div>
-		<div>共计 <span style="color: #409EFF;">{{ total }}</span> 条，成功 <span style="color: #67C23A;">{{ success }}</span> 条，失败 <span style="color: #E6A23C;">{{fail}}</span> 条。
+		<div>共计 <span style="color: #409EFF;">{{ total }}</span> 条，成功 <span style="color: #67C23A;">{{ success }}</span> 条，失败 <span style="color: #E6A23C;">{{fail}}</span> 条<span v-show="finished">，耗时 <span v-show="showMin"><span style="color: #F56C6C;">{{ tookMin }}</span> 分 </span><span style="color: #F56C6C;">{{ tookSec }}</span> 秒</span>。
 			<el-link type="primary" 
 					 v-show="failClick" 
 					 @click="showFailDetail"
@@ -21,7 +21,7 @@
 	</el-dialog>
 </template>
 <script>
-
+import NumberUtil from '@/utils/NumberUtil';
 
 export default {
 	name: 'excel-dialog-progress',
@@ -32,6 +32,10 @@ export default {
 			success: 0,
 			fail: 0,
 			percentage: 0,
+			startTime: 0,
+			tookMin: 0,
+			showMin: false,
+			tookSec: 0,
 			errorDetails: {},
 			failClick: false,
 			finished: false, // 是否完成
@@ -48,15 +52,37 @@ export default {
 		},
 		computePercentage(){
 			let per = ((this.success + this.fail)/this.total)*100;
-			this.percentage = parseInt(per);
+			if(per === 0 || per === 100){
+				this.percentage = per;
+			}else{
+				if(NumberUtil.isInteger(per)){
+					this.percentage = per;
+				}else if(NumberUtil.isInteger(per*10)){
+					this.percentage = parseFloat(per.toFixed(1));
+				}else{
+					this.percentage = parseFloat(per.toFixed(2));
+				}
+			}
 		},
 		checkFinished(){
 			if((this.success + this.fail) >= this.total){
 				this.finished = true;
-				this.title = '导入结果：';
+				this.title = '导入完成：';
+				this.handlerTook();
 				return true;
 			}
 			return false;
+		},
+		handlerTook(){
+			let now = new Date().getTime();
+			let took = now - this.startTime;
+			let oneMin = 1000*60;
+			let min = took/oneMin;
+			if(min > 1){
+				this.tookMin = parseInt(min);
+                this.showMin = true;
+			}
+			this.tookSec = (took%oneMin)/1000;
 		},
 		computeNumberAndPercentage(data){
 			this.computeNumber(data);
@@ -74,9 +100,13 @@ export default {
 			this.$emit('show-fail-detail', this.errorDetails);
 		},
 		open(data){
+			// console.log(data);
 			this.reset();
 			this.visible = true;
 			this.computeNumberAndPercentage(data);
+			if(data){
+				this.startTime = data.startTime;
+			}
 		},
 		close(boolean){
 			this.visible = false;
@@ -93,6 +123,11 @@ export default {
 			this.failClick = false;
 			this.finished = false;
 			this.title = '导入进度：';
+			this.startTime = 0;
+			this.tookMin = 0;
+			this.tookSec = 0;
+			this.showMin = false;
+			this.errorDetails = {};
 		}
 	}
 }
@@ -104,6 +139,11 @@ export default {
 }
 .excel_dialog_progress_f .el-dialog__footer{
 	padding: 0px 20px 16px;
+}
+.excel_dialog_progress_f .el-progress__text{
+	position: absolute;
+	top: 0px;
+	right: 0px;
 }
 
 </style>

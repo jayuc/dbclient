@@ -9,8 +9,8 @@ public class TaskForkTest {
 	
 	@Test
 	public void test() {
-		TaskFork fork = new DefaultTaskFork();
-		fork.fork(null);
+//		TaskFork fork = new DefaultTaskFork();
+//		fork.fork(null);
 	}
 
 }

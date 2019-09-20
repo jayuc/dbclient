@@ -61,9 +61,9 @@ public class DefaultTaskExecuteThread extends Thread {
 			List<RowData> failData = new ArrayList<RowData>();
 			for(Future<TaskResult> future:futures) {
 				TaskResult t = future.get();
-				taskResult.add(t.getSuccess(), t.getFail());
-				failData.addAll(t.getFailData());
-				taskResult.addError(t.getErrorList(), t.getFailRows());
+				if(t.getFailData().size() > 0) {
+					failData.addAll(t.getFailData());
+				}
 			}
 			LOG.info("fail data: " + failData.size());
 			if(failData.size() > 0) {
@@ -86,14 +86,20 @@ public class DefaultTaskExecuteThread extends Thread {
 			batchSize = size;
 		}
 		return taskFork.batchSize(size)
-					.fork(data);
+					.fork(data, taskResult);
 	}
 	
+	/**
+	 * 切片 核心算法
+	 * @return
+	 */
 	private int computeBatchSize() {
 		int dataSize = data.size();
 		int currentSize = dataSize > batchSize ? batchSize : dataSize;
-		int size = currentSize/2;
-		return currentSize%2 > 0 ? size + 1 : size;
+		int part = 4;
+		int size = currentSize/part;
+		int preSize = currentSize%part > 0 ? size + 1 : size;
+		return preSize;
 	}
 	
 }

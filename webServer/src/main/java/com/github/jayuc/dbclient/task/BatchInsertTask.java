@@ -21,42 +21,43 @@ public class BatchInsertTask implements Callable<TaskResult> {
 	private final String sql;
 	private final DataSource dataSource;
 	private final List<RowData> data;
+	private final TaskResult finalResult;
 
-	public BatchInsertTask(String sql, DataSource dataSource, List<RowData> data) {
+	public BatchInsertTask(String sql, DataSource dataSource, List<RowData> data, TaskResult finalResult) {
 		super();
 		this.sql = sql;
 		this.dataSource = dataSource;
 		this.data = data;
+		this.finalResult = finalResult;
 	}
 
 	@Override
 	public TaskResult call() throws Exception {
 		TaskResult result = new TaskResult();
 		if(data != null && data.size() > 0) {
-			result.setTotal(data.size());
 			Connection conn = dataSource.getConnection();
 			PreparedStatement statement = conn.prepareStatement(sql);
 			conn.setAutoCommit(false);
-			if(!(setParams(statement, data, result) > 0)) {
+			if(!(setParams(statement, data, finalResult) > 0)) {
 				LOG.debug("设置全部失败");
 				return result;
 			}
 			try {
 				statement.executeBatch();
 				conn.commit();
-				result.setSuccess(data.size());
+				finalResult.add(data.size(), 0);
 				if(LOG.isDebugEnabled()) {
-					LOG.debug("本次插入数据成功");
+//					LOG.debug("本次插入数据成功");
 				}
 			} catch (Exception e) {
 				rollback(conn);
 				if(this.data.size() == 1) {
-					result.addError(e.getMessage(), data.get(0).getIndex());
+					finalResult.addError(e.getMessage(), data.get(0).getIndex());
 				}else {
 					result.addFailData(data);
 				}
 				if(LOG.isDebugEnabled()) {
-					LOG.debug("本次插入数据失败");
+//					LOG.debug("本次插入数据失败");
 				}
 			} finally {
 				close(statement, conn);

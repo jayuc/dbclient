@@ -144,7 +144,7 @@
             }, () => {
               clearInterval(timer);
             })
-          }, 1000);
+          }, 500);
         },
         showFailDetail(data){
           this.$refs.error_detail.open(data);
