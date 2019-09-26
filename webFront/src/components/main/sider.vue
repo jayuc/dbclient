@@ -20,6 +20,7 @@
                      icon="el-icon-search" 
                      style="width: 20px;margin: -10px -26px;"
                      @click="searchTable"
+                     title="回车键搜索"
           ></el-button>
         </el-input>
       </div>
@@ -119,7 +120,7 @@
           let arr = [];
           for(let i=0; i<list.length; i++){
             let item = list[i];
-            if(item.label.indexOf(searchText) > -1){
+            if((item.label.toLowerCase()).indexOf(searchText.toLowerCase()) > -1){
               arr.push(item);
             }
           }
@@ -178,6 +179,10 @@
             that.tableLoading = false;
             ResultUtil.handle(data, () => {
               let arr = handler.produceTables(data, that.currentDb);
+              that.allTreeList = arr;
+              that.tableTreeName = entity.tableNa[that.currentDb];
+              that.searchText = '';
+              that.oldSerachText = '';
               that.tableTree = [{
                 id: 1,
                 label: entity.tableNa[that.currentDb],
