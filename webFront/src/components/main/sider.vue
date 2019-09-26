@@ -9,6 +9,20 @@
       />
     </div>
     <div class="main_asider_item_tree_">
+      <div class="search_box">
+        <el-input 
+            v-model="searchText" 
+            placeholder="搜索"
+            size="mini"
+            @change="searchTable"
+        >
+          <el-button slot="append" 
+                     icon="el-icon-search" 
+                     style="width: 20px;margin: -10px -26px;"
+                     @click="searchTable"
+          ></el-button>
+        </el-input>
+      </div>
       <el-tree :data="tableTree"
                node-key="id"
                :default-expanded-keys="tableTerrDefaultExpanded"
@@ -25,6 +39,7 @@
     import Config from '@/config';
     import user from '@/user';
     import AjaxUtil from '@/utils/AjaxUtil';
+    import StringUtil from '@/utils/StringUtil';
     import entity from './configs';
     import handler from './handler';
     import ResultUtil from '@/utils/ResultUtil';
@@ -73,17 +88,52 @@
             children: connects
           }],
           connectTerrDefaultExpanded: [1],
+          tableTreeName: tables,
           tableTree: [{
             id: 1,
             label: tables,
             children: tableTreeArr
           }],
+          allTreeList: tableTreeArr,
           tableTerrDefaultExpanded: [1],
           tableLoading: true,
           currentDb: currentDb,
+          searchText: '',
+          oldSerachText: ''
         }
       },
       methods: {
+        searchTable(){
+          if(this.oldSerachText === this.searchText){
+            return;
+          }
+          let searchText = this.searchText;
+          // console.log(searchText);
+          if(StringUtil.isBlank(searchText)){
+            // console.log(this.allTreeList);
+            this.oldSerachText = searchText;
+            this.addTableTreeArr(this.allTreeList);
+            return;
+          }
+          let list = this.allTreeList;
+          let arr = [];
+          for(let i=0; i<list.length; i++){
+            let item = list[i];
+            if(item.label.indexOf(searchText) > -1){
+              arr.push(item);
+            }
+          }
+          // console.log(arr);
+          this.oldSerachText = searchText;
+          this.addTableTreeArr(arr);
+        },
+        addTableTreeArr(arr){
+          this.tableTree = [{
+            id: 1,
+            label: this.tableTreeName,
+            children: arr
+          }];
+        },
         nodeClick(data, node, node_div){
           if(node.level === 2){
             let nodeDiv = node_div.$refs.node;
@@ -294,5 +344,18 @@
   }
   .main_asider_item_tree_{
     margin-top: 5px;
+    position: relative;
+  }
+  .main_asider_item_tree_ .search_box{
+    position: absolute;
+    top: 0;
+    left: 120px;
+    width: 160px;
+    z-index: 2;
+  }
+  .main_asider_item_tree_ .search_box .el-input--mini .el-input__inner{
+    height: 24px;
+    line-height: 24px;
+    border: 1px solid #67C23A;
   }
 </style>
