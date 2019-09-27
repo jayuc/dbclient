@@ -280,6 +280,7 @@ public class DbUtil {
 	* @return List    返回类型 
 	* @throws 
 	*/
+	@SuppressWarnings("rawtypes")
 	public static List queryData(Connection conn, String sql,Class className) throws SQLException {
 		if(null == conn) {
 			throw new SQLException("connection连接为空");
@@ -307,6 +308,7 @@ public class DbUtil {
 	* @return List    返回类型 
 	* @throws 
 	*/
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private static List createList(ResultSet rs, Class classType) throws SQLException{
 		List list  = new ArrayList();
 		Method[]  methods  = classType.getDeclaredMethods();
