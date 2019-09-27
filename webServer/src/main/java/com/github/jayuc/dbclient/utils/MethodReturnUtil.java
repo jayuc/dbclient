@@ -59,6 +59,7 @@ public class MethodReturnUtil {
 			}else if(Set.class == clazz) {
 				Set<String> row = (Set<String>) obj;
 				int len = row.size();
+//				System.out.println(shoudLimit(sql));
 				if(shoudLimit(sql) && len > RedisConfig.MAX_LINE) {
 					len = RedisConfig.MAX_LINE;
 				}
@@ -105,7 +106,7 @@ public class MethodReturnUtil {
 	}
 	
 	private static final boolean shoudLimit(String sql) {
-		if("getRedisAllKeys".equals(sql)) {
+		if("keys *".equals(sql) || "show collections".equals(sql)) {
 			return false;
 		}
 		return true;
