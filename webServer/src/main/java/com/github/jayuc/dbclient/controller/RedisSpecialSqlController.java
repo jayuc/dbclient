@@ -30,6 +30,7 @@ public class RedisSpecialSqlController {
 	@Autowired
 	SqlExecuteController executer;
 	
+	@SuppressWarnings("unchecked")
 	@GetMapping("/execute")
 	public Map<String, Object> execute(@ModelAttribute("param") SqlDataParam param){
 		LOG.debug("开始执行,sql: " + param.getSql());

@@ -353,7 +353,7 @@
   }
   .main_asider_item_tree_ .search_box{
     position: absolute;
-    top: 0;
+    top: -2px;
     left: 120px;
     width: 160px;
     z-index: 2;

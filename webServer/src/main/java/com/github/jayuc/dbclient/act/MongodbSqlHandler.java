@@ -74,7 +74,7 @@ public class MongodbSqlHandler implements ISqlHandler {
 					Object methodResult = method.invoke(obj, param);
 					LOG.info("methodResult: " + methodResult);
 					
-					Map<String, Object> map = MethodReturnUtil.parse(methodReturnClass, methodResult);
+					Map<String, Object> map = MethodReturnUtil.parse(methodReturnClass, methodResult, sql);
 					LOG.debug("map: " + map);
 					if(null != map) {
 						result = map;
@@ -98,7 +98,7 @@ public class MongodbSqlHandler implements ISqlHandler {
 	}
 	
 	// 解析result
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "deprecation" })
 	private Map<String, Object> parseResult(Class<?> clazz, Object obj){
 		Map<String, Object> map = new HashMap<String, Object>();
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();

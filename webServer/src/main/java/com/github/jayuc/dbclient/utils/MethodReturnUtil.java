@@ -17,7 +17,7 @@ import com.github.jayuc.dbclient.err.SqlHandlerException;
 public class MethodReturnUtil {
 
 	@SuppressWarnings({ "unchecked" })
-	public static Map<String, Object> parse(Class<?> clazz, Object obj) 
+	public static Map<String, Object> parse(Class<?> clazz, final Object obj, final String sql) 
 			throws SqlHandlerException {
 		Map<String, Object> map = new HashMap<String, Object>();
 		final String field = "field";
@@ -38,7 +38,7 @@ public class MethodReturnUtil {
 				Map<String, Object> row = (Map<String, Object>) obj;
 				Set<String> keys = row.keySet();
 				int len = keys.size();
-				if(len > RedisConfig.MAX_LINE) {
+				if(shoudLimit(sql) && len > RedisConfig.MAX_LINE) {
 					len = RedisConfig.MAX_LINE;
 				}
 				int i = 0;
@@ -59,7 +59,7 @@ public class MethodReturnUtil {
 			}else if(Set.class == clazz) {
 				Set<String> row = (Set<String>) obj;
 				int len = row.size();
-				if(len > RedisConfig.MAX_LINE) {
+				if(shoudLimit(sql) && len > RedisConfig.MAX_LINE) {
 					len = RedisConfig.MAX_LINE;
 				}
 				int i = 0;
@@ -78,7 +78,7 @@ public class MethodReturnUtil {
 			}else if(List.class == clazz) {
 				List<String> row = (List<String>) obj;
 				int len = row.size();
-				if(len > RedisConfig.MAX_LINE) {
+				if(shoudLimit(sql) && len > RedisConfig.MAX_LINE) {
 					len = RedisConfig.MAX_LINE;
 				}
 				int i = 0;
@@ -102,6 +102,13 @@ public class MethodReturnUtil {
 			map.put("total", total);
 		}
 		return map;
+	}
+	
+	private static final boolean shoudLimit(String sql) {
+		if("getRedisAllKeys".equals(sql)) {
+			return false;
+		}
+		return true;
 	}
 	
 }

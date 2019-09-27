@@ -128,7 +128,7 @@ public class RedisSqlHandler implements ISqlHandler {
 				
 				Object methodResult = method.invoke(jedis, params);
 				LOG.info("methodResult: " + methodResult);
-				result = MethodReturnUtil.parse(methodReturnClass, methodResult);
+				result = MethodReturnUtil.parse(methodReturnClass, methodResult, sql);
 			}else {
 				throw new SqlHandlerException("方法名或参数不正确");
 			}
