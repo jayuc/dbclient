@@ -15,7 +15,7 @@ m_version=1.0.0
 if [ $1 ]; then
   m_version=$1
 else
-  echo "镜像版本号必填，第一个参数是镜像版本号"
+  echo "镜像版本号必填，第一个参数是项目版本号"
   exit 5
 fi
 
