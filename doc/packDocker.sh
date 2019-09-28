@@ -73,7 +73,7 @@ echo "setp 5/5: docker build"
 cp ../doc/Dockerfile ./target/
 cp ../doc/application.properties ./target/
 cd ./target/
-docker build -t "db/client:v${m_version}" .
-docker save "db/client:v${m_version}" -o "dbclient_v${m_version}.jar"
+docker build -t "db/client:${m_version}" .
+docker save "db/client:${m_version}" -o "dbclient_${m_version}.jar"
 
 echo "finshed."
