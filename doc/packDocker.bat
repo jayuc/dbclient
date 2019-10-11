@@ -70,8 +70,8 @@ call mvn clean package -Dmaven.test.skip=true
 @REM 构建docker镜像
 @REM 注意：DockerFile 中的版本号要配置和项目版本号一致
 echo setp 5/5: docker build
-copy /y ../doc/Dockerfile ./target/
-copy /y ../doc/application.properties ./target/
+copy /y ..\doc\Dockerfile .\target\
+copy /y ..\doc\application.properties .\target\
 cd ./target/
 call docker build -t db/client:%project_version% .
 call docker save db/client:%project_version% -o dbclient_%project_version%.jar
