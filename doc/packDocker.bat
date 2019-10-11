@@ -30,7 +30,7 @@ if exist ../%server_name%/pom.xml (
 	if exist %project_path%/%server_name%/pom.xml (
 		echo code already exists
 	) else (
-		git clone https://github.com/jayuc/%project_name%.git
+		call git clone https://github.com/jayuc/%project_name%.git
 	)
 )
 
@@ -44,25 +44,27 @@ if exist ./%front_name%/node_modules (
 ) else (
 	echo node modules is not exist, start npm install ...
 	cd ./%front_name%
-	npm install
+	call npm install
 	cd ../
 )
 
 echo start node build ...
-node ./%front_name%/build/build.js
+cd %front_name%
+call node ./build/build.js
+cd ../
 
 @REM step 3/5:
 @REM 配置
 echo setp 3/5: config
 copy /y .\doc\config.js .\%front_name%\dist\static\
 copy /y .\doc\application.properties .\%server_name%\src\main\resources\
-copy .\%front_name%\dist\*.* .\%server_name%\src\main\resources/static\ /s /e /y
+xcopy .\%front_name%\dist\*.* .\%server_name%\src\main\resources\static\ /s /e /y
 
 @REM setp 4/5:
 @REM 编译项目
 echo setp 4/5: mvn package
 cd %server_name%
-mvn clean package -Dmaven.test.skip=true
+call mvn clean package -Dmaven.test.skip=true
 
 @REM setp 5/5:
 @REM 构建docker镜像
@@ -71,8 +73,8 @@ echo setp 5/5: docker build
 copy /y ../doc/Dockerfile ./target/
 copy /y ../doc/application.properties ./target/
 cd ./target/
-docker build -t db/client:%project_version% .
-docker save db/client:%project_version% -o dbclient_%project_version%.jar
+call docker build -t db/client:%project_version% .
+call docker save db/client:%project_version% -o dbclient_%project_version%.jar
 
 echo "finshed."
 
