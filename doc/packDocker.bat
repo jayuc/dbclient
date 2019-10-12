@@ -30,7 +30,7 @@ if exist ../%server_name%/pom.xml (
 	if exist %project_path%/%server_name%/pom.xml (
 		echo code already exists
 	) else (
-		call git clone https://github.com/jayuc/%project_name%.git
+		git clone https://github.com/jayuc/%project_name%.git
 	)
 )
 
@@ -50,7 +50,7 @@ if exist ./%front_name%/node_modules (
 
 echo start node build ...
 cd %front_name%
-call node ./build/build.js
+node ./build/build.js
 cd ../
 
 @REM step 3/5:
