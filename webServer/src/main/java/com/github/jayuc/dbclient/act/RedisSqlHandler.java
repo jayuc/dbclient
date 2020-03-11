@@ -154,13 +154,25 @@ public class RedisSqlHandler implements ISqlHandler {
 		String[] sqlArr = sql.trim().split(" ");
 		pro.methodName = sqlArr[0].toLowerCase();
 		List<String> paramList = new ArrayList<String>();
+		StringBuilder sb = new StringBuilder();
 		for(int i=1; i<sqlArr.length; i++) {
 			if(sqlArr[i].length() > 0) {
 				paramList.add(sqlArr[i]);
 			}
+			if(i>2){
+				sb.append(sqlArr[i] + " ");
+			}
 		}
 		pro.paramNumber = paramList.size();
 		pro.paramList = paramList;
+		if(sql.startsWith("hset")){
+			pro.paramNumber = 3;
+			List<String> p = new ArrayList<>();
+			p.add(paramList.get(0));
+			p.add(paramList.get(1));
+			p.add(sb.toString());
+			pro.paramList = p;
+		}
 		LOG.debug("结束解析sql");
 		return pro;
 	}
