@@ -27,6 +27,16 @@ import redis.clients.jedis.Jedis;
 public class RedisSqlHandler implements ISqlHandler {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(RedisSqlHandler.class);
+
+	/**
+	 * redis 方法对应的参数个数, 例如， hset 参数个数是 3
+	 */
+	public static Map<String, Integer> METHOD_NAME_MAP = new HashMap<>();
+
+	static {
+		METHOD_NAME_MAP.put("hset", 3);
+		METHOD_NAME_MAP.put("set", 2);
+	}
 	
 	@Autowired
 	UserCacheData userCacheData;
@@ -154,22 +164,31 @@ public class RedisSqlHandler implements ISqlHandler {
 		String[] sqlArr = sql.trim().split(" ");
 		pro.methodName = sqlArr[0].toLowerCase();
 		List<String> paramList = new ArrayList<String>();
+
 		StringBuilder sb = new StringBuilder();
+		String methodName = pro.methodName;
+		int pn = 0;
+		int m_i = 0;
+		if(METHOD_NAME_MAP.containsKey(methodName)){
+			pn = METHOD_NAME_MAP.get(methodName);
+			m_i = pn - 1;
+		}
 		for(int i=1; i<sqlArr.length; i++) {
 			if(sqlArr[i].length() > 0) {
 				paramList.add(sqlArr[i]);
 			}
-			if(i>2){
+			if(m_i > 0 && i>m_i){
 				sb.append(sqlArr[i] + " ");
 			}
 		}
 		pro.paramNumber = paramList.size();
 		pro.paramList = paramList;
-		if(sql.startsWith("hset")){
-			pro.paramNumber = 3;
+		if(m_i > 0 && pn < pro.paramNumber){
+			pro.paramNumber = pn;
 			List<String> p = new ArrayList<>();
-			p.add(paramList.get(0));
-			p.add(paramList.get(1));
+			for(int i=0; i<m_i; i++){
+				p.add(paramList.get(i));
+			}
 			p.add(sb.toString());
 			pro.paramList = p;
 		}

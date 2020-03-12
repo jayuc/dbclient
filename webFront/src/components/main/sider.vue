@@ -10,19 +10,30 @@
     </div>
     <div class="main_asider_item_tree_">
       <div class="search_box">
-        <el-input 
-            v-model="searchText" 
+        <el-input
+            v-model="searchText"
             placeholder="搜索"
             size="mini"
             @change="searchTable"
         >
-          <el-button slot="append" 
-                     icon="el-icon-search" 
-                     style="width: 20px;margin: -10px -26px;"
+          <el-button slot="append"
+                     icon="el-icon-search"
+                     style="width: 20px;margin: -10px -27px;"
                      @click="searchTable"
                      title="回车键搜索"
           ></el-button>
         </el-input>
+      </div>
+      <div class="search_refresh">
+        <el-button icon="el-icon-refresh"
+                   size="mini"
+                   plain
+                   type="success"
+                   style="padding: 5px 7px;"
+                   title="刷新"
+                   @click="loadTableTree"
+                   :disabled="tableLoading"
+        ></el-button>
       </div>
       <el-tree :data="tableTree"
                node-key="id"
@@ -45,11 +56,13 @@
     import handler from './handler';
     import ResultUtil from '@/utils/ResultUtil';
     import loginHandler from '../login/handler';
+    import ElButton from "../../../node_modules/element-ui/packages/button/src/button.vue";
 
     // table 查询sql
     const tableSql = entity.tableSql;
 
     export default {
+      components: {ElButton},
       name: "main-sider",
       data(){
         // 连接
@@ -354,13 +367,24 @@
   .main_asider_item_tree_ .search_box{
     position: absolute;
     top: -2px;
-    left: 120px;
-    width: 160px;
+    left: 124px;
+    width: 140px;
     z-index: 2;
   }
   .main_asider_item_tree_ .search_box .el-input--mini .el-input__inner{
     height: 24px;
+    padding: 0px 5px;
     line-height: 24px;
     border: 1px solid #67C23A;
+  }
+  .main_asider_item_tree_ .search_box .el-input-group__append{
+    padding: 0 13px;
+  }
+  .main_asider_item_tree_ .search_refresh{
+    position: absolute;
+    top: -2px;
+    left: 270px;
+    width: 10px;
+    z-index: 2;
   }
 </style>
