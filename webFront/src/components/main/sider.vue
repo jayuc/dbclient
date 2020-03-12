@@ -117,14 +117,14 @@
         }
       },
       methods: {
-        searchTable(){
-          if(this.oldSerachText === this.searchText){
+        searchTable(refresh){
+          if(!refresh && this.oldSerachText === this.searchText){
             return;
           }
           let searchText = this.searchText;
-          // console.log(searchText);
+//           console.log(searchText);
           if(StringUtil.isBlank(searchText)){
-            // console.log(this.allTreeList);
+//             console.log(this.allTreeList);
             this.oldSerachText = searchText;
             this.addTableTreeArr(this.allTreeList);
             return;
@@ -137,7 +137,7 @@
               arr.push(item);
             }
           }
-          // console.log(arr);
+//           console.log(arr);
           this.oldSerachText = searchText;
           this.addTableTreeArr(arr);
         },
@@ -194,13 +194,15 @@
               let arr = handler.produceTables(data, that.currentDb);
               that.allTreeList = arr;
               that.tableTreeName = entity.tableNa[that.currentDb];
-              that.searchText = '';
-              that.oldSerachText = '';
+//              that.searchText = '';
+//              that.oldSerachText = '';
               that.tableTree = [{
                 id: 1,
                 label: entity.tableNa[that.currentDb],
                 children: arr
               }];
+              // 过滤查询条件
+              that.searchTable(true);
             }, that);
           }, () => {
             that.tableLoading = false;
